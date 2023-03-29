@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "+CNVi+AD2fNWmlFPbLLI7OUOd/CRD5Je7QtAcRc+N8UAs28KkYl4FOAqka7qHEhSGtIUMn0JU8U7kNIm+Ofq4Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\andriik\\Documents\\SFC_NEW\\services\\Identity\\src\\Core\\SFC.Identity.Domain\\SFC.Identity.Domain.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1803",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "You are running the 'restore' operation with an 'HTTP' source, 'http://ngt-tfs:8080/tfs/NeoGamesCollection/_packaging/NeoGamesNugetPackages/nuget/v3/index.json'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source."
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
+namespace SFC.Identity.Application.Common.Validators
+{
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class AtLeastOneRequiredAttribute : ValidationAttribute
+    {
+        private readonly string _field1;
+
+        private readonly string _field2;
+
+        public AtLeastOneRequiredAttribute(string field1, string field2) : base($"Either or both of '{field1}' and '{field2}' are required.")
+            => (_field1, _field2) = (field1, field2);
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            if (!TryGetProperty(_field1, validationContext, out PropertyInfo? property1))
+            {
+                return new ValidationResult($"Unknown property: '{_field1}'", new[] { _field1 });
+            }
+
+            if (!TryGetProperty(_field2, validationContext, out PropertyInfo? property2))
+            {
+                return new ValidationResult($"Unknown property: '{_field2}'", new[] { _field2 });
+            }
+
+            if (property1?.GetValue(validationContext.ObjectInstance) != null ||
+                property2?.GetValue(validationContext.ObjectInstance) != null)
+            {
+                return ValidationResult.Success;
+            }
+
+            return new ValidationResult(ErrorMessage, new[] { _field1, _field2 });
+        }
+
+        private static bool TryGetProperty(string fieldName, ValidationContext validateionContext, out PropertyInfo? propertyInfo)
+            => (propertyInfo = validateionContext.ObjectType.GetProperty(fieldName)) != null;
+    }
+}

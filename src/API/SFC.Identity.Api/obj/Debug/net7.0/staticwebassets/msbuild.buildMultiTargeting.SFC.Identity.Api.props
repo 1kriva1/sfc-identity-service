@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\SFC.Identity.Api.props" />
+</Project>

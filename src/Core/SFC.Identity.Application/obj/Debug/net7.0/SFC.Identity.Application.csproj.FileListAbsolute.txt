@@ -1,0 +1,12 @@
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\bin\Debug\net7.0\SFC.Identity.Application.deps.json
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\bin\Debug\net7.0\SFC.Identity.Application.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\bin\Debug\net7.0\SFC.Identity.Application.pdb
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.csproj.AssemblyReference.cache
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.AssemblyInfoInputs.cache
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.AssemblyInfo.cs
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.csproj.CoreCompileInputs.cache
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\refint\SFC.Identity.Application.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\SFC.Identity.Application.pdb
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Core\SFC.Identity.Application\obj\Debug\net7.0\ref\SFC.Identity.Application.dll

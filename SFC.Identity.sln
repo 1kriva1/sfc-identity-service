@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2C704F95-810B-42CA-987B-C711BF6C3456}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{91C4081C-7EC1-4082-B918-A87499FC4CBC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5665E84D-2C02-4F99-82B7-FF2B54A9EC19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Application", "src\Core\SFC.Identity.Application\SFC.Identity.Application.csproj", "{AF0357D5-CC47-4AC2-9227-1638CB940E23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{C8A24B9E-1A80-48A5-8423-1F39E9433804}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure", "src\Infrastructure\SFC.Identity.Infrastructure\SFC.Identity.Infrastructure.csproj", "{6F1AE249-F571-4553-8AC9-4A952410CFBA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{2F60C7FF-4DA4-497A-9DF7-276A9319677A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Api", "src\API\SFC.Identity.Api\SFC.Identity.Api.csproj", "{B596AE58-135F-4460-831B-D61D58F8181F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Persistence", "src\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj", "{2F5FE3F3-31DA-410A-876F-0C7FDB762D02}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF0357D5-CC47-4AC2-9227-1638CB940E23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF0357D5-CC47-4AC2-9227-1638CB940E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF0357D5-CC47-4AC2-9227-1638CB940E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF0357D5-CC47-4AC2-9227-1638CB940E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F1AE249-F571-4553-8AC9-4A952410CFBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F1AE249-F571-4553-8AC9-4A952410CFBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F1AE249-F571-4553-8AC9-4A952410CFBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F1AE249-F571-4553-8AC9-4A952410CFBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B596AE58-135F-4460-831B-D61D58F8181F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B596AE58-135F-4460-831B-D61D58F8181F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B596AE58-135F-4460-831B-D61D58F8181F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B596AE58-135F-4460-831B-D61D58F8181F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F5FE3F3-31DA-410A-876F-0C7FDB762D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5FE3F3-31DA-410A-876F-0C7FDB762D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5FE3F3-31DA-410A-876F-0C7FDB762D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5FE3F3-31DA-410A-876F-0C7FDB762D02}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5665E84D-2C02-4F99-82B7-FF2B54A9EC19} = {2C704F95-810B-42CA-987B-C711BF6C3456}
+		{AF0357D5-CC47-4AC2-9227-1638CB940E23} = {5665E84D-2C02-4F99-82B7-FF2B54A9EC19}
+		{C8A24B9E-1A80-48A5-8423-1F39E9433804} = {2C704F95-810B-42CA-987B-C711BF6C3456}
+		{6F1AE249-F571-4553-8AC9-4A952410CFBA} = {C8A24B9E-1A80-48A5-8423-1F39E9433804}
+		{2F60C7FF-4DA4-497A-9DF7-276A9319677A} = {2C704F95-810B-42CA-987B-C711BF6C3456}
+		{B596AE58-135F-4460-831B-D61D58F8181F} = {2F60C7FF-4DA4-497A-9DF7-276A9319677A}
+		{2F5FE3F3-31DA-410A-876F-0C7FDB762D02} = {C8A24B9E-1A80-48A5-8423-1F39E9433804}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9DADF67B-0150-48FA-B103-9460262A7AA4}
+	EndGlobalSection
+EndGlobal

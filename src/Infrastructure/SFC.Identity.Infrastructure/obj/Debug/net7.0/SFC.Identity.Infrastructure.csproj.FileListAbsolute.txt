@@ -1,0 +1,17 @@
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Infrastructure.deps.json
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Infrastructure.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Infrastructure.pdb
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Application.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Infrastructure.Persistence.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Application.pdb
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\bin\Debug\net7.0\SFC.Identity.Infrastructure.Persistence.pdb
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.AssemblyInfo.cs
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.csproj.CopyComplete
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\refint\SFC.Identity.Infrastructure.dll
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\SFC.Identity.Infrastructure.pdb
+C:\Users\andriik\Documents\SFC_NEW\services\Identity\src\Infrastructure\SFC.Identity.Infrastructure\obj\Debug\net7.0\ref\SFC.Identity.Infrastructure.dll

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "ODg9qJAeaFHn0Z47mvsmoHL6KUQOoP1vFUxBPnG8lQ8=",
+  "Source": "SFC.Identity.Api",
+  "BasePath": "_content/SFC.Identity.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
