@@ -23,6 +23,8 @@ namespace SFC.Identity.Api
                 options.AllowEmptyInputInBodyModelBinding = true;
             });
 
+            builder.Services.AddCors();
+
             builder.Services.AddControllers(config =>
             {
                 config.Filters.Add(new ValidationFilterAttribute());
@@ -44,6 +46,13 @@ namespace SFC.Identity.Api
 
         public static WebApplication ConfigurePipeline(this WebApplication app)
         {
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

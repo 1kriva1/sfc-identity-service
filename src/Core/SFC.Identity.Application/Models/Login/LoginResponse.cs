@@ -1,4 +1,5 @@
 ﻿using SFC.Identity.Application.Common.Models;
+using SFC.Identity.Application.Models.Tokens;
 
 namespace SFC.Identity.Application.Models.Login
 {
@@ -6,8 +7,6 @@ namespace SFC.Identity.Application.Models.Login
     {
         public Guid UserId { get; set; }
 
-        public string AccessToken { get; set; } = null!;
-
-        public string RefreshToken { get; set; } = null!;
+        public JwtToken Token { get; set; } = null!;
     }
 }

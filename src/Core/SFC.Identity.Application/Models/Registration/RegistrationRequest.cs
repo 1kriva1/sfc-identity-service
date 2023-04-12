@@ -20,5 +20,9 @@ namespace SFC.Identity.Application.Models.Registration
             "one uppercase ('A'-'Z'), " +
             "one lowercase ('a'-'z').")]
         public string Password { get; set; } = null!;
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string ConfirmPassword { get; set; } = null!;
     }
 }

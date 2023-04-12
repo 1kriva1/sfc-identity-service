@@ -35,7 +35,7 @@ namespace SFC.Identity.Infrastructure
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
             });
 
             services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));

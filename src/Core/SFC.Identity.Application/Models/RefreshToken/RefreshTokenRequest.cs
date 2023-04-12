@@ -1,13 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SFC.Identity.Application.Models.Tokens;
+using System.ComponentModel.DataAnnotations;
 
 namespace SFC.Identity.Application.Models.RefreshToken
 {
     public class RefreshTokenRequest
     {
         [Required]
-        public string AccessToken { get; set; } = null!;
-
-        [Required]
-        public string RefreshToken { get; set; } = null!;
+        public JwtToken Token { get; set; } = null!;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Models.Login;
@@ -60,7 +59,17 @@ namespace SFC.Identity.Infrastructure.Services
 
             if (result.Succeeded)
             {
-                return new RegistrationResponse { UserId = user.Id };
+                AccessToken token = await CreateTokenAsync(user);
+
+                return new RegistrationResponse
+                {
+                    UserId = user.Id,
+                    Token = new JwtToken
+                    {
+                        Access = token.Value,
+                        Refresh = token.RefreshToken.Value
+                    }
+                };
             }
             else
             {
@@ -101,47 +110,43 @@ namespace SFC.Identity.Infrastructure.Services
                 throw new AuthorizationException(AUTHORIZATION_ERROR_MESSAGE);
             }
 
-            IEnumerable<Claim> userClaims = await _userManager.GetClaimsAsync(user);
-
-            AccessToken token = _jwtService.CreateAccessToken(userClaims);
-
-            user.AccessToken = token;
-
-            await _userManager.UpdateAsync(user);
+            AccessToken token = await CreateTokenAsync(user);
 
             return new LoginResponse
             {
                 UserId = user.Id,
-                AccessToken = token.Value,
-                RefreshToken = token.RefreshToken.Value
+                Token = new JwtToken
+                {
+                    Access = token.Value,
+                    Refresh = token.RefreshToken.Value
+                }
             };
         }
 
         public async Task<RefreshTokenResponse> RefreshTokenAsync(RefreshTokenRequest request)
         {
-            ClaimsPrincipal principal = _jwtService.GetPrincipalFromExpiredToken(request.AccessToken)
-                ?? throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, (nameof(request.AccessToken), ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
+            ClaimsPrincipal principal = _jwtService.GetPrincipalFromExpiredToken(request.Token.Access)
+                ?? throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, (nameof(request.Token.Access), ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
 
             ApplicationUser user = await _userManager.FindByNameAsync(principal.Identity?.Name ?? string.Empty)
                 ?? throw new AuthorizationException("User not found or incorrect token.");
 
             if (user.AccessToken == null
-                || !user.AccessToken.RefreshToken.Value.Equals(request.RefreshToken, StringComparison.InvariantCultureIgnoreCase)
+                || !user.AccessToken.RefreshToken.Value.Equals(request.Token.Refresh, StringComparison.InvariantCultureIgnoreCase)
                 || user.AccessToken.RefreshToken.IsExpired)
             {
-                throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, (nameof(request.RefreshToken), ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
+                throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, (nameof(request.Token.Refresh), ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
             }
 
-            AccessToken token = _jwtService.CreateAccessToken(principal.Claims);
-
-            user.AccessToken = token;
-
-            await _userManager.UpdateAsync(user);
+            AccessToken token = await CreateTokenAsync(user);
 
             return new RefreshTokenResponse
             {
-                AccessToken = token.Value,
-                RefreshToken = token.RefreshToken.Value
+                Token = new JwtToken
+                {
+                    Access = token.Value,
+                    Refresh = token.RefreshToken.Value
+                }
             };
         }
 
@@ -157,6 +162,21 @@ namespace SFC.Identity.Infrastructure.Services
             await _userManager.UpdateAsync(user);
 
             return new LogoutResponse();
+        }
+
+        private async Task<AccessToken> CreateTokenAsync(ApplicationUser user)
+        {
+            IList<Claim> userClaims = await _userManager.GetClaimsAsync(user);
+
+            userClaims.Add(new Claim(ClaimTypes.Name, user.UserName ?? user.Email ?? string.Empty));
+
+            AccessToken token = _jwtService.CreateAccessToken(userClaims);
+
+            user.AccessToken = token;
+
+            await _userManager.UpdateAsync(user);
+
+            return token;
         }
     }
 }
