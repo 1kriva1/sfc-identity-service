@@ -37,4 +37,4 @@ msbuild.wrn
 .vs/
 
 # Tests coverage
-.test/coverage
+.tests/coverage
