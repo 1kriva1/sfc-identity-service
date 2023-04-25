@@ -36,7 +36,7 @@ namespace SFC.Identity.Infrastructure.Services
             {
                 if (await _userManager.FindByNameAsync(request.UserName) != null)
                 {
-                    throw new ConflictException($"User already exists.");
+                    throw new ConflictException("User already exists.");
                 }
             }
 
@@ -44,7 +44,7 @@ namespace SFC.Identity.Infrastructure.Services
             {
                 if (await _userManager.FindByEmailAsync(request.Email) != null)
                 {
-                    throw new ConflictException($"User already exists.");
+                    throw new ConflictException("User already exists.");
                 }
             }
 

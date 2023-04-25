@@ -22,7 +22,7 @@ namespace SFC.Identity.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ExistenceResponse>> CheckExistenceByUserName([FromRoute] string userName)
         {
-            ExistenceResponse response = await _existenceService.CheckByUserName(userName);
+            ExistenceResponse response = await _existenceService.CheckByUserNameAsync(userName);
 
             return Ok(response);
         }
@@ -32,7 +32,7 @@ namespace SFC.Identity.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ExistenceResponse>> CheckExistenceByEmail([FromRoute] string email)
         {
-            ExistenceResponse response = await _existenceService.CheckByEmail(email);
+            ExistenceResponse response = await _existenceService.CheckByEmailAsync(email);
 
             return Ok(response);
         }

@@ -1,14 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using SFC.Identity.Application.Common.Constants;
+using System.Text.Json.Serialization;
 
 namespace SFC.Identity.Application.Common.Models
 {
     [JsonDerivedType(typeof(BaseErrorResponse))]
     public class BaseResponse
-    {
+    {        
         public BaseResponse()
         {
             Success = true;
-            Message = "Success result.";
+            Message = CommonConstants.SUCCESS_MESSAGE;
         }
         public BaseResponse(string message)
         {
@@ -16,6 +17,7 @@ namespace SFC.Identity.Application.Common.Models
             Message = message;
         }
 
+        [JsonConstructor]
         public BaseResponse(string message, bool success)
         {
             Success = success;

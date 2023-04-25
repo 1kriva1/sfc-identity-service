@@ -49,7 +49,7 @@ namespace SFC.Identity.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<LogoutResponse>> Logout(LogoutRequest request)
+        public async Task<ActionResult<LogoutResponse>> LogoutAsync(LogoutRequest request)
         {
             LogoutResponse response = await _identityService.LogoutAsync(request);
 

@@ -14,14 +14,14 @@ namespace SFC.Identity.Infrastructure.Services
             _userManager = userManager;
         }
 
-        public async Task<ExistenceResponse> CheckByUserName(string userName)
+        public async Task<ExistenceResponse> CheckByUserNameAsync(string userName)
         {
             ApplicationUser? user = await _userManager.FindByNameAsync(userName);
 
             return new ExistenceResponse { Exist = user != null };
         }
 
-        public async Task<ExistenceResponse> CheckByEmail(string email)
+        public async Task<ExistenceResponse> CheckByEmailAsync(string email)
         {
             ApplicationUser? user = await _userManager.FindByEmailAsync(email);
 

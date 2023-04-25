@@ -8,14 +8,13 @@ namespace SFC.Identity.Infrastructure.Extensions
     {
         public static AccessToken CreateAccessToken(this IJwtService jwtService, IEnumerable<Claim> userClaims)
         {
-
-            AccessToken token = jwtService.GenerateToken(userClaims);
+            AccessToken accessToken = jwtService.GenerateAccessToken(userClaims);
 
             RefreshToken refreshToken = jwtService.GenerateRefreshToken();
 
-            token.RefreshToken = refreshToken;
+            accessToken.RefreshToken = refreshToken;
 
-            return token;
+            return accessToken;
         }
     }
 }

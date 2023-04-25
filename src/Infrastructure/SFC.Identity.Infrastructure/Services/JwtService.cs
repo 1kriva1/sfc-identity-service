@@ -21,7 +21,7 @@ namespace SFC.Identity.Infrastructure.Services
             _jwtSettings = jwtSettings.Value;
         }
 
-        public AccessToken GenerateToken(IEnumerable<Claim> authClaims)
+        public AccessToken GenerateAccessToken(IEnumerable<Claim> authClaims)
         {
             SymmetricSecurityKey symmetricSecurityKey = new(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
