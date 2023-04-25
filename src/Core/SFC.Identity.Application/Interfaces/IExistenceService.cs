@@ -4,8 +4,8 @@ namespace SFC.Identity.Application.Interfaces
 {
     public interface IExistenceService
     {
-        Task<ExistenceResponse> CheckByUserName(string userName);
+        Task<ExistenceResponse> CheckByUserNameAsync(string userName);
 
-        Task<ExistenceResponse> CheckByEmail(string email);
+        Task<ExistenceResponse> CheckByEmailAsync(string email);
     }
 }

@@ -6,6 +6,7 @@ namespace SFC.Identity.Application.Common.Models
     {
         public BaseErrorResponse() { }
 
+        [JsonConstructor]
         public BaseErrorResponse(string message, Dictionary<string, IEnumerable<string>> errors) : base(message, false)
         {
             Errors = errors;

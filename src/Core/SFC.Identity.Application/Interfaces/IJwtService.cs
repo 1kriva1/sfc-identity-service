@@ -5,7 +5,7 @@ namespace SFC.Identity.Application.Interfaces
 {
     public interface IJwtService
     {
-        AccessToken GenerateToken(IEnumerable<Claim> userClaims);
+        AccessToken GenerateAccessToken(IEnumerable<Claim> userClaims);
 
         RefreshToken GenerateRefreshToken();
 

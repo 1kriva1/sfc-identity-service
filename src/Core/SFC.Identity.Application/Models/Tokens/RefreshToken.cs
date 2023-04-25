@@ -2,7 +2,7 @@
 {
     public class RefreshToken
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; }
 
         public string Value { get; set; } = null!;
 

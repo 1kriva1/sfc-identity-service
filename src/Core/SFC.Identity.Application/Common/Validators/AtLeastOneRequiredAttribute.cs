@@ -25,8 +25,11 @@ namespace SFC.Identity.Application.Common.Validators
                 return new ValidationResult($"Unknown property: '{_field2}'", new[] { _field2 });
             }
 
-            if (property1?.GetValue(validationContext.ObjectInstance) != null ||
-                property2?.GetValue(validationContext.ObjectInstance) != null)
+            object? value1 = property1?.GetValue(validationContext.ObjectInstance);
+
+            object? value2 = property2?.GetValue(validationContext.ObjectInstance);
+
+            if (!string.IsNullOrEmpty(value1 as string) || !string.IsNullOrEmpty(value2 as string))
             {
                 return ValidationResult.Success;
             }
