@@ -22,7 +22,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
             // Arrange
             HttpClient client = _factory.CreateClient();
 
-            string userName = "IntegrationTestUser";
+            string userName = "IntegrationTestUser"; 
 
             // Act
             HttpResponseMessage response = await client.GetAsync($"/api/existence/name/{userName}");
