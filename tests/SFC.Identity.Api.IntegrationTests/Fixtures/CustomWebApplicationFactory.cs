@@ -35,6 +35,8 @@ namespace SFC.Identity.Api.IntegrationTests.Fixtures
 
                 ILogger logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
+                context.Database.EnsureDeleted();
+
                 context.Database.EnsureCreated();
 
                 try

@@ -1,3 +1,0 @@
-dotnet coverage collect dotnet test --output .\tests\coverage\code_coverage --output-format cobertura
-
-reportgenerator -reports:.\tests\coverage\code_coverage  -targetdir:".\tests\coverage\report" -reporttypes:Html -assemblyfilters:+SFC.Identity.Api;+SFC.Identity.Application;+SFC.Identity.Infrastructure;+SFC.Identity.Infrastructure.Persistence

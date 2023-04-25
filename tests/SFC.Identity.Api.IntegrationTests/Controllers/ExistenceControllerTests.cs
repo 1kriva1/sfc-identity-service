@@ -25,7 +25,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
             string userName = "IntegrationTestUser"; 
 
             // Act
-            HttpResponseMessage response = await client.GetAsync($"/api/existence/name/{userName}");
+            HttpResponseMessage response = await client.GetAsync($"/api/existence/name/{userName}"); 
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
