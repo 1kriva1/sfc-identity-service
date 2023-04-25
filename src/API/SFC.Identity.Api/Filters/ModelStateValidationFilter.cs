@@ -29,7 +29,7 @@ namespace SFC.Identity.Api.Filters
                 context.Result = new BadRequestObjectResult(result);
             }
 
-            return base.OnActionExecutionAsync(context, next);
+            return base.OnActionExecutionAsync(context, next); 
         }
     }
 }
