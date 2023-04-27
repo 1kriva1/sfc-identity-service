@@ -29,7 +29,7 @@ jobs:
     - name: Coverlet coverage test
       uses: b3b00/coverlet-action@1.2.5
       with:      
-        output: 'coverage.opencover'
+        output: '/home/runner/work/sfc-identity-service/sfc-identity-service/tests/coverage.opencover'
         outputFormat: opencover
         threshold: 5        
         debug: true
