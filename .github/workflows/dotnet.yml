@@ -29,7 +29,7 @@ jobs:
     - name: Coverlet coverage test
       uses: b3b00/coverlet-action@1.2.5
       with:
-        testProject: 'tests/SFC.Identity.Api.UnitTests/SFC.Identity.Api.UnitTests.csproj'
+        testProject: 'SFC.Identity.Api.UnitTests/SFC.Identity.Api.UnitTests.csproj'
         output: 'coverage.opencover'
         outputFormat: opencover
         threshold: 5        
