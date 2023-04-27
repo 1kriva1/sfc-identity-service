@@ -19,6 +19,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         public IdentityControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
+            _factory.InitializeDbForTests();
         }
 
         #region Registration        

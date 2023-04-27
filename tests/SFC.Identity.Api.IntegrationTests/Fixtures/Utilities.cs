@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
-using System.Diagnostics;
 
 namespace SFC.Identity.Api.IntegrationTests.Fixtures
 {
@@ -13,11 +12,8 @@ namespace SFC.Identity.Api.IntegrationTests.Fixtures
 
         public static void InitializeDbForTests(IdentityDbContext context)
         {
-            if (context.Users.Any(u => u.Id == USER_ID))
-            {
-                Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAA");
+            if (context.Users.Any(user => user.Id == USER_ID))
                 return;
-            }                
 
             context.Users.Add(new ApplicationUser
             {

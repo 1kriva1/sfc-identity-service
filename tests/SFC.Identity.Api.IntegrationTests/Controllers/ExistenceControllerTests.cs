@@ -14,6 +14,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         public ExistenceControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
+            _factory.InitializeDbForTests();
         }
 
         [Fact]
