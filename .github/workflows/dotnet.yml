@@ -29,8 +29,6 @@ jobs:
     - name: Coverlet coverage test
       uses: b3b00/coverlet-action@1.2.5
       with:
-        output: \coverage\code_coverage
         outputFormat: opencover
-        threshold: 5
-        thresholdStat: total
+        threshold: 5        
         debug: true
