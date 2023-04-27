@@ -29,6 +29,7 @@ jobs:
     - name: Coverlet coverage test
       uses: b3b00/coverlet-action@1.2.5
       with:
+        output: 'lcov.info'
         outputFormat: opencover
         threshold: 5        
         debug: true
