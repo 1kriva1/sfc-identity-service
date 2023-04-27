@@ -26,3 +26,11 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Coverlet coverage test
+      uses: b3b00/coverlet-action@1.2.5
+      with:
+        output: \coverage\code_coverage
+        outputFormat: opencover
+        threshold: 5
+        thresholdStat: total
+        debug: true
