@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SFC.Identity.Api.Filters;
 using SFC.Identity.Api.Middlewares;
 using SFC.Identity.Application;
+using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure;
 using SFC.Identity.Infrastructure.Persistence;
 
@@ -23,25 +24,38 @@ namespace SFC.Identity.Api
                 options.AllowEmptyInputInBodyModelBinding = true;
             });
 
+            builder.Services.AddLocalization(options => options.ResourcesPath = CommonConstants.RESOURCE_PATH);
+
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.SetDefaultCulture(CommonConstants.SUPPORTED_CULTURES[0])
+                    .AddSupportedCultures(CommonConstants.SUPPORTED_CULTURES)
+                    .AddSupportedUICultures(CommonConstants.SUPPORTED_CULTURES);
+            });
+
             builder.Services.AddCors();
 
             builder.Services.AddControllers(config =>
             {
                 config.Filters.Add(new ValidationFilterAttribute());
             })
-            .AddJsonOptions(o =>
+            .AddJsonOptions(configure =>
             {
-                o.JsonSerializerOptions.PropertyNamingPolicy = null;
-                o.JsonSerializerOptions.DictionaryKeyPolicy = null;
-                o.JsonSerializerOptions.WriteIndented = true;
+                configure.JsonSerializerOptions.PropertyNamingPolicy = null;
+                configure.JsonSerializerOptions.DictionaryKeyPolicy = null;
+                configure.JsonSerializerOptions.WriteIndented = true;
             })
             .ConfigureApiBehaviorOptions(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
+            })
+            .AddDataAnnotationsLocalization(options =>
+            {
+                options.DataAnnotationLocalizerProvider = (type, factory) =>
+                    factory.Create(typeof(Resources));
             });
 
             return builder.Build();
-
         }
 
         public static WebApplication ConfigurePipeline(this WebApplication app)
@@ -54,6 +68,8 @@ namespace SFC.Identity.Api
                 .AllowCredentials()); // allow credentials
 
             app.UseHttpsRedirection();
+
+            app.UseLocalization();
 
             app.UseAuthorization();
 

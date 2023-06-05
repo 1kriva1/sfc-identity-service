@@ -4,7 +4,7 @@ namespace SFC.Identity.Application.Models.Login
 {
     public class LogoutRequest
     {
-        [Required]
+        [Required(ErrorMessage = "UserIdRequired")]
         public string UserId { get; set; } = null!;
     }
 }

@@ -8,6 +8,7 @@ namespace SFC.Identity.Application.UnitTests
     public class ApplicationRegistrationTests
     {
         [Fact]
+        [Trait("Registration", "Servises")]
         public void ApplicationRegistration_Execute_ServicesAreRegistered()
         {
             // Arrange

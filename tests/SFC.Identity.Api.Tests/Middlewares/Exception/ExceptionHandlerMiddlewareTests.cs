@@ -12,6 +12,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
     public class ExceptionHandlerMiddlewareTests
     {
         [Fact]
+        [Trait("Exception", "ContentType")]
         public async Task ExceptionHandlerMiddleware_ContentType_ShouldHaveDefaultContentType()
         {
             // Arrange
@@ -29,6 +30,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "ContentType")]
         public async Task ExceptionHandlerMiddleware_ContentType_ShouldHaveDefinedContentType()
         {
             // Arrange
@@ -83,6 +85,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnConflict()
         {
             // Arrange
@@ -103,6 +106,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnBadRequest()
         {
             // Arrange
@@ -123,6 +127,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnBadRequestForIdentityException()
         {
             // Arrange
@@ -145,6 +150,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnNotFound()
         {
             // Arrange
@@ -165,6 +171,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnUnauthorized()
         {
             // Arrange
@@ -185,6 +192,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnForbidden()
         {
             // Arrange
@@ -205,6 +213,7 @@ namespace SFC.Identity.Api.Tests.Middlewares.Exception
         }
 
         [Fact]
+        [Trait("Exception", "With handling")]
         public async Task ExceptionHandlerMiddleware_WithException_ShouldReturnBadRequestForJwtException()
         {
             // Arrange

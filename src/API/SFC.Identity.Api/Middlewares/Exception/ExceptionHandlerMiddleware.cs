@@ -3,6 +3,7 @@ using SFC.Identity.Application.Common.Models;
 using System.Net;
 using System.Text.Json;
 using ExceptionType = System.Exception;
+using SFC.Identity.Application.Common.Constants;
 
 namespace SFC.Identity.Api.Middlewares.Exception
 {
@@ -49,7 +50,9 @@ namespace SFC.Identity.Api.Middlewares.Exception
 
             ExceptionResponse response = _exceptionHandlers.TryGetValue(exceptionType, out Handler? handler)
                 ? handler.Invoke(exception)
-                : new(HttpStatusCode.InternalServerError, new BaseResponse("Failed result.", false));
+                : new(HttpStatusCode.InternalServerError, new BaseResponse(
+                    Messages.FailedResult,
+                    false));
 
             context.Response.StatusCode = (int)response.StatusCode;
 

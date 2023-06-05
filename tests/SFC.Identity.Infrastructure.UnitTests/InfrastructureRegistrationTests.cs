@@ -28,6 +28,7 @@ namespace SFC.Identity.Infrastructure.UnitTests
         }
 
         [Fact]
+        [Trait("Registration", "Identity Services")]
         public void InfrastructureRegistration_Execute_IdentityServicesAreRegistered()
         {
             // Assert
@@ -39,6 +40,7 @@ namespace SFC.Identity.Infrastructure.UnitTests
         }
 
         [Fact]
+        [Trait("Registration", "Custom Services")]
         public void InfrastructureRegistration_Execute_CustomServicesAreRegistered()
         {
             // Assert

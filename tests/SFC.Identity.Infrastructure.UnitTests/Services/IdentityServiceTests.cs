@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Login;
@@ -18,6 +17,10 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 {
     public class IdentityServiceTests
     {
+        private const string SUCCESS_MESSAGE = "Success result.";
+        private const string VALIDATION_ERROR_MESSAGE = "Validation error.";
+        private const string INVALID_TOKEN_ERROR_MESSAGE = "Invalid token.";
+
         private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
 
         private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
@@ -51,6 +54,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         #region Registration
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task IdentityService_Register_ShouldReturnConflictExceptionIfUserAlreadyExistByUserName()
         {
             // Arrange
@@ -71,6 +75,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task IdentityService_Register_ShouldReturnConflictExceptionIfUserAlreadyExistByEmail()
         {
             // Arrange
@@ -91,6 +96,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task IdentityService_Register_ShouldReturnIdentityExceptionIfProcessNotSuccess()
         {
             // Arrange
@@ -116,11 +122,12 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(request));
-            Assert.Equal("Error occured during user registration process.", exception.Message);
+            Assert.Equal("Error occurred during user registration process.", exception.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> { { errorCode, new string[1] { errorDescription } } }, exception.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task IdentityService_Register_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -160,7 +167,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             Assert.True(response.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, response.Message);
+            Assert.Equal(SUCCESS_MESSAGE, response.Message);
             Assert.Equal(accessTokenValue, response.Token.Access);
             Assert.Equal(refreshTokenValue, response.Token.Refresh);
             Assert.Equal(userId, response.UserId);
@@ -172,6 +179,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         #region Login
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task IdentityService_Login_ShouldReturnAuthorizationExceptionIfUserNotFound()
         {
             // Arrange
@@ -194,6 +202,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task IdentityService_Login_ShouldReturnAuthorizationExceptionIfLoginFailed()
         {
             // Arrange
@@ -218,6 +227,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task IdentityService_Login_ShouldReturnForbiddenExceptionIfUserLockedIout()
         {
             // Arrange
@@ -242,6 +252,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task IdentityService_Login_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -279,7 +290,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             Assert.True(response.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, response.Message);
+            Assert.Equal(SUCCESS_MESSAGE, response.Message);
             Assert.Equal(accessTokenValue, response.Token.Access);
             Assert.Equal(refreshTokenValue, response.Token.Refresh);
             Assert.Equal(userId, response.UserId);
@@ -291,6 +302,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         #region Refresh token
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfPrincipalNotFound()
         {
             // Arrange
@@ -308,11 +320,12 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Access), new string[1] { ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
+            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Access), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task IdentityService_RefreshToken_ShouldReturnAuthorizationExceptionIfUserNotFound()
         {
             // Arrange
@@ -336,6 +349,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfUserHasNotAccessToken()
         {
             // Arrange
@@ -355,11 +369,12 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
+            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenNotEqualToRequestRefreshToken()
         {
             // Arrange
@@ -383,11 +398,12 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
+            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenExpired()
         {
             // Arrange
@@ -411,11 +427,12 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
+            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task IdentityService_RefreshToken_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -451,7 +468,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             Assert.True(response.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, response.Message);
+            Assert.Equal(SUCCESS_MESSAGE, response.Message);
             Assert.Equal(accessTokenValue, response.Token.Access);
             Assert.Equal(refreshTokenValue, response.Token.Refresh);
             _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
@@ -462,6 +479,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         #region Logout
 
         [Fact]
+        [Trait("Identity", "Logout")]
         public async Task IdentityService_Logout_ShouldReturnNotFoundExceptionIfUserNotFound()
         {
             // Arrange
@@ -480,6 +498,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Identity", "Logout")]
         public async Task IdentityService_Logout_ShouldReturnSuccessResult()
         {
             // Arrange
@@ -498,7 +517,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
 
             // Assert
             Assert.True(response.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, response.Message);
+            Assert.Equal(SUCCESS_MESSAGE, response.Message);
             Assert.Null(user.AccessToken);
             _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
             _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Once());

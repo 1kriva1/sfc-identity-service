@@ -1,5 +1,4 @@
 ﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
-using SFC.Identity.Application.Common.Constants;
 using System.Net;
 using Xunit;
 using System.Text.Json;
@@ -9,6 +8,8 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 {
     public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
+        private const string SUCCESS_MESSAGE = "Success result.";
+
         private readonly CustomWebApplicationFactory<Program> _factory;
 
         public ExistenceControllerTests(CustomWebApplicationFactory<Program> factory)
@@ -18,6 +19,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Existence", "CheckByUserName")]
         public async Task Existence_CheckByUserName_ShouldReturnUserExist()
         {
             // Arrange
@@ -37,11 +39,12 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<ExistenceResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.True(responseValue.Exist);
         }
 
         [Fact]
+        [Trait("Existence", "CheckByUserName")]
         public async Task Existence_CheckByUserName_ShouldReturnUserNotExist()
         {
             // Arrange
@@ -61,11 +64,12 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<ExistenceResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.False(responseValue.Exist);
         }
 
         [Fact]
+        [Trait("Existence", "CheckByEmail")]
         public async Task Existence_CheckByEmail_ShouldReturnUserExist()
         {
             // Arrange
@@ -85,11 +89,12 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<ExistenceResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.True(responseValue.Exist);
         }
 
         [Fact]
+        [Trait("Existence", "CheckByEmail")]
         public async Task Existence_CheckByEmail_ShouldReturnUserNotExist()
         {
             // Arrange
@@ -109,7 +114,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<ExistenceResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.False(responseValue.Exist);
         }
     }

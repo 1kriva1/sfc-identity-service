@@ -31,6 +31,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Jwt", "AccessToken")]
         public void JwtService_GenerateAccessToken_ShouldGenerateToken()
         {
             // Arrange
@@ -47,6 +48,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Jwt", "RefreshToken")]
         public void JwtService_GenerateRefreshToken_ShouldGenerateToken()
         {
             // Act
@@ -59,6 +61,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Jwt", "GetPrincipal")]
         public void JwtService_GetPrincipalFromExpiredToken_ShouldReturnPrincipal()
         {
             // Arrange
@@ -75,6 +78,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Jwt", "GetPrincipal")]
         public void JwtService_GetPrincipalFromExpiredToken_ShouldHaveDefinedClaims()
         {
             // Arrange
@@ -96,6 +100,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Jwt", "GetPrincipal")]
         public void JwtService_GetPrincipalFromExpiredToken_ShouldThrowSecurityTokenSignatureKeyNotFoundExceptionWhenTokenInvalid()
         {
             // Arrange
