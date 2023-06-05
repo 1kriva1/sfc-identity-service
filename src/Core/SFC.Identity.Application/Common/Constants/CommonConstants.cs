@@ -2,6 +2,8 @@
 {
     public static class CommonConstants
     {
-        public const string SUCCESS_MESSAGE = "Success result.";
+        public const string RESOURCE_PATH = "Resources";
+
+        public static readonly string[] SUPPORTED_CULTURES = { "en-GB", "ru-UA" };
     }
 }

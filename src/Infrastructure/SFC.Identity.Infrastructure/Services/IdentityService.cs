@@ -7,15 +7,13 @@ using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Infrastructure.Extensions;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Interfaces;
+using SFC.Identity.Application.Common.Constants;
 
 namespace SFC.Identity.Infrastructure.Services
 {
     public class IdentityService : IIdentityService
     {
-        private const string AUTHORIZATION_ERROR_MESSAGE = "User not found or incorrect password.";
-
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtService _jwtService;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -36,7 +34,7 @@ namespace SFC.Identity.Infrastructure.Services
             {
                 if (await _userManager.FindByNameAsync(request.UserName) != null)
                 {
-                    throw new ConflictException("User already exists.");
+                    throw new ConflictException(Messages.UserAlreadyExist);
                 }
             }
 
@@ -44,7 +42,7 @@ namespace SFC.Identity.Infrastructure.Services
             {
                 if (await _userManager.FindByEmailAsync(request.Email) != null)
                 {
-                    throw new ConflictException("User already exists.");
+                    throw new ConflictException(Messages.UserAlreadyExist);
                 }
             }
 
@@ -73,7 +71,7 @@ namespace SFC.Identity.Infrastructure.Services
             }
             else
             {
-                throw new IdentityException("Error occured during user registration process.",
+                throw new IdentityException(Messages.UserRegistrationError,
                     result.Errors.ToDictionary(e => e.Code, e => new List<string> { e.Description }.AsEnumerable()));
             }
         }
@@ -93,7 +91,7 @@ namespace SFC.Identity.Infrastructure.Services
 
             if (user == null)
             {
-                throw new AuthorizationException(AUTHORIZATION_ERROR_MESSAGE);
+                throw new AuthorizationException(Messages.AuthorizationError);
             }
 
             string username = (string.IsNullOrEmpty(request.UserName) ? request.Email : request.UserName) ?? string.Empty;
@@ -104,10 +102,10 @@ namespace SFC.Identity.Infrastructure.Services
             {
                 if (result.IsLockedOut)
                 {
-                    throw new ForbiddenException("User account locked out.");
+                    throw new ForbiddenException(Messages.AccountLocked);
                 }
 
-                throw new AuthorizationException(AUTHORIZATION_ERROR_MESSAGE);
+                throw new AuthorizationException(Messages.AuthorizationError);
             }
 
             AccessToken token = await CreateTokenAsync(user);
@@ -126,16 +124,18 @@ namespace SFC.Identity.Infrastructure.Services
         public async Task<RefreshTokenResponse> RefreshTokenAsync(RefreshTokenRequest request)
         {
             ClaimsPrincipal principal = _jwtService.GetPrincipalFromExpiredToken(request.Token.Access)
-                ?? throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, (nameof(request.Token.Access), ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
+                ?? throw new BadRequestException(Messages.ValidationError,
+                        (nameof(request.Token.Access), Messages.TokenInvalid));
 
             ApplicationUser user = await _userManager.FindByNameAsync(principal.Identity?.Name ?? string.Empty)
-                ?? throw new AuthorizationException("User not found or incorrect token.");
+                ?? throw new AuthorizationException(Messages.IncorrectTokenError);
 
             if (user.AccessToken == null
                 || !user.AccessToken.RefreshToken.Value.Equals(request.Token.Refresh, StringComparison.InvariantCultureIgnoreCase)
                 || user.AccessToken.RefreshToken.IsExpired)
             {
-                throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, (nameof(request.Token.Refresh), ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
+                throw new BadRequestException(Messages.ValidationError,
+                    (nameof(request.Token.Refresh), Messages.TokenInvalid));
             }
 
             AccessToken token = await CreateTokenAsync(user);
@@ -153,7 +153,7 @@ namespace SFC.Identity.Infrastructure.Services
         public async Task<LogoutResponse> LogoutAsync(LogoutRequest request)
         {
             ApplicationUser? user = await _userManager.FindByIdAsync(request.UserId)
-                ?? throw new NotFoundException("User not found.");
+                ?? throw new NotFoundException(Messages.UserNotFound);
 
             await _signInManager.SignOutAsync();
 

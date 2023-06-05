@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SFC.Identity.Application.Common.Constants;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace SFC.Identity.Application.Common.Validators
@@ -10,19 +11,21 @@ namespace SFC.Identity.Application.Common.Validators
 
         private readonly string _field2;
 
-        public AtLeastOneRequiredAttribute(string field1, string field2) : base($"Either or both of '{field1}' and '{field2}' are required.")
+        public AtLeastOneRequiredAttribute(string field1, string field2)
             => (_field1, _field2) = (field1, field2);
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
+            ErrorMessage = string.Format(Messages.AtLeastOneRequired, _field1, _field2);
+
             if (!TryGetProperty(_field1, validationContext, out PropertyInfo? property1))
             {
-                return new ValidationResult($"Unknown property: '{_field1}'", new[] { _field1 });
+                return new ValidationResult(string.Format(Messages.AtLeastOneRequiredUnknownProperty, _field1), new[] { _field1 });
             }
 
             if (!TryGetProperty(_field2, validationContext, out PropertyInfo? property2))
             {
-                return new ValidationResult($"Unknown property: '{_field2}'", new[] { _field2 });
+                return new ValidationResult(string.Format(Messages.AtLeastOneRequiredUnknownProperty, _field2), new[] { _field2 });
             }
 
             object? value1 = property1?.GetValue(validationContext.ObjectInstance);

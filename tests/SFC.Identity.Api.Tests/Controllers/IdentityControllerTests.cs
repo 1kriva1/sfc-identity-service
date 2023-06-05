@@ -1,18 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SFC.Identity.Api.Controllers;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Existence;
 using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Application.Models.Registration;
 using SFC.Identity.Application.Models.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SFC.Identity.Api.Tests.Controllers
@@ -30,6 +23,7 @@ namespace SFC.Identity.Api.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -58,6 +52,7 @@ namespace SFC.Identity.Api.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task Identity_Login_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -86,6 +81,7 @@ namespace SFC.Identity.Api.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Logout")]
         public async Task Identity_Logout_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -110,6 +106,7 @@ namespace SFC.Identity.Api.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task Identity_RefreshToken_ShouldReturnSuccessResponse()
         {
             // Arrange

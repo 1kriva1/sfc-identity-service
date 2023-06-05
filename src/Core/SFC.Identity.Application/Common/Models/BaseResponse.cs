@@ -9,7 +9,7 @@ namespace SFC.Identity.Application.Common.Models
         public BaseResponse()
         {
             Success = true;
-            Message = CommonConstants.SUCCESS_MESSAGE;
+            Message = Messages.SuccessResult;
         }
         public BaseResponse(string message)
         {

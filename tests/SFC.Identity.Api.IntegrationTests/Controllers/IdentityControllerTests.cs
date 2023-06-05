@@ -1,5 +1,4 @@
 ﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Models;
 using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.RefreshToken;
@@ -14,6 +13,9 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 {
     public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
+        private const string SUCCESS_MESSAGE = "Success result.";
+        private const string VALIDATION_ERROR_MESSAGE = "Validation error.";
+
         private readonly CustomWebApplicationFactory<Program> _factory;
 
         public IdentityControllerTests(CustomWebApplicationFactory<Program> factory)
@@ -25,6 +27,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         #region Registration        
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnValidationErrorForPasswordExistence()
         {
             // Arrange
@@ -46,7 +49,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(RegistrationRequest.Password), new string[1] { "The Password field is required." } },
                 { nameof(RegistrationRequest.ConfirmPassword), new string[1] { "The ConfirmPassword field is required." } }
@@ -54,6 +57,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnValidationErrorForPasswordValue()
         {
             // Arrange
@@ -75,7 +79,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(RegistrationRequest.Password), new string[1] { "Passwords must have at least 6 characters, " +
             "one non alphanumeric character, " +
             "one digit ('0'-'9'), " +
@@ -84,6 +88,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnValidationErrorForNotMatchedPasswords()
         {
             // Arrange
@@ -105,13 +110,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.ConfirmPassword), new string[1] { "'ConfirmPassword' and 'Password' do not match." } }
+                { nameof(RegistrationRequest.ConfirmPassword), new string[1] { "'Password' and 'Confirm password' do not match." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnValidationErrorForInvalidUserName()
         {
             // Arrange
@@ -133,13 +139,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.UserName), new string[1] { "The field UserName must match the regular expression '^[a-zA-Z0-9-._@+]+$'." } }
+                { nameof(RegistrationRequest.UserName), new string[1] { "User name can only have letters, numbers and special characters -._@+." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnValidationErrorForInvalidEmail()
         {
             // Arrange
@@ -161,13 +168,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(RegistrationRequest.Email), new string[1] { "The Email field is not a valid e-mail address." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnValidationErrorForMissingUserNameAndEmail()
         {
             // Arrange
@@ -189,7 +197,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(RegistrationRequest.UserName), new string[1] { "Either or both of 'Email' and 'UserName' are required." } },
                 { nameof(RegistrationRequest.Email), new string[1] { "Either or both of 'Email' and 'UserName' are required." } }
@@ -197,6 +205,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Register")]
         public async Task Identity_Register_ShouldReturnSuccessResult()
         {
             // Arrange
@@ -218,7 +227,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<RegistrationResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.True(responseValue.UserId != Guid.Empty);
             Assert.NotNull(responseValue.Token);
         }
@@ -228,6 +237,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         #region Login
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task Identity_Login_ShouldReturnValidationErrorForPasswordExistence()
         {
             // Arrange
@@ -249,13 +259,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(LoginRequest.Password), new string[1] { "The Password field is required." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task Identity_Login_ShouldReturnValidationErrorForInvalidEmail()
         {
             // Arrange
@@ -277,13 +288,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(LoginRequest.Email), new string[1] { "The Email field is not a valid e-mail address." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task Identity_Login_ShouldReturnValidationErrorForMissingUserNameAndEmail()
         {
             // Arrange
@@ -305,7 +317,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(LoginRequest.UserName), new string[1] { "Either or both of 'Email' and 'UserName' are required." } },
                 { nameof(LoginRequest.Email), new string[1] { "Either or both of 'Email' and 'UserName' are required." } }
@@ -313,6 +325,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task Identity_Login_ShouldNotLoginUser()
         {
             // Arrange
@@ -338,6 +351,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Login")]
         public async Task Identity_Login_ShouldLoginUser()
         {
             // Arrange
@@ -359,7 +373,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<LoginResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.Equal(Utilities.USER_ID, responseValue.UserId);
             Assert.NotNull(responseValue.Token);
         }
@@ -369,6 +383,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         #region Logout
 
         [Fact]
+        [Trait("Identity", "Logout")]
         public async Task Identity_Logout_ShouldReturnValidationErrorForUserIdExistence()
         {
             // Arrange
@@ -390,13 +405,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(LogoutRequest.UserId), new string[1] { "The UserId field is required." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "Logout")]
         public async Task Identity_Logout_ShouldNotLogoutUser()
         {
             // Arrange
@@ -422,6 +438,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         }
 
         [Fact]
+        [Trait("Identity", "Logout")]
         public async Task Identity_Logout_ShouldLogoutUser()
         {
             // Arrange
@@ -443,7 +460,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<LogoutResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
         }
 
         #endregion Logout
@@ -451,6 +468,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
         #region RefreshToken
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task Identity_RefreshToken_ShouldReturnValidationErrorForTokenExistence()
         {
             // Arrange
@@ -472,13 +490,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
                 { nameof(RefreshTokenRequest.Token), new string[1] { "The Token field is required." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task Identity_RefreshToken_ShouldNotRefreshToken()
         {
             // Arrange
@@ -507,13 +526,14 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<BaseErrorResponse>(responseValue);
             Assert.False(responseValue.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, responseValue.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RefreshTokenRequest.Token.Refresh), new string[1] { ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE } }
+                { nameof(RefreshTokenRequest.Token.Refresh), new string[1] { "Invalid token." } }
             }, responseValue.Errors);
         }
 
         [Fact]
+        [Trait("Identity", "RefreshToken")]
         public async Task Identity_RefreshToken_ShouldRefreshToken()
         {
             // Arrange
@@ -542,7 +562,7 @@ namespace SFC.Identity.Api.IntegrationTests.Controllers
 
             Assert.IsType<RefreshTokenResponse>(responseValue);
             Assert.True(responseValue.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, responseValue.Message);
+            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
             Assert.NotNull(responseValue.Token);
         }
 

@@ -21,6 +21,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Existence", "ByUserName")]
         public async Task ExistenceService_ByUserName_ShouldReturnPlayerExist()
         {
             // Arrange
@@ -36,6 +37,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Existence", "ByUserName")]
         public async Task ExistenceService_ByUserName_ShouldReturnPlayerNotExist()
         {
             // Arrange
@@ -51,6 +53,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Existence", "ByEmail")]
         public async Task ExistenceService_ByEmail_ShouldReturnPlayerExist()
         {
             // Arrange
@@ -66,6 +69,7 @@ namespace SFC.Identity.Infrastructure.UnitTests.Services
         }
 
         [Fact]
+        [Trait("Existence", "ByEmail")]
         public async Task ExistenceService_ByEmail_ShouldReturnPlayerNotExist()
         {
             // Arrange

@@ -76,7 +76,8 @@ namespace SFC.Identity.Infrastructure.Services
 
             if (securityToken is not JwtSecurityToken jwtSecurityToken
                 || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new BadRequestException(ErrorConstants.VALIDATION_ERROR_MESSAGE, ("AccessToken", ErrorConstants.INVALID_TOKEN_ERROR_MESSAGE));
+                throw new BadRequestException(Messages.ValidationError,
+                    ("AccessToken", Messages.TokenInvalid));
 
             return principal;
         }

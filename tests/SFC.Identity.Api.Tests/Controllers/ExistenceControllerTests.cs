@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SFC.Identity.Api.Controllers;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Existence;
 using Xunit;
@@ -10,17 +9,17 @@ namespace SFC.Identity.Api.Tests.Controllers
 {
     public class ExistenceControllerTests
     {
-        private readonly Mock<IExistenceService> _existenceServiceMock;
+        private readonly Mock<IExistenceService> _existenceServiceMock = new();
 
         private readonly ExistenceController _controller;
 
         public ExistenceControllerTests()
         {
-            _existenceServiceMock = new();
             _controller = new ExistenceController(_existenceServiceMock.Object);
         }
 
         [Fact]
+        [Trait("Existence", "CheckByUserName")]
         public async Task Existence_CheckByUserName_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -36,6 +35,7 @@ namespace SFC.Identity.Api.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Existence", "CheckByEmail")]
         public async Task Existence_CheckByEmail_ShouldReturnSuccessResponse()
         {
             // Arrange
@@ -59,7 +59,7 @@ namespace SFC.Identity.Api.Tests.Controllers
             ExistenceResponse response = Assert.IsType<ExistenceResponse>(objectResult.Value);
 
             Assert.True(response?.Success);
-            Assert.Equal(CommonConstants.SUCCESS_MESSAGE, response?.Message);
+            Assert.Equal("Success result.", response?.Message);
             Assert.True(response?.Exist);
         }
     }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SFC.Identity.Api.Filters;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Models;
 using Xunit;
 
@@ -11,6 +10,8 @@ namespace SFC.Identity.Api.Tests.Filters
 {
     public class ModelStateValidationFilterTests
     {
+        private const string VALIDATION_ERROR_MESSAGE = "Validation error.";
+
         [Fact]
         public async Task ValidationFilter_InvokeWithValidModelState_ShouldProcessRequest()
         {
@@ -51,7 +52,7 @@ namespace SFC.Identity.Api.Tests.Filters
             Assert.IsType<BaseErrorResponse>(result.Value);
             BaseErrorResponse? response = result.Value as BaseErrorResponse;
             Assert.False(response?.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, response?.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, response?.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> { { errorCode, new string[1] { "test_message" } } }, response?.Errors);
         }
 
@@ -67,7 +68,7 @@ namespace SFC.Identity.Api.Tests.Filters
             Assert.IsType<BaseErrorResponse>(result.Value);
             BaseErrorResponse? response = result.Value as BaseErrorResponse;
             Assert.False(response?.Success);
-            Assert.Equal(ErrorConstants.VALIDATION_ERROR_MESSAGE, response?.Message);
+            Assert.Equal(VALIDATION_ERROR_MESSAGE, response?.Message);
             Assert.Equal(new Dictionary<string, IEnumerable<string>> { { "Body", new string[1] { "Request body is required." } } }, response?.Errors);
         }
 

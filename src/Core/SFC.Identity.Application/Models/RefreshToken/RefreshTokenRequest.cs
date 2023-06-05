@@ -5,7 +5,7 @@ namespace SFC.Identity.Application.Models.RefreshToken
 {
     public class RefreshTokenRequest
     {
-        [Required]
+        [Required(ErrorMessage = "TokenRequired")]
         public JwtToken Token { get; set; } = null!;
     }
 }
