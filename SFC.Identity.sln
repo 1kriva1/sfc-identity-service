@@ -21,13 +21,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Api", "src\API
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Persistence", "src\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj", "{2F5FE3F3-31DA-410A-876F-0C7FDB762D02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Application.UnitTests", "tests\SFC.Identity.Application.UnitTests\SFC.Identity.Application.UnitTests.csproj", "{DD74EA9F-FA2E-4B75-A081-0A39F70C3623}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Application.UnitTests", "tests\SFC.Identity.Application.UnitTests\SFC.Identity.Application.UnitTests.csproj", "{DD74EA9F-FA2E-4B75-A081-0A39F70C3623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Infrastructure.UnitTests", "tests\SFC.Identity.Infrastructure.UnitTests\SFC.Identity.Infrastructure.UnitTests.csproj", "{95A8F806-1D7E-4203-8775-09B9E256D1B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.UnitTests", "tests\SFC.Identity.Infrastructure.UnitTests\SFC.Identity.Infrastructure.UnitTests.csproj", "{95A8F806-1D7E-4203-8775-09B9E256D1B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Api.UnitTests", "tests\SFC.Identity.Api.Tests\SFC.Identity.Api.UnitTests.csproj", "{8BA54D5A-3E32-4780-8607-56B76A015320}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Api.UnitTests", "tests\SFC.Identity.Api.Tests\SFC.Identity.Api.UnitTests.csproj", "{8BA54D5A-3E32-4780-8607-56B76A015320}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Api.IntegrationTests", "tests\SFC.Identity.Api.IntegrationTests\SFC.Identity.Api.IntegrationTests.csproj", "{2FE72008-6897-4712-AE6D-9C60C9FE1D07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Api.IntegrationTests", "tests\SFC.Identity.Api.IntegrationTests\SFC.Identity.Api.IntegrationTests.csproj", "{2FE72008-6897-4712-AE6D-9C60C9FE1D07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4328AA1E-3BA9-493A-A2E4-D0A883767F4E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Contracts", "src\Infrastructure\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Infrastructure.Contracts.csproj", "{988798D1-5CE7-4615-8692-6F21CC07530E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Infrastructure.Persistence.UnitTests", "tests\SFC.Identity.Infrastructure.Persistence.UnitTests\SFC.Identity.Infrastructure.Persistence.UnitTests.csproj", "{95B9929D-147E-4096-8A32-95EB88CF9268}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +78,14 @@ Global
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{988798D1-5CE7-4615-8692-6F21CC07530E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{988798D1-5CE7-4615-8692-6F21CC07530E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{988798D1-5CE7-4615-8692-6F21CC07530E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{988798D1-5CE7-4615-8692-6F21CC07530E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95B9929D-147E-4096-8A32-95EB88CF9268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B9929D-147E-4096-8A32-95EB88CF9268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95B9929D-147E-4096-8A32-95EB88CF9268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95B9929D-147E-4096-8A32-95EB88CF9268}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +102,8 @@ Global
 		{95A8F806-1D7E-4203-8775-09B9E256D1B6} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{8BA54D5A-3E32-4780-8607-56B76A015320} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
+		{988798D1-5CE7-4615-8692-6F21CC07530E} = {C8A24B9E-1A80-48A5-8423-1F39E9433804}
+		{95B9929D-147E-4096-8A32-95EB88CF9268} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DADF67B-0150-48FA-B103-9460262A7AA4}

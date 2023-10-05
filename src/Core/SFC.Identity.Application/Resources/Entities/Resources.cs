@@ -1,4 +1,3 @@
-﻿namespace SFC.Identity.Application
-{
-    public class Resources { }
-}
+﻿namespace SFC.Identity.Application;
+
+public class Resources { }

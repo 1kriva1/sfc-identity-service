@@ -1,14 +1,13 @@
 ﻿using SFC.Identity.Application.Models.Tokens;
 using System.Security.Claims;
 
-namespace SFC.Identity.Application.Interfaces
+namespace SFC.Identity.Application.Interfaces;
+
+public interface IJwtService
 {
-    public interface IJwtService
-    {
-        AccessToken GenerateAccessToken(IEnumerable<Claim> userClaims);
+    AccessToken GenerateAccessToken(IEnumerable<Claim> userClaims);
 
-        RefreshToken GenerateRefreshToken();
+    RefreshToken GenerateRefreshToken();
 
-        ClaimsPrincipal? GetPrincipalFromExpiredToken(string accessToken);
-    }
+    ClaimsPrincipal? GetPrincipalFromExpiredToken(string accessToken);
 }

@@ -1,7 +1,6 @@
-﻿namespace SFC.Identity.Application.Common.Constants
+﻿namespace SFC.Identity.Application.Common.Constants;
+
+public static class DbConstants
 {
-    public static class DbConstants
-    {
-        public const string DEFAULT_SCHEMA_NAME = "Identity";
-    }
+    public const string DEFAULT_SCHEMA_NAME = "Identity";
 }

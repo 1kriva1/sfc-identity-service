@@ -18,7 +18,7 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Identity")
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -272,24 +272,6 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("Users", "Identity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("b0788d2f-8003-43c1-92a4-edc76a7c5dde"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "52465a7a-c253-472d-b6a0-25053d0f7aca",
-                            Email = "testemail@mail.com",
-                            EmailConfirmed = true,
-                            LockoutEnabled = true,
-                            NormalizedEmail = "TESTEMAIL@MAIL.COM",
-                            NormalizedUserName = "TESTUSER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ5i2nPk7V5SLw1roFHjY6w4c56+h0OJeUe0h8H58OjUDA9kxXtpUF9rbArAPqqXiw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "4c33c3eb-df7b-4304-822f-57ccb4cc3f78",
-                            TwoFactorEnabled = false,
-                            UserName = "TestUser"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

@@ -1,17 +1,16 @@
-﻿namespace SFC.Identity.Application.Models.Tokens
+﻿namespace SFC.Identity.Application.Models.Tokens;
+
+public class AccessToken
 {
-    public class AccessToken
-    {
-        public Guid Id { get; }
+    public Guid Id { get; }
 
-        public string Value { get; set; } = null!;
+    public string Value { get; set; } = null!;
 
-        public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 
-        public DateTime ExpiresDate { get; set; }
+    public DateTime ExpiresDate { get; set; }
 
-        public Guid UserForeignKey { get; set; }
+    public Guid UserForeignKey { get; set; }
 
-        public RefreshToken RefreshToken { get; set; } = null!;        
-    }
+    public RefreshToken RefreshToken { get; set; } = null!;        
 }

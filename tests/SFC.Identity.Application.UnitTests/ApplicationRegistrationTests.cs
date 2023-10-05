@@ -3,24 +3,23 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace SFC.Identity.Application.UnitTests
+namespace SFC.Identity.Application.UnitTests;
+
+public class ApplicationRegistrationTests
 {
-    public class ApplicationRegistrationTests
+    [Fact]
+    [Trait("Registration", "Servises")]
+    public void ApplicationRegistration_Execute_ServicesAreRegistered()
     {
-        [Fact]
-        [Trait("Registration", "Servises")]
-        public void ApplicationRegistration_Execute_ServicesAreRegistered()
-        {
-            // Arrange
-            ServiceCollection serviceCollection = new();
+        // Arrange
+        ServiceCollection serviceCollection = new();
 
-            // Act
-            serviceCollection.AddApplicationServices();
-            ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+        // Act
+        serviceCollection.AddApplicationServices();
+        ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-            // Assert
-            Assert.NotNull(serviceProvider.GetService<IMediator>());
-            Assert.NotNull(serviceProvider.GetService<IMapper>());
-        }
+        // Assert
+        Assert.NotNull(serviceProvider.GetService<IMediator>());
+        Assert.NotNull(serviceProvider.GetService<IMapper>());
     }
 }

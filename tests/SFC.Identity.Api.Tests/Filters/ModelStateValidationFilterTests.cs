@@ -3,102 +3,115 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SFC.Identity.Api.Filters;
+using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Models;
 using Xunit;
 
-namespace SFC.Identity.Api.Tests.Filters
+namespace SFC.Identity.Api.Tests.Filters;
+
+public class ModelStateValidationFilterTests
 {
-    public class ModelStateValidationFilterTests
+    [Fact]
+    [Trait("API", "Filter")]
+    public async Task API_Filter_Validation_ShouldProcessRequest()
     {
-        private const string VALIDATION_ERROR_MESSAGE = "Validation error.";
+        // Arrange 
+        ValidationFilterAttribute filter = new();
 
-        [Fact]
-        public async Task ValidationFilter_InvokeWithValidModelState_ShouldProcessRequest()
-        {
-            // Arrange 
-            ValidationFilterAttribute filter = new();
+        DefaultHttpContext httpContext = new();
 
-            DefaultHttpContext httpContext = new();
+        ActionContext actionContext = new(httpContext, new(), new(), new());
 
-            ActionContext actionContext = new(httpContext, new(), new(), new());
+        ActionExecutingContext actionExecutingContext = new(actionContext,
+            new List<IFilterMetadata>(),
+            new Dictionary<string, object?>(), null!);
 
-            ActionExecutingContext actionExecutingContext = new(actionContext,
-                new List<IFilterMetadata>(),
-                new Dictionary<string, object?>(), null!);
+        ActionExecutedContext actionExecutedContext = new(actionContext, new List<IFilterMetadata>(), null!);
 
-            ActionExecutedContext actionExecutedContext = new(actionContext, new List<IFilterMetadata>(), null!);
+        Task<ActionExecutedContext> next() => Task.FromResult(actionExecutedContext);
 
-            Task<ActionExecutedContext> next() => Task.FromResult(actionExecutedContext);
+        // Act
+        await filter.OnActionExecutionAsync(actionExecutingContext, next);
 
-            // Act
-            await filter.OnActionExecutionAsync(actionExecutingContext, next);
+        // Assert
+        Assert.Null(actionExecutingContext.Result);
+    }
 
-            // Assert
-            Assert.Null(actionExecutingContext.Result);
-        }
+    [Fact]
+    [Trait("API", "Filter")]
+    public async Task API_Filter_Validation_ShouldReturnBadRequestResult()
+    {
+        // Arrange 
+        string errorCode = "test_code";
 
-        [Fact]
-        public async Task ValidationFilter_InvokeWithInvalidModelState_ShouldReturnBadRequestResult()
-        {
-            // Arrange 
-            string errorCode = "test_code";
+        // Act
+        ActionExecutingContext context = await ExecuteActionFilterAsync(errorCode);
 
-            // Act
-            ActionExecutingContext context = await ExecuteActionFilterAsync(errorCode);
+        // Assert
+        BadRequestObjectResult result = Assert.IsType<BadRequestObjectResult>(context.Result);
 
-            // Assert
-            BadRequestObjectResult result = Assert.IsType<BadRequestObjectResult>(context.Result);
-            Assert.NotNull(result.Value);
-            Assert.IsType<BaseErrorResponse>(result.Value);
-            BaseErrorResponse? response = result.Value as BaseErrorResponse;
-            Assert.False(response?.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, response?.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { errorCode, new string[1] { "test_message" } } }, response?.Errors);
-        }
+        Assert.NotNull(result.Value);
+        Assert.IsType<BaseErrorResponse>(result.Value);
 
-        [Fact]
-        public async Task ValidationFilter_InvokeWithInvalidModelState_ShouldReturnBadRequestResultForEmptyBody()
-        {
-            // Act
-            ActionExecutingContext context = await ExecuteActionFilterAsync(string.Empty);
+        BaseErrorResponse? response = result.Value as BaseErrorResponse;
 
-            // Assert
-            BadRequestObjectResult result = Assert.IsType<BadRequestObjectResult>(context.Result);
-            Assert.NotNull(result.Value);
-            Assert.IsType<BaseErrorResponse>(result.Value);
-            BaseErrorResponse? response = result.Value as BaseErrorResponse;
-            Assert.False(response?.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, response?.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { "Body", new string[1] { "Request body is required." } } }, response?.Errors);
-        }
+        Assert.False(response?.Success);
+        Assert.Equal(Messages.ValidationError, response?.Message);
+        Assert.NotNull(response!.Errors);
+        Assert.True(response.Errors.ContainsKey(errorCode));
+        Assert.Single(response.Errors[errorCode]);
+        Assert.Equal("test_message", response.Errors[errorCode].FirstOrDefault());
+    }
 
-        private async Task<ActionExecutingContext> ExecuteActionFilterAsync(string errorCode)
-        {
-            // Arrange 
-            ValidationFilterAttribute filter = new();
+    [Fact]
+    [Trait("API", "Filter")]
+    public async Task API_Filter_Validation_ShouldReturnBadRequestResultForEmptyBody()
+    {
+        // Act
+        ActionExecutingContext context = await ExecuteActionFilterAsync(string.Empty);
 
-            DefaultHttpContext httpContext = new();
+        // Assert
+        BadRequestObjectResult result = Assert.IsType<BadRequestObjectResult>(context.Result);
 
-            string errorMessage = "test_message";
-            ModelStateDictionary modelState = new();
-            modelState.AddModelError(errorCode, errorMessage);
+        Assert.NotNull(result.Value);
+        Assert.IsType<BaseErrorResponse>(result.Value);
 
-            ActionContext actionContext = new(httpContext, new(), new(), modelState);
+        BaseErrorResponse? response = result.Value as BaseErrorResponse;
 
-            List<IFilterMetadata> filterMetadata = new();
+        Assert.False(response?.Success);
+        Assert.Equal(Messages.ValidationError, response?.Message);
+        Assert.NotNull(response!.Errors);
+        Assert.True(response.Errors.ContainsKey("Body"));
+        Assert.Single(response.Errors["Body"]);
+        Assert.Equal(Messages.RequestBodyRequired, response.Errors["Body"].FirstOrDefault());
+    }
 
-            ActionExecutingContext actionExecutingContext = new(actionContext,
-                filterMetadata,
-                new Dictionary<string, object?>(), null!);
+    private async Task<ActionExecutingContext> ExecuteActionFilterAsync(string errorCode)
+    {
+        // Arrange 
+        ValidationFilterAttribute filter = new();
 
-            ActionExecutedContext actionExecutedContext = new(actionContext, filterMetadata, null!);
+        DefaultHttpContext httpContext = new();
 
-            Task<ActionExecutedContext> next() => Task.FromResult(actionExecutedContext);
+        string errorMessage = "test_message";
+        ModelStateDictionary modelState = new();
+        modelState.AddModelError(errorCode, errorMessage);
 
-            // Act
-            await filter.OnActionExecutionAsync(actionExecutingContext, next);
+        ActionContext actionContext = new(httpContext, new(), new(), modelState);
 
-            return actionExecutingContext;
-        }
+        List<IFilterMetadata> filterMetadata = new();
+
+        ActionExecutingContext actionExecutingContext = new(actionContext,
+            filterMetadata,
+            new Dictionary<string, object?>(), null!);
+
+        ActionExecutedContext actionExecutedContext = new(actionContext, filterMetadata, null!);
+
+        Task<ActionExecutedContext> Next() => Task.FromResult(actionExecutedContext);
+
+        // Act
+        await filter.OnActionExecutionAsync(actionExecutingContext, Next);
+
+        return actionExecutingContext;
     }
 }

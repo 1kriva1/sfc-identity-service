@@ -218,12 +218,6 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                schema: "Identity",
-                table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { new Guid("b0788d2f-8003-43c1-92a4-edc76a7c5dde"), 0, "52465a7a-c253-472d-b6a0-25053d0f7aca", "testemail@mail.com", true, true, null, "TESTEMAIL@MAIL.COM", "TESTUSER", "AQAAAAIAAYagAAAAEJ5i2nPk7V5SLw1roFHjY6w4c56+h0OJeUe0h8H58OjUDA9kxXtpUF9rbArAPqqXiw==", null, false, "4c33c3eb-df7b-4304-822f-57ccb4cc3f78", false, "TestUser" });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AccessTokens_UserForeignKey",
                 schema: "Identity",

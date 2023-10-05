@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SFC.Identity.Application.Models.Login
+namespace SFC.Identity.Application.Models.Login;
+
+public class LogoutRequest
 {
-    public class LogoutRequest
-    {
-        [Required(ErrorMessage = "UserIdRequired")]
-        public string UserId { get; set; } = null!;
-    }
+    [Required(ErrorMessage = "UserIdRequired")]
+    public string UserId { get; set; } = null!;
 }

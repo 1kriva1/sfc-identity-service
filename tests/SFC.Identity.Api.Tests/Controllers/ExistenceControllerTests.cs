@@ -1,66 +1,66 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SFC.Identity.Api.Controllers;
+using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Existence;
 using Xunit;
 
-namespace SFC.Identity.Api.Tests.Controllers
+namespace SFC.Identity.Api.Tests.Controllers;
+
+public class ExistenceControllerTests
 {
-    public class ExistenceControllerTests
+    private readonly Mock<IExistenceService> _existenceServiceMock = new();
+
+    private readonly ExistenceController _controller;
+
+    public ExistenceControllerTests()
     {
-        private readonly Mock<IExistenceService> _existenceServiceMock = new();
+        _controller = new ExistenceController(_existenceServiceMock.Object);
+    }
 
-        private readonly ExistenceController _controller;
+    [Fact]
+    [Trait("API", "Controller")]
+    public async Task API_Controller_Existence_CheckByUserName_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        string userName = "username";
 
-        public ExistenceControllerTests()
-        {
-            _controller = new ExistenceController(_existenceServiceMock.Object);
-        }
+        _existenceServiceMock.Setup(es => es.CheckByUserNameAsync(userName)).ReturnsAsync(new ExistenceResponse { Exist = true });
 
-        [Fact]
-        [Trait("Existence", "CheckByUserName")]
-        public async Task Existence_CheckByUserName_ShouldReturnSuccessResponse()
-        {
-            // Arrange
-            string userName = "username";
+        // Act
+        ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByUserNameAsync(userName);
 
-            _existenceServiceMock.Setup(es => es.CheckByUserNameAsync(userName)).ReturnsAsync(new ExistenceResponse { Exist = true });
+        // Assert
+        AssertResponse(result);
+    }
 
-            // Act
-            ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByUserName(userName);
+    [Fact]
+    [Trait("API", "Controller")]
+    public async Task API_Controller_Existence_CheckByEmail_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        string email = "email@mail.com";
 
-            // Assert
-            AssertResponse(result);
-        }
+        _existenceServiceMock.Setup(es => es.CheckByEmailAsync(email)).ReturnsAsync(new ExistenceResponse { Exist = true });
 
-        [Fact]
-        [Trait("Existence", "CheckByEmail")]
-        public async Task Existence_CheckByEmail_ShouldReturnSuccessResponse()
-        {
-            // Arrange
-            string email = "email@mail.com";
+        // Act
+        ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByEmailAsync(email);
 
-            _existenceServiceMock.Setup(es => es.CheckByEmailAsync(email)).ReturnsAsync(new ExistenceResponse { Exist = true });
+        // Assert
+        AssertResponse(result);
+    }
 
-            // Act
-            ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByEmail(email);
+    private static void AssertResponse(ActionResult<ExistenceResponse> result)
+    {
+        ActionResult<ExistenceResponse> actionResult = Assert.IsType<ActionResult<ExistenceResponse>>(result);
 
-            // Assert
-            AssertResponse(result);
-        }
+        OkObjectResult? objectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
 
-        private static void AssertResponse(ActionResult<ExistenceResponse> result)
-        {
-            ActionResult<ExistenceResponse> actionResult = Assert.IsType<ActionResult<ExistenceResponse>>(result);
+        ExistenceResponse response = Assert.IsType<ExistenceResponse>(objectResult.Value);
 
-            OkObjectResult? objectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-
-            ExistenceResponse response = Assert.IsType<ExistenceResponse>(objectResult.Value);
-
-            Assert.True(response?.Success);
-            Assert.Equal("Success result.", response?.Message);
-            Assert.True(response?.Exist);
-        }
+        Assert.True(response?.Success);
+        Assert.Equal(Messages.SuccessResult, response?.Message);
+        Assert.True(response?.Exist);
     }
 }

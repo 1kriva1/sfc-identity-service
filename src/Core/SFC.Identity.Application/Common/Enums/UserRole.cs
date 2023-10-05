@@ -1,8 +1,7 @@
-﻿namespace SFC.Identity.Application.Common.Enums
+﻿namespace SFC.Identity.Application.Common.Enums;
+
+public enum UserRole
 {
-    public enum UserRole
-    {
-        Admin,
-        User
-    }
+    Admin,
+    User
 }

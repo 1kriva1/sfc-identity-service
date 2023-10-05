@@ -3,29 +3,21 @@ using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Existence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 
-namespace SFC.Identity.Infrastructure.Services
+namespace SFC.Identity.Infrastructure.Services;
+
+public record ExistenceService(UserManager<ApplicationUser> UserManager) : IExistenceService
 {
-    public class ExistenceService : IExistenceService
+    public async Task<ExistenceResponse> CheckByUserNameAsync(string userName)
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        ApplicationUser? user = await UserManager.FindByNameAsync(userName);
 
-        public ExistenceService(UserManager<ApplicationUser> userManager)
-        {
-            _userManager = userManager;
-        }
+        return new ExistenceResponse { Exist = user != null };
+    }
 
-        public async Task<ExistenceResponse> CheckByUserNameAsync(string userName)
-        {
-            ApplicationUser? user = await _userManager.FindByNameAsync(userName);
+    public async Task<ExistenceResponse> CheckByEmailAsync(string email)
+    {
+        ApplicationUser? user = await UserManager.FindByEmailAsync(email);
 
-            return new ExistenceResponse { Exist = user != null };
-        }
-
-        public async Task<ExistenceResponse> CheckByEmailAsync(string email)
-        {
-            ApplicationUser? user = await _userManager.FindByEmailAsync(email);
-
-            return new ExistenceResponse { Exist = user != null };
-        }
+        return new ExistenceResponse { Exist = user != null };
     }
 }
