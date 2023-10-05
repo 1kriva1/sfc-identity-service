@@ -154,7 +154,7 @@
     <value>Потрібне тіло запиту.</value>
   </data>
   <data name="SuccessResult" xml:space="preserve">
-    <value>Успішний результат</value>
+    <value>Успішний результат.</value>
   </data>
   <data name="TokenInvalid" xml:space="preserve">
     <value>Невалідний токен.</value>

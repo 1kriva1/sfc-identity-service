@@ -1,571 +1,711 @@
 ﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
+using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Models;
 using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Application.Models.Registration;
 using SFC.Identity.Application.Models.Tokens;
+
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+
 using Xunit;
 
-namespace SFC.Identity.Api.IntegrationTests.Controllers
+namespace SFC.Identity.Api.IntegrationTests.Controllers;
+
+public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
-    public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
+    private readonly CustomWebApplicationFactory<Program> _factory;
+
+    public IdentityControllerTests(CustomWebApplicationFactory<Program> factory)
     {
-        private const string SUCCESS_MESSAGE = "Success result.";
-        private const string VALIDATION_ERROR_MESSAGE = "Validation error.";
+        _factory = factory;
+        _factory.InitializeDbForTests();
+    }
 
-        private readonly CustomWebApplicationFactory<Program> _factory;
+    #region Registration        
 
-        public IdentityControllerTests(CustomWebApplicationFactory<Program> factory)
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnValidationErrorForPasswordExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = null, Email = null, Password = null!, ConfirmPassword = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.ConfirmPassword)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.ConfirmPassword)]);
+        Assert.Equal("The ConfirmPassword field is required.", responseValue.Errors[nameof(RegistrationRequest.ConfirmPassword)].FirstOrDefault());
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Password)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Password)]);
+        Assert.Equal("The Password field is required.", responseValue.Errors[nameof(RegistrationRequest.Password)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnValidationErrorForPasswordValue()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = null, Email = null, Password = "pass", ConfirmPassword = "pass" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Password)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Password)]);
+        Assert.Equal("Passwords must have at least 6 characters, " +
+        "one non alphanumeric character, " +
+        "one digit ('0'-'9'), " +
+        "one uppercase ('A'-'Z'), " +
+        "one lowercase ('a'-'z').", responseValue.Errors[nameof(RegistrationRequest.Password)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnValidationErrorForNotMatchedPasswords()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = null, Email = null, Password = "Test1234!", ConfirmPassword = "Test12345!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.ConfirmPassword)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.ConfirmPassword)]);
+        Assert.Equal("'Password' and 'Confirm password' do not match.", responseValue.Errors[nameof(RegistrationRequest.ConfirmPassword)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnValidationErrorForInvalidUserName()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = "Тест", Email = null, Password = "Test1234!", ConfirmPassword = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.UserName)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.UserName)]);
+        Assert.Equal("User name can only have letters, numbers and special characters -._@+.", responseValue.Errors[nameof(RegistrationRequest.UserName)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnValidationErrorForInvalidEmail()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!", ConfirmPassword = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Email)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Email)]);
+        Assert.Equal("The Email field is not a valid e-mail address.", responseValue.Errors[nameof(RegistrationRequest.Email)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnLocalizedValidationErrorForInvalidEmail()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+
+        RegistrationRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!", ConfirmPassword = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.Equal("Валідаційна помилка.", responseValue!.Message);
+        Assert.Equal("Поле електронної пошти не є дійсною адресою електронної пошти.", responseValue!.Errors![nameof(RegistrationRequest.Email)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnValidationErrorForMissingUserNameAndEmail()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = null!, Email = null!, Password = "Test1234!", ConfirmPassword = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.UserName)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.UserName)]);
+        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+            responseValue.Errors[nameof(RegistrationRequest.UserName)].FirstOrDefault());
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Email)));
+        Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Email)]);
+        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+            responseValue.Errors[nameof(RegistrationRequest.Email)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Register")]
+    public async Task Identity_Register_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RegistrationRequest request = new() { UserName = "Username_New", Email = "email_New@mail.com", Password = "Test1234!", ConfirmPassword = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        RegistrationResponse? responseValue = JsonSerializer.Deserialize<RegistrationResponse>(responseString);
+
+        Assert.IsType<RegistrationResponse>(responseValue);
+        Assert.True(responseValue.Success);
+        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.True(responseValue.UserId != Guid.Empty);
+        Assert.NotNull(responseValue.Token);
+    }
+
+    #endregion Registration
+
+    #region Login
+
+    [Fact]
+    [Trait("Identity", "Login")]
+    public async Task Identity_Login_ShouldReturnValidationErrorForPasswordExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LoginRequest request = new() { UserName = null, Email = null, Password = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.Password)));
+        Assert.Single(responseValue.Errors[nameof(LoginRequest.Password)]);
+        Assert.Equal("The Password field is required.", responseValue.Errors[nameof(LoginRequest.Password)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Login")]
+    public async Task Identity_Login_ShouldReturnLocalizedValidationErrorForPasswordExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+
+        LoginRequest request = new() { UserName = null, Email = null, Password = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.Equal("Валідаційна помилка.", responseValue!.Message);
+        Assert.Equal("Поле Пароль є обов’язковим для заповнення.", responseValue!.Errors![nameof(LoginRequest.Password)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Login")]
+    public async Task Identity_Login_ShouldReturnValidationErrorForInvalidEmail()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LoginRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.Email)));
+        Assert.Single(responseValue.Errors[nameof(LoginRequest.Email)]);
+        Assert.Equal("The Email field is not a valid e-mail address.", responseValue.Errors[nameof(LoginRequest.Email)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Login")]
+    public async Task Identity_Login_ShouldReturnValidationErrorForMissingUserNameAndEmail()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LoginRequest request = new() { UserName = null!, Email = null!, Password = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.Email)));
+        Assert.Single(responseValue.Errors[nameof(LoginRequest.Email)]);
+        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+            responseValue.Errors[nameof(LoginRequest.Email)].FirstOrDefault());
+        Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.UserName)));
+        Assert.Single(responseValue.Errors[nameof(LoginRequest.UserName)]);
+        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+            responseValue.Errors[nameof(LoginRequest.UserName)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Login")]
+    public async Task Identity_Login_ShouldNotLoginUser()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LoginRequest request = new() { UserName = "IntegrationTestUser", Email = "integrationtestemail@mail.com", Password = "wrong_pass" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseResponse? responseValue = JsonSerializer.Deserialize<BaseResponse>(responseString);
+
+        Assert.IsType<BaseResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.AuthorizationError, responseValue.Message);
+    }
+
+    [Fact]
+    [Trait("Identity", "Login")]
+    public async Task Identity_Login_ShouldLoginUser()
+    {
+        // Act
+        LoginResponse? responseValue = await LoginPlayer();
+
+        Assert.IsType<LoginResponse>(responseValue);
+        Assert.True(responseValue.Success);
+        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Utilities.USER_ID, responseValue.UserId);
+        Assert.NotNull(responseValue.Token);
+    }
+
+    #endregion Login
+
+    #region Logout
+
+    [Fact]
+    [Trait("Identity", "Logout")]
+    public async Task Identity_Logout_ShouldReturnValidationErrorForUserIdExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LogoutRequest request = new() { UserId = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(LogoutRequest.UserId)));
+        Assert.Single(responseValue.Errors[nameof(LogoutRequest.UserId)]);
+        Assert.Equal("The UserId field is required.", responseValue.Errors[nameof(LogoutRequest.UserId)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Logout")]
+    public async Task Identity_Logout_ShouldReturnLocalizedValidationErrorForUserIdExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+
+        LogoutRequest request = new() { UserId = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.Equal("Валідаційна помилка.", responseValue!.Message);
+        Assert.Equal("Поле UserId обов’язкове.", responseValue!.Errors![nameof(LogoutRequest.UserId)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "Logout")]
+    public async Task Identity_Logout_ShouldNotLogoutUser()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LogoutRequest request = new() { UserId = Guid.NewGuid().ToString() };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseResponse? responseValue = JsonSerializer.Deserialize<BaseResponse>(responseString);
+
+        Assert.IsType<BaseResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.UserNotFound, responseValue.Message);
+    }
+
+    [Fact]
+    [Trait("Identity", "Logout")]
+    public async Task Identity_Logout_ShouldLogoutUser()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        LogoutRequest request = new() { UserId = Utilities.USER_ID.ToString() };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        LogoutResponse? responseValue = JsonSerializer.Deserialize<LogoutResponse>(responseString);
+
+        Assert.IsType<LogoutResponse>(responseValue);
+        Assert.True(responseValue.Success);
+        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+    }
+
+    #endregion Logout
+
+    #region RefreshToken
+
+    [Fact]
+    [Trait("Identity", "RefreshToken")]
+    public async Task Identity_RefreshToken_ShouldReturnValidationErrorForTokenExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        RefreshTokenRequest request = new() { Token = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RefreshTokenRequest.Token)));
+        Assert.Single(responseValue.Errors[nameof(RefreshTokenRequest.Token)]);
+        Assert.Equal("The Token field is required.", responseValue.Errors[nameof(RefreshTokenRequest.Token)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "RefreshToken")]
+    public async Task Identity_RefreshToken_ShouldReturnLocalizedValidationErrorForTokenExistence()
+    {
+        // Arrange
+        HttpClient client = _factory.CreateClient();
+
+        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+
+        RefreshTokenRequest request = new() { Token = null! };
+
+        JsonContent content = JsonContent.Create(request);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+
+        Assert.Equal("Валідаційна помилка.", responseValue!.Message);
+        Assert.Equal("Поле Token є обов’язковим для заповнення.", responseValue!.Errors![nameof(RefreshTokenRequest.Token)].FirstOrDefault());
+    }
+
+    [Fact]
+    [Trait("Identity", "RefreshToken")]
+    public async Task Identity_RefreshToken_ShouldNotRefreshToken()
+    {
+        // Arrange
+        LoginResponse? loginResponse = await LoginPlayer();
+
+        HttpClient client = _factory.CreateClient();
+
+        RefreshTokenRequest request = new()
         {
-            _factory = factory;
-            _factory.InitializeDbForTests();
-        }
-
-        #region Registration        
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnValidationErrorForPasswordExistence()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = null, Email = null, Password = null!, ConfirmPassword = null! };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.Password), new string[1] { "The Password field is required." } },
-                { nameof(RegistrationRequest.ConfirmPassword), new string[1] { "The ConfirmPassword field is required." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnValidationErrorForPasswordValue()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = null, Email = null, Password = "pass", ConfirmPassword = "pass" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(RegistrationRequest.Password), new string[1] { "Passwords must have at least 6 characters, " +
-            "one non alphanumeric character, " +
-            "one digit ('0'-'9'), " +
-            "one uppercase ('A'-'Z'), " +
-            "one lowercase ('a'-'z')." } } }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnValidationErrorForNotMatchedPasswords()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = null, Email = null, Password = "Test1234!", ConfirmPassword = "Test12345!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.ConfirmPassword), new string[1] { "'Password' and 'Confirm password' do not match." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnValidationErrorForInvalidUserName()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = "Тест", Email = null, Password = "Test1234!", ConfirmPassword = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.UserName), new string[1] { "User name can only have letters, numbers and special characters -._@+." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnValidationErrorForInvalidEmail()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!", ConfirmPassword = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.Email), new string[1] { "The Email field is not a valid e-mail address." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnValidationErrorForMissingUserNameAndEmail()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = null!, Email = null!, Password = "Test1234!", ConfirmPassword = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RegistrationRequest.UserName), new string[1] { "Either or both of 'Email' and 'UserName' are required." } },
-                { nameof(RegistrationRequest.Email), new string[1] { "Either or both of 'Email' and 'UserName' are required." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task Identity_Register_ShouldReturnSuccessResult()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RegistrationRequest request = new() { UserName = "Username_New", Email = "email_New@mail.com", Password = "Test1234!", ConfirmPassword = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            RegistrationResponse? responseValue = JsonSerializer.Deserialize<RegistrationResponse>(responseString);
-
-            Assert.IsType<RegistrationResponse>(responseValue);
-            Assert.True(responseValue.Success);
-            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
-            Assert.True(responseValue.UserId != Guid.Empty);
-            Assert.NotNull(responseValue.Token);
-        }
-
-        #endregion Registration
-
-        #region Login
-
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task Identity_Login_ShouldReturnValidationErrorForPasswordExistence()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LoginRequest request = new() { UserName = null, Email = null, Password = null! };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(LoginRequest.Password), new string[1] { "The Password field is required." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task Identity_Login_ShouldReturnValidationErrorForInvalidEmail()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LoginRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(LoginRequest.Email), new string[1] { "The Email field is not a valid e-mail address." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task Identity_Login_ShouldReturnValidationErrorForMissingUserNameAndEmail()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LoginRequest request = new() { UserName = null!, Email = null!, Password = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(LoginRequest.UserName), new string[1] { "Either or both of 'Email' and 'UserName' are required." } },
-                { nameof(LoginRequest.Email), new string[1] { "Either or both of 'Email' and 'UserName' are required." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task Identity_Login_ShouldNotLoginUser()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LoginRequest request = new() { UserName = "IntegrationTestUser", Email = "integrationtestemail@mail.com", Password = "wrong_pass" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseResponse? responseValue = JsonSerializer.Deserialize<BaseResponse>(responseString);
-
-            Assert.IsType<BaseResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal("User not found or incorrect password.", responseValue.Message);
-        }
-
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task Identity_Login_ShouldLoginUser()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LoginRequest request = new() { UserName = "IntegrationTestUser", Email = "integrationtestemail@mail.com", Password = "Test1234!" };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            LoginResponse? responseValue = JsonSerializer.Deserialize<LoginResponse>(responseString);
-
-            Assert.IsType<LoginResponse>(responseValue);
-            Assert.True(responseValue.Success);
-            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
-            Assert.Equal(Utilities.USER_ID, responseValue.UserId);
-            Assert.NotNull(responseValue.Token);
-        }
-
-        #endregion Login
-
-        #region Logout
-
-        [Fact]
-        [Trait("Identity", "Logout")]
-        public async Task Identity_Logout_ShouldReturnValidationErrorForUserIdExistence()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LogoutRequest request = new() { UserId = null! };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(LogoutRequest.UserId), new string[1] { "The UserId field is required." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "Logout")]
-        public async Task Identity_Logout_ShouldNotLogoutUser()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LogoutRequest request = new() { UserId = Guid.NewGuid().ToString() };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseResponse? responseValue = JsonSerializer.Deserialize<BaseResponse>(responseString);
-
-            Assert.IsType<BaseResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal("User not found.", responseValue.Message);
-        }
-
-        [Fact]
-        [Trait("Identity", "Logout")]
-        public async Task Identity_Logout_ShouldLogoutUser()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            LogoutRequest request = new() { UserId = Utilities.USER_ID.ToString() };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            LogoutResponse? responseValue = JsonSerializer.Deserialize<LogoutResponse>(responseString);
-
-            Assert.IsType<LogoutResponse>(responseValue);
-            Assert.True(responseValue.Success);
-            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
-        }
-
-        #endregion Logout
-
-        #region RefreshToken
-
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task Identity_RefreshToken_ShouldReturnValidationErrorForTokenExistence()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RefreshTokenRequest request = new() { Token = null! };
-
-            JsonContent content = JsonContent.Create(request);
-
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-            string responseString = await response.Content.ReadAsStringAsync();
-
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RefreshTokenRequest.Token), new string[1] { "The Token field is required." } }
-            }, responseValue.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task Identity_RefreshToken_ShouldNotRefreshToken()
-        {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RefreshTokenRequest request = new()
+            Token = new JwtToken
             {
-                Token = new JwtToken
-                {
-                    Access = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiVGVzdFVzZXIiLCJleHAiOjE2ODIzNDI0MzksImlzcyI6Ikdsb2JvVGlja2V0SWRlbnRpdHkiLCJhdWQiOiJHbG9ib1RpY2tldElkZW50aXR5VXNlciJ9.EEV1kD8UseVlGxCMJJjkLyYKAtEwBrfjJmn2eGh43C0",
-                    Refresh = "test_refresh"
-                }
-            };
+                Access = loginResponse!.Token.Access,
+                Refresh = "test_refresh"
+            }
+        };
 
-            JsonContent content = JsonContent.Create(request);
+        JsonContent content = JsonContent.Create(request);
 
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
 
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-            string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync();
 
-            BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
+        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
-            Assert.IsType<BaseErrorResponse>(responseValue);
-            Assert.False(responseValue.Success);
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, responseValue.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> {
-                { nameof(RefreshTokenRequest.Token.Refresh), new string[1] { "Invalid token." } }
-            }, responseValue.Errors);
-        }
+        Assert.IsType<BaseErrorResponse>(responseValue);
+        Assert.False(responseValue.Success);
+        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.NotNull(responseValue.Errors);
+        Assert.True(responseValue.Errors.ContainsKey(nameof(RefreshTokenRequest.Token.Refresh)));
+        Assert.Single(responseValue.Errors[nameof(RefreshTokenRequest.Token.Refresh)]);
+        Assert.Equal(Messages.TokenInvalid, responseValue.Errors[nameof(RefreshTokenRequest.Token.Refresh)].FirstOrDefault());
+    }
 
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task Identity_RefreshToken_ShouldRefreshToken()
+    [Fact]
+    [Trait("Identity", "RefreshToken")]
+    public async Task Identity_RefreshToken_ShouldRefreshToken()
+    {
+        // Arrange
+        LoginResponse? loginResponse = await LoginPlayer();
+
+        HttpClient client = _factory.CreateClient();
+
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            HttpClient client = _factory.CreateClient();
-
-            RefreshTokenRequest request = new()
+            Token = new JwtToken
             {
-                Token = new JwtToken
-                {
-                    Access = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiSW50ZWdyYXRpb25UZXN0VXNlciIsImV4cCI6MTY4MjQwNTkxOCwiaXNzIjoiR2xvYm9UaWNrZXRJZGVudGl0eSIsImF1ZCI6Ikdsb2JvVGlja2V0SWRlbnRpdHlVc2VyIn0.sniULKxCa7wBI3OGqJMayaBdKo7zwPdo91XCt7cyleo",
-                    Refresh = "kaGWK0agkRpoKjvRvnV+R/jswQJ1aqeszK9V61xN9vj0lD+yBj9EXFeM1GmWjChmtVeXWppJptak1uOOdpkBkA=="
-                }
-            };
+                Access = loginResponse!.Token.Access,
+                Refresh = loginResponse!.Token.Refresh
+            }
+        };
 
-            JsonContent content = JsonContent.Create(request);
+        JsonContent content = JsonContent.Create(request);
 
-            // Act
-            HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+        // Act
+        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
 
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync();
 
-            RefreshTokenResponse? responseValue = JsonSerializer.Deserialize<RefreshTokenResponse>(responseString);
+        RefreshTokenResponse? responseValue = JsonSerializer.Deserialize<RefreshTokenResponse>(responseString);
 
-            Assert.IsType<RefreshTokenResponse>(responseValue);
-            Assert.True(responseValue.Success);
-            Assert.Equal(SUCCESS_MESSAGE, responseValue.Message);
-            Assert.NotNull(responseValue.Token);
-        }
+        Assert.IsType<RefreshTokenResponse>(responseValue);
+        Assert.True(responseValue.Success);
+        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.NotNull(responseValue.Token);
+    }
 
-        #endregion RefreshToken
+    #endregion RefreshToken
+
+    private async Task<LoginResponse?> LoginPlayer()
+    {
+        HttpClient client = _factory.CreateClient();
+
+        LoginRequest request = new() { UserName = "IntegrationTestUser", Email = "integrationtestemail@mail.com", Password = "Test1234!" };
+
+        JsonContent content = JsonContent.Create(request);
+
+        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        LoginResponse? responseValue = JsonSerializer.Deserialize<LoginResponse>(responseString);
+
+        return responseValue;
     }
 }

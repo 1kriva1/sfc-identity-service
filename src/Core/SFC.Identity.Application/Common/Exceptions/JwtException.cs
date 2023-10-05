@@ -1,7 +1,6 @@
-﻿namespace SFC.Identity.Application.Common.Exceptions
+﻿namespace SFC.Identity.Application.Common.Exceptions;
+
+public class JwtException : Exception
 {
-    public class JwtException : Exception
-    {
-        public JwtException(string message) : base(message) { }
-    }
+    public JwtException(string message) : base(message) { }
 }

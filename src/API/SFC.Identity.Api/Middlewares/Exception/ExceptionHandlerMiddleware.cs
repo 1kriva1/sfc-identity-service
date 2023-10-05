@@ -5,99 +5,98 @@ using System.Text.Json;
 using ExceptionType = System.Exception;
 using SFC.Identity.Application.Common.Constants;
 
-namespace SFC.Identity.Api.Middlewares.Exception
+namespace SFC.Identity.Api.Middlewares.Exception;
+
+using Handler = Func<ExceptionType, ExceptionResponse>;
+
+internal record struct ExceptionResponse(HttpStatusCode StatusCode, BaseResponse Result) { }
+
+public class ExceptionHandlerMiddleware
 {
-    using Handler = Func<ExceptionType, ExceptionResponse>;
+    private readonly RequestDelegate _next;
 
-    internal record struct ExceptionResponse(HttpStatusCode StatusCode, BaseResponse Result) { }
+    private readonly IDictionary<Type, Handler> _exceptionHandlers;
 
-    public class ExceptionHandlerMiddleware
+    public ExceptionHandlerMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        private readonly IDictionary<Type, Handler> _exceptionHandlers;
-
-        public ExceptionHandlerMiddleware(RequestDelegate next)
+        _exceptionHandlers = new Dictionary<Type, Handler>
         {
-            _exceptionHandlers = new Dictionary<Type, Handler>
-            {
-                { typeof(ConflictException), HandleConflictException },
-                { typeof(IdentityException), HandleIdentityException },
-                { typeof(NotFoundException), HandleNotFoundException },
-                { typeof(AuthorizationException), HandleAuthorizationException },
-                { typeof(ForbiddenException), HandleForbiddenException },
-                { typeof(JwtException), HandleJwtException },
-                { typeof(BadRequestException), HandleBadRequestException }
-            };
-            _next = next;
-        }
+            { typeof(ConflictException), HandleConflictException },
+            { typeof(IdentityException), HandleIdentityException },
+            { typeof(NotFoundException), HandleNotFoundException },
+            { typeof(AuthorizationException), HandleAuthorizationException },
+            { typeof(ForbiddenException), HandleForbiddenException },
+            { typeof(JwtException), HandleJwtException },
+            { typeof(BadRequestException), HandleBadRequestException }
+        };
+        _next = next;
+    }
 
-        public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (ExceptionType ex)
-            {
-                await HandleExceptionAsync(context, ex);
-            }
+            await _next(context);
         }
-
-        private Task HandleExceptionAsync(HttpContext context, ExceptionType exception)
+        catch (ExceptionType ex)
         {
-            Type exceptionType = exception.GetType();
-
-            ExceptionResponse response = _exceptionHandlers.TryGetValue(exceptionType, out Handler? handler)
-                ? handler.Invoke(exception)
-                : new(HttpStatusCode.InternalServerError, new BaseResponse(
-                    Messages.FailedResult,
-                    false));
-
-            context.Response.StatusCode = (int)response.StatusCode;
-
-            context.Response.ContentType = context.Request.ContentType ?? "application/json";
-
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response.Result));
+            await HandleExceptionAsync(context, ex);
         }
+    }
 
-        private static ExceptionResponse HandleConflictException(ExceptionType exception)
-        {
-            return new ExceptionResponse(HttpStatusCode.Conflict, new BaseResponse(exception.Message, false));
-        }
+    private Task HandleExceptionAsync(HttpContext context, ExceptionType exception)
+    {
+        Type exceptionType = exception.GetType();
 
-        private static ExceptionResponse HandleIdentityException(ExceptionType exception)
-        {
-            Dictionary<string, IEnumerable<string>> validationErrors = ((IdentityException)exception).Errors;
+        ExceptionResponse response = _exceptionHandlers.TryGetValue(exceptionType, out Handler? handler)
+            ? handler.Invoke(exception)
+            : new(HttpStatusCode.InternalServerError, new BaseResponse(
+                Messages.FailedResult,
+                false));
 
-            return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseErrorResponse(exception.Message, validationErrors));
-        }
+        context.Response.StatusCode = (int)response.StatusCode;
 
-        private ExceptionResponse HandleNotFoundException(ExceptionType exception)
-        {
-            return new ExceptionResponse(HttpStatusCode.NotFound, new BaseResponse(exception.Message, false));
-        }
+        context.Response.ContentType = context.Request.ContentType ?? "application/json";
 
-        private ExceptionResponse HandleAuthorizationException(ExceptionType exception)
-        {
-            return new ExceptionResponse(HttpStatusCode.Unauthorized, new BaseResponse(exception.Message, false));
-        }
+        return context.Response.WriteAsync(JsonSerializer.Serialize(response.Result));
+    }
 
-        private ExceptionResponse HandleForbiddenException(ExceptionType exception)
-        {
-            return new ExceptionResponse(HttpStatusCode.Forbidden, new BaseResponse(exception.Message, false));
-        }
+    private static ExceptionResponse HandleConflictException(ExceptionType exception)
+    {
+        return new ExceptionResponse(HttpStatusCode.Conflict, new BaseResponse(exception.Message, false));
+    }
 
-        private ExceptionResponse HandleJwtException(ExceptionType exception)
-        {
-            return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseResponse(exception.Message, false));
-        }
+    private static ExceptionResponse HandleIdentityException(ExceptionType exception)
+    {
+        Dictionary<string, IEnumerable<string>> validationErrors = ((IdentityException)exception).Errors;
 
-        private ExceptionResponse HandleBadRequestException(ExceptionType exception)
-        {
-            Dictionary<string, IEnumerable<string>> validationErrors = ((BadRequestException)exception).Errors;
+        return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseErrorResponse(exception.Message, validationErrors));
+    }
 
-            return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseErrorResponse(exception.Message, validationErrors));
-        }
+    private ExceptionResponse HandleNotFoundException(ExceptionType exception)
+    {
+        return new ExceptionResponse(HttpStatusCode.NotFound, new BaseResponse(exception.Message, false));
+    }
+
+    private ExceptionResponse HandleAuthorizationException(ExceptionType exception)
+    {
+        return new ExceptionResponse(HttpStatusCode.Unauthorized, new BaseResponse(exception.Message, false));
+    }
+
+    private ExceptionResponse HandleForbiddenException(ExceptionType exception)
+    {
+        return new ExceptionResponse(HttpStatusCode.Forbidden, new BaseResponse(exception.Message, false));
+    }
+
+    private ExceptionResponse HandleJwtException(ExceptionType exception)
+    {
+        return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseResponse(exception.Message, false));
+    }
+
+    private ExceptionResponse HandleBadRequestException(ExceptionType exception)
+    {
+        Dictionary<string, IEnumerable<string>> validationErrors = ((BadRequestException)exception).Errors;
+
+        return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseErrorResponse(exception.Message, validationErrors));
     }
 }

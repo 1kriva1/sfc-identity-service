@@ -1,8 +1,9 @@
 using SFC.Identity.Api;
+using SFC.Identity.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var app = builder
+WebApplication app = builder
        .ConfigureServices()
        .ConfigurePipeline();
 

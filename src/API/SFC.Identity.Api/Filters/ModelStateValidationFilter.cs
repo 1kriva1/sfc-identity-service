@@ -3,42 +3,41 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using SFC.Identity.Application.Common.Models;
 using SFC.Identity.Application.Common.Constants;
 
-namespace SFC.Identity.Api.Filters
+namespace SFC.Identity.Api.Filters;
+
+public class ValidationFilterAttribute : ActionFilterAttribute
 {
-    public class ValidationFilterAttribute : ActionFilterAttribute
+    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        if (!context.ModelState.IsValid)
         {
-            if (!context.ModelState.IsValid)
+            BaseErrorResponse result;
+
+            if (context.ModelState.Any(e => string.IsNullOrEmpty(e.Key)))
             {
-                BaseErrorResponse result;
-
-                if (context.ModelState.Any(e => string.IsNullOrEmpty(e.Key)))
+                Dictionary<string, IEnumerable<string>> emptyBodyError = new()
                 {
-                    Dictionary<string, IEnumerable<string>> emptyBodyError = new()
                     {
-                        {
-                            "Body",
-                            new List<string> {
-                                Messages.RequestBodyRequired
-                            }
+                        "Body",
+                        new List<string> {
+                            Messages.RequestBodyRequired
                         }
-                    };
+                    }
+                };
 
-                    result = new BaseErrorResponse(Messages.ValidationError, emptyBodyError);
-                }
-                else
-                {
-                    result = new(Messages.ValidationError, context.ModelState.ToDictionary(
-                        state => state.Key,
-                        state => state.Value?.Errors.Select(e => e.ErrorMessage) ?? Array.Empty<string>())
-                   );
-                }
-
-                context.Result = new BadRequestObjectResult(result);
+                result = new BaseErrorResponse(Messages.ValidationError, emptyBodyError);
+            }
+            else
+            {
+                result = new(Messages.ValidationError, context.ModelState.ToDictionary(
+                    state => state.Key,
+                    state => state.Value?.Errors.Select(e => e.ErrorMessage) ?? Array.Empty<string>())
+               );
             }
 
-            return base.OnActionExecutionAsync(context, next);
+            context.Result = new BadRequestObjectResult(result);
         }
+
+        return base.OnActionExecutionAsync(context, next);
     }
 }

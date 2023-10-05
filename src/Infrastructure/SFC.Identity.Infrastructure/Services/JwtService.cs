@@ -10,76 +10,75 @@ using System.Security.Cryptography;
 using System.Text;
 using AccessToken = SFC.Identity.Application.Models.Tokens.AccessToken;
 
-namespace SFC.Identity.Infrastructure.Services
+namespace SFC.Identity.Infrastructure.Services;
+
+public class JwtService : IJwtService
 {
-    public class JwtService : IJwtService
+    private readonly JwtSettings _jwtSettings;
+
+    public JwtService(IOptions<JwtSettings> jwtSettings)
     {
-        private readonly JwtSettings _jwtSettings;
+        _jwtSettings = jwtSettings.Value;
+    }
 
-        public JwtService(IOptions<JwtSettings> jwtSettings)
+    public AccessToken GenerateAccessToken(IEnumerable<Claim> authClaims)
+    {
+        SymmetricSecurityKey symmetricSecurityKey = new(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+
+        SigningCredentials signingCredentials = new(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+
+        DateTime expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenDurationInMinutes);
+
+        JwtSecurityToken jwtSecurityToken = new(
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
+            claims: authClaims,
+            expires: expires,
+            signingCredentials: signingCredentials);
+
+        return new AccessToken
         {
-            _jwtSettings = jwtSettings.Value;
-        }
+            CreatedDate = DateTime.UtcNow,
+            ExpiresDate = expires,
+            Value = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+        };
+    }
 
-        public AccessToken GenerateAccessToken(IEnumerable<Claim> authClaims)
+    public RefreshToken GenerateRefreshToken()
+    {
+        byte[] randomNumber = new byte[64];
+
+        using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+
+        rng.GetBytes(randomNumber);
+
+        return new RefreshToken
         {
-            SymmetricSecurityKey symmetricSecurityKey = new(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+            CreatedDate = DateTime.UtcNow,
+            ExpiresDate = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDurationInDays),
+            Value = Convert.ToBase64String(randomNumber)
+        };
+    }
 
-            SigningCredentials signingCredentials = new(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-
-            DateTime expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenDurationInMinutes);
-
-            JwtSecurityToken jwtSecurityToken = new(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: authClaims,
-                expires: expires,
-                signingCredentials: signingCredentials);
-
-            return new AccessToken
-            {
-                CreatedDate = DateTime.UtcNow,
-                ExpiresDate = expires,
-                Value = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
-            };
-        }
-
-        public RefreshToken GenerateRefreshToken()
+    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string accessToken)
+    {
+        TokenValidationParameters parameters = new()
         {
-            byte[] randomNumber = new byte[64];
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key)),
+            ValidateLifetime = false
+        };
 
-            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        ClaimsPrincipal principal = new JwtSecurityTokenHandler()
+            .ValidateToken(accessToken, parameters, out SecurityToken securityToken);
 
-            rng.GetBytes(randomNumber);
+        if (securityToken is not JwtSecurityToken jwtSecurityToken
+            || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            throw new BadRequestException(Messages.ValidationError,
+                ("AccessToken", Messages.TokenInvalid));
 
-            return new RefreshToken
-            {
-                CreatedDate = DateTime.UtcNow,
-                ExpiresDate = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDurationInDays),
-                Value = Convert.ToBase64String(randomNumber)
-            };
-        }
-
-        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string accessToken)
-        {
-            TokenValidationParameters parameters = new()
-            {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key)),
-                ValidateLifetime = false
-            };
-
-            ClaimsPrincipal principal = new JwtSecurityTokenHandler()
-                .ValidateToken(accessToken, parameters, out SecurityToken securityToken);
-
-            if (securityToken is not JwtSecurityToken jwtSecurityToken
-                || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new BadRequestException(Messages.ValidationError,
-                    ("AccessToken", Messages.TokenInvalid));
-
-            return principal;
-        }
+        return principal;
     }
 }

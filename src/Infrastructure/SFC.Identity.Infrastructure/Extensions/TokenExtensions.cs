@@ -2,19 +2,18 @@
 using SFC.Identity.Application.Models.Tokens;
 using System.Security.Claims;
 
-namespace SFC.Identity.Infrastructure.Extensions
+namespace SFC.Identity.Infrastructure.Extensions;
+
+public static class TokenExtensions
 {
-    public static class TokenExtensions
+    public static AccessToken CreateAccessToken(this IJwtService jwtService, IEnumerable<Claim> userClaims)
     {
-        public static AccessToken CreateAccessToken(this IJwtService jwtService, IEnumerable<Claim> userClaims)
-        {
-            AccessToken accessToken = jwtService.GenerateAccessToken(userClaims);
+        AccessToken accessToken = jwtService.GenerateAccessToken(userClaims);
 
-            RefreshToken refreshToken = jwtService.GenerateRefreshToken();
+        RefreshToken refreshToken = jwtService.GenerateRefreshToken();
 
-            accessToken.RefreshToken = refreshToken;
+        accessToken.RefreshToken = refreshToken;
 
-            return accessToken;
-        }
+        return accessToken;
     }
 }

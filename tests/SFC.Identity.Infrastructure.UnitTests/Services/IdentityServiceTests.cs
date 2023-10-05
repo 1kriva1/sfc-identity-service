@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+
 using Moq;
+
+using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Login;
@@ -10,520 +13,574 @@ using SFC.Identity.Application.Models.Registration;
 using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
+
 using System.Security.Claims;
+
 using Xunit;
 
-namespace SFC.Identity.Infrastructure.UnitTests.Services
+namespace SFC.Identity.Infrastructure.UnitTests.Services;
+
+public class IdentityServiceTests
 {
-    public class IdentityServiceTests
+    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+
+    private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
+
+    private readonly Mock<IJwtService> _jwtServiceMock;
+
+    private readonly JwtSettings _settings = new()
     {
-        private const string SUCCESS_MESSAGE = "Success result.";
-        private const string VALIDATION_ERROR_MESSAGE = "Validation error.";
-        private const string INVALID_TOKEN_ERROR_MESSAGE = "Invalid token.";
+        Key = "key_ahsvdjavsdvqwyvetyqweyvasndvhgavsdghcvahsdc",
+        Issuer = "test_issuer",
+        Audience = "test_audience",
+        RefreshTokenDurationInDays = 7,
+        AccessTokenDurationInMinutes = 2
+    };
 
-        private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+    private readonly IdentityService _service;
 
-        private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
+    public IdentityServiceTests()
+    {
+        Mock<IUserStore<ApplicationUser>> userStore = new();
+        _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStore.Object, null!, null!, null!, null!, null!, null!, null!, null!);
+        _signInManagerMock = new Mock<SignInManager<ApplicationUser>>(_userManagerMock.Object,
+            Mock.Of<IHttpContextAccessor>(), Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(),
+            null!, null!, null!, null!);
+        Mock<IOptions<JwtSettings>> jwtSettingsOptionsMock = new();
+        jwtSettingsOptionsMock.Setup(s => s.Value).Returns(_settings);
+        _jwtServiceMock = new Mock<IJwtService>();
+        _service = new IdentityService(_userManagerMock.Object, _signInManagerMock.Object, _jwtServiceMock.Object);
+    }
 
-        private readonly Mock<IJwtService> _jwtServiceMock;
+    #region Registration
 
-        private readonly JwtSettings _settings = new()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Register_ShouldReturnConflictExceptionIfUserAlreadyExistByUserName()
+    {
+        // Arrange
+        string username = "username";
+
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+
+        RegistrationRequest request = new()
         {
-            Key = "key_ahsvdjavsdvqwyvetyqweyvasndvhgavsdghcvahsdc",
-            Issuer = "test_issuer",
-            Audience = "test_audience",
-            RefreshTokenDurationInDays = 7,
-            AccessTokenDurationInMinutes = 2
+            UserName = username,
+            Password = "password",
+            ConfirmPassword = "password"
         };
 
-        private readonly IdentityService _service;
+        // Assert
+        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(request));
+        Assert.Equal(Messages.UserAlreadyExist, exception.Message);
+    }
 
-        public IdentityServiceTests()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Register_ShouldReturnConflictExceptionIfUserAlreadyExistByEmail()
+    {
+        // Arrange
+        string email = "email@mail.com";
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+
+        RegistrationRequest request = new()
         {
-            Mock<IUserStore<ApplicationUser>> userStore = new();
-            _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStore.Object, null, null, null, null, null, null, null, null);
-            _signInManagerMock = new Mock<SignInManager<ApplicationUser>>(_userManagerMock.Object,
-                Mock.Of<IHttpContextAccessor>(), Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(),
-                null, null, null, null);
-            Mock<IOptions<JwtSettings>> jwtSettingsOptionsMock = new();
-            jwtSettingsOptionsMock.Setup(s => s.Value).Returns(_settings);
-            _jwtServiceMock = new Mock<IJwtService>();
-            _service = new IdentityService(_userManagerMock.Object, _signInManagerMock.Object, _jwtServiceMock.Object);
-        }
+            Email = email,
+            Password = "password",
+            ConfirmPassword = "password"
+        };
 
-        #region Registration
+        // Assert
+        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(request));
+        Assert.Equal(Messages.UserAlreadyExist, exception.Message);
+    }
 
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task IdentityService_Register_ShouldReturnConflictExceptionIfUserAlreadyExistByUserName()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Register_ShouldReturnIdentityExceptionIfProcessNotSuccess()
+    {
+        // Arrange
+        string email = "email@mail.com", username = "username", errorCode = "100", errorDescription = "100 error description",
+            password = "password";
+
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
+            .Returns(Task.FromResult(IdentityResult.Failed(new IdentityError[1] {
+                new IdentityError { Code =errorCode, Description = errorDescription }
+            })));
+
+        RegistrationRequest request = new()
         {
-            // Arrange
-            string username = "username";
+            Email = "email_new@mail.com",
+            UserName = "username_new",
+            Password = password,
+            ConfirmPassword = password
+        };
 
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+        // Assert
+        IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(request));
+        Assert.Equal(Messages.UserRegistrationError, exception.Message);
+        Assert.True(exception.Errors.ContainsKey(errorCode));
+        Assert.Single(exception.Errors[errorCode]);
+        Assert.Equal(errorDescription, exception.Errors[errorCode].FirstOrDefault());
+    }
 
-            RegistrationRequest request = new()
-            {
-                UserName = username,
-                Password = "password",
-                ConfirmPassword = "password"
-            };
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Register_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        string email = "email@mail.com", username = "username", password = "password",
+            claimType = "test_type", claimValue = "test_value",
+            accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
 
-            // Assert
-            ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(request));
-            Assert.Equal("User already exists.", exception.Message);
-        }
+        Guid userId = Guid.NewGuid();
 
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task IdentityService_Register_ShouldReturnConflictExceptionIfUserAlreadyExistByEmail()
+        List<Claim> claims = new() { new Claim(claimType, claimValue) };
+
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
+
+        _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
+            .Returns(Task.FromResult(IdentityResult.Success));
+
+        _userManagerMock.Setup(mock => mock.UpdateAsync(It.IsAny<ApplicationUser>())).Callback<ApplicationUser>(user => user.Id = userId);
+
+        _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
+
+        _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
+
+        RegistrationRequest request = new()
         {
-            // Arrange
-            string email = "email@mail.com";
+            Email = "email_new@mail.com",
+            UserName = "username_new",
+            Password = password,
+            ConfirmPassword = password
+        };
 
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+        // Act
+        RegistrationResponse response = await _service.RegisterAsync(request);
 
-            RegistrationRequest request = new()
-            {
-                Email = email,
-                Password = "password",
-                ConfirmPassword = "password"
-            };
+        // Assert
+        Assert.True(response.Success);
+        Assert.Equal(Messages.SuccessResult, response.Message);
+        Assert.Equal(accessTokenValue, response.Token.Access);
+        Assert.Equal(refreshTokenValue, response.Token.Refresh);
+        Assert.Equal(userId, response.UserId);
+        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+    }
 
-            // Assert
-            ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(request));
-            Assert.Equal("User already exists.", exception.Message);
-        }
+    #endregion Registration
 
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task IdentityService_Register_ShouldReturnIdentityExceptionIfProcessNotSuccess()
+    #region Login
+
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Login_ShouldReturnAuthorizationExceptionIfUserNotFound()
+    {
+        // Arrange
+        string username = "username", email = "email@mail.com";
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+
+        LoginRequest request = new()
         {
-            // Arrange
-            string email = "email@mail.com", username = "username", errorCode = "100", errorDescription = "100 error description",
-                password = "password";
+            UserName = "username_test",
+            Password = "password",
+            Email = "email_test@mail.com"
+        };
 
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+        // Assert
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(request));
+        Assert.Equal(Messages.AuthorizationError, exception.Message);
+    }
 
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Login_ShouldReturnAuthorizationExceptionIfLoginFailed()
+    {
+        // Arrange
+        string username = "username", email = "email@mail.com", password = "password";
 
-            _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
-                .Returns(Task.FromResult(IdentityResult.Failed(new IdentityError[1] {
-                    new IdentityError { Code =errorCode, Description = errorDescription }
-                })));
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
 
-            RegistrationRequest request = new()
-            {
-                Email = "email_new@mail.com",
-                UserName = "username_new",
-                Password = password,
-                ConfirmPassword = password
-            };
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
-            // Assert
-            IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(request));
-            Assert.Equal("Error occurred during user registration process.", exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { errorCode, new string[1] { errorDescription } } }, exception.Errors);
-        }
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Failed);
 
-        [Fact]
-        [Trait("Identity", "Register")]
-        public async Task IdentityService_Register_ShouldReturnSuccessResponse()
+        LoginRequest request = new()
         {
-            // Arrange
-            string email = "email@mail.com", username = "username", password = "password",
-                claimType = "test_type", claimValue = "test_value",
-                accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+            UserName = username,
+            Password = password,
+            Email = email
+        };
 
-            Guid userId = Guid.NewGuid();
+        // Assert
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(request));
+        Assert.Equal(Messages.AuthorizationError, exception.Message);
+    }
 
-            List<Claim> claims = new() { new Claim(claimType, claimValue) };
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Login_ShouldReturnForbiddenExceptionIfUserLockedOut()
+    {
+        // Arrange
+        string username = "username", email = "email@mail.com", password = "password";
 
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
 
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
-            _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.LockedOut);
 
-            _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
-                .Returns(Task.FromResult(IdentityResult.Success));
-
-            _userManagerMock.Setup(mock => mock.UpdateAsync(It.IsAny<ApplicationUser>())).Callback<ApplicationUser>(user => user.Id = userId);
-
-            _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
-
-            _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
-
-            RegistrationRequest request = new()
-            {
-                Email = "email_new@mail.com",
-                UserName = "username_new",
-                Password = password,
-                ConfirmPassword = password
-            };
-
-            // Act
-            RegistrationResponse response = await _service.RegisterAsync(request);
-
-            // Assert
-            Assert.True(response.Success);
-            Assert.Equal(SUCCESS_MESSAGE, response.Message);
-            Assert.Equal(accessTokenValue, response.Token.Access);
-            Assert.Equal(refreshTokenValue, response.Token.Refresh);
-            Assert.Equal(userId, response.UserId);
-            _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
-        }
-
-        #endregion Registration
-
-        #region Login
-
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task IdentityService_Login_ShouldReturnAuthorizationExceptionIfUserNotFound()
+        LoginRequest request = new()
         {
-            // Arrange
-            string username = "username", email = "email@mail.com";
+            UserName = username,
+            Password = password,
+            Email = email
+        };
 
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+        // Assert
+        ForbiddenException exception = await Assert.ThrowsAsync<ForbiddenException>(async () => await _service.LoginAsync(request));
+        Assert.Equal(Messages.AccountLocked, exception.Message);
+    }
 
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Login_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        string email = "email@mail.com", username = "username", password = "password",
+           claimType = "test_type", claimValue = "test_value",
+           accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
 
-            LoginRequest request = new()
-            {
-                UserName = "username_test",
-                Password = "password",
-                Email = "email_test@mail.com"
-            };
+        Guid userId = Guid.NewGuid();
 
-            // Assert
-            AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(request));
-            Assert.Equal("User not found or incorrect password.", exception.Message);
-        }
+        List<Claim> claims = new() { new Claim(claimType, claimValue) };
 
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task IdentityService_Login_ShouldReturnAuthorizationExceptionIfLoginFailed()
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+
+        _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
+
+        _userManagerMock.Setup(mock => mock.UpdateAsync(It.IsAny<ApplicationUser>())).Callback<ApplicationUser>(user => user.Id = userId);
+
+        _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
+
+        _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
+
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Success);
+
+        LoginRequest request = new()
         {
-            // Arrange
-            string username = "username", email = "email@mail.com", password = "password";
+            UserName = username,
+            Password = password,
+            Email = email
+        };
 
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+        // Act
+        LoginResponse response = await _service.LoginAsync(request);
 
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+        // Assert
+        Assert.True(response.Success);
+        Assert.Equal(Messages.SuccessResult, response.Message);
+        Assert.Equal(accessTokenValue, response.Token.Access);
+        Assert.Equal(refreshTokenValue, response.Token.Refresh);
+        Assert.Equal(userId, response.UserId);
+        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+    }
 
-            _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Failed);
+    #endregion Login
 
-            LoginRequest request = new()
-            {
-                UserName = username,
-                Password = password,
-                Email = email
-            };
+    #region Refresh token
 
-            // Assert
-            AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(request));
-            Assert.Equal("User not found or incorrect password.", exception.Message);
-        }
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfPrincipalNotFound()
+    {
+        // Arrange
+        string accessTokenValue = "test_access";
 
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task IdentityService_Login_ShouldReturnForbiddenExceptionIfUserLockedIout()
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(null as ClaimsPrincipal);
+
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            string username = "username", email = "email@mail.com", password = "password";
-
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
-
-            _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.LockedOut);
-
-            LoginRequest request = new()
+            Token = new JwtToken
             {
-                UserName = username,
-                Password = password,
-                Email = email
-            };
+                Access = accessTokenValue
+            }
+        };
 
-            // Assert
-            ForbiddenException exception = await Assert.ThrowsAsync<ForbiddenException>(async () => await _service.LoginAsync(request));
-            Assert.Equal("User account locked out.", exception.Message);
-        }
+        // Assert
+        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
+        Assert.Equal(Messages.ValidationError, exception.Message);
+        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Access)));
+        Assert.Single(exception.Errors[nameof(request.Token.Access)]);
+        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Access)].FirstOrDefault());
+    }
 
-        [Fact]
-        [Trait("Identity", "Login")]
-        public async Task IdentityService_Login_ShouldReturnSuccessResponse()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnAuthorizationExceptionIfUserNotFound()
+    {
+        // Arrange
+        string accessTokenValue = "test_access";
+        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
+
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(null as ApplicationUser);
+
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            string email = "email@mail.com", username = "username", password = "password",
-               claimType = "test_type", claimValue = "test_value",
-               accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
-
-            Guid userId = Guid.NewGuid();
-
-            List<Claim> claims = new() { new Claim(claimType, claimValue) };
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
-
-            _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
-
-            _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
-
-            _userManagerMock.Setup(mock => mock.UpdateAsync(It.IsAny<ApplicationUser>())).Callback<ApplicationUser>(user => user.Id = userId);
-
-            _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
-
-            _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
-
-            _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Success);
-
-            LoginRequest request = new()
+            Token = new JwtToken
             {
-                UserName = username,
-                Password = password,
-                Email = email
-            };
+                Access = accessTokenValue
+            }
+        };
 
-            // Act
-            LoginResponse response = await _service.LoginAsync(request);
+        // Assert
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.RefreshTokenAsync(request));
+        Assert.Equal(Messages.IncorrectTokenError, exception.Message);
+    }
 
-            // Assert
-            Assert.True(response.Success);
-            Assert.Equal(SUCCESS_MESSAGE, response.Message);
-            Assert.Equal(accessTokenValue, response.Token.Access);
-            Assert.Equal(refreshTokenValue, response.Token.Refresh);
-            Assert.Equal(userId, response.UserId);
-            _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
-        }
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUserHasNotAccessToken()
+    {
+        // Arrange
+        string accessTokenValue = "test_access";
+        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
 
-        #endregion Login
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
 
-        #region Refresh token
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser { AccessToken = null });
 
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfPrincipalNotFound()
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            string accessTokenValue = "test_access";
-
-            _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(null as ClaimsPrincipal);
-
-            RefreshTokenRequest request = new()
+            Token = new JwtToken
             {
-                Token = new JwtToken
-                {
-                    Access = accessTokenValue
-                }
-            };
+                Access = accessTokenValue
+            }
+        };
 
-            // Assert
-            BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Access), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
-        }
+        // Assert
+        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
+        Assert.Equal(Messages.ValidationError, exception.Message);
+        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Refresh)));
+        Assert.Single(exception.Errors[nameof(request.Token.Refresh)]);
+        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Refresh)].FirstOrDefault());
+    }
 
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task IdentityService_RefreshToken_ShouldReturnAuthorizationExceptionIfUserNotFound()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenNotEqualToRequestRefreshToken()
+    {
+        // Arrange
+        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
+
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser
         {
-            // Arrange
-            string accessTokenValue = "test_access";
+            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = "another_refresh" } }
+        });
 
-            _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(null as ApplicationUser);
-
-            RefreshTokenRequest request = new()
-            {
-                Token = new JwtToken
-                {
-                    Access = accessTokenValue
-                }
-            };
-
-            // Assert
-            AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal("User not found or incorrect token.", exception.Message);
-        }
-
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfUserHasNotAccessToken()
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            string accessTokenValue = "test_access";
-
-            _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ApplicationUser { AccessToken = null });
-
-            RefreshTokenRequest request = new()
+            Token = new JwtToken
             {
-                Token = new JwtToken
-                {
-                    Access = accessTokenValue
-                }
-            };
+                Access = accessTokenValue,
+                Refresh = refreshTokenValue
+            }
+        };
 
-            // Assert
-            BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
-        }
+        // Assert
+        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
+        Assert.Equal(Messages.ValidationError, exception.Message);
+        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Refresh)));
+        Assert.Single(exception.Errors[nameof(request.Token.Refresh)]);
+        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Refresh)].FirstOrDefault());
+    }
 
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenNotEqualToRequestRefreshToken()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUserHasNotNameIdentifierClaim()
+    {
+        // Arrange
+        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ApplicationUser
         {
-            // Arrange
-            string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = "another_refresh" } }
+        });
 
-            _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ApplicationUser
-            {
-                AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = "another_refresh" } }
-            });
-
-            RefreshTokenRequest request = new()
-            {
-                Token = new JwtToken
-                {
-                    Access = accessTokenValue,
-                    Refresh = refreshTokenValue
-                }
-            };
-
-            // Assert
-            BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
-        }
-
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task IdentityService_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenExpired()
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
-
-            _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ApplicationUser
+            Token = new JwtToken
             {
-                AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = refreshTokenValue, ExpiresDate = DateTime.MinValue } }
-            });
+                Access = accessTokenValue,
+                Refresh = refreshTokenValue
+            }
+        };
 
-            RefreshTokenRequest request = new()
-            {
-                Token = new JwtToken
-                {
-                    Access = accessTokenValue,
-                    Refresh = refreshTokenValue
-                }
-            };
+        // Assert
+        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
+        Assert.Equal(Messages.ValidationError, exception.Message);
+        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Access)));
+        Assert.Single(exception.Errors[nameof(request.Token.Access)]);
+        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Access)].FirstOrDefault());
+    }
 
-            // Assert
-            BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-            Assert.Equal(VALIDATION_ERROR_MESSAGE, exception.Message);
-            Assert.Equal(new Dictionary<string, IEnumerable<string>> { { nameof(request.Token.Refresh), new string[1] { INVALID_TOKEN_ERROR_MESSAGE } } }, exception.Errors);
-        }
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenExpired()
+    {
+        // Arrange
+        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
 
-        [Fact]
-        [Trait("Identity", "RefreshToken")]
-        public async Task IdentityService_RefreshToken_ShouldReturnSuccessResponse()
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser
         {
-            // Arrange
-            string accessTokenValue = "test_access", refreshTokenValue = "test_refresh",
-                 claimType = "test_type", claimValue = "test_value";
+            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = refreshTokenValue, ExpiresDate = DateTime.MinValue } }
+        });
 
-            List<Claim> claims = new() { new Claim(claimType, claimValue) };
-
-            _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
-
-            _userManagerMock.Setup(um => um.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(new ApplicationUser
-            {
-                AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = refreshTokenValue, ExpiresDate = DateTime.MaxValue } }
-            });
-
-            _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
-
-            _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
-
-            _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
-
-            RefreshTokenRequest request = new()
-            {
-                Token = new JwtToken
-                {
-                    Access = accessTokenValue,
-                    Refresh = refreshTokenValue
-                }
-            };
-
-            // Act
-            RefreshTokenResponse response = await _service.RefreshTokenAsync(request);
-
-            // Assert
-            Assert.True(response.Success);
-            Assert.Equal(SUCCESS_MESSAGE, response.Message);
-            Assert.Equal(accessTokenValue, response.Token.Access);
-            Assert.Equal(refreshTokenValue, response.Token.Refresh);
-            _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
-        }
-
-        #endregion Refresh token
-
-        #region Logout
-
-        [Fact]
-        [Trait("Identity", "Logout")]
-        public async Task IdentityService_Logout_ShouldReturnNotFoundExceptionIfUserNotFound()
+        RefreshTokenRequest request = new()
         {
-            // Arrange
-            string userId = Guid.NewGuid().ToString();
-
-            _userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(new ApplicationUser());
-
-            LogoutRequest request = new()
+            Token = new JwtToken
             {
-                UserId = Guid.NewGuid().ToString()
-            };
+                Access = accessTokenValue,
+                Refresh = refreshTokenValue
+            }
+        };
 
-            // Assert
-            NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(async () => await _service.LogoutAsync(request));
-            Assert.Equal("User not found.", exception.Message);
-        }
+        // Assert
+        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
+        Assert.Equal(Messages.ValidationError, exception.Message);
+        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Refresh)));
+        Assert.Single(exception.Errors[nameof(request.Token.Refresh)]);
+        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Refresh)].FirstOrDefault());
+    }
 
-        [Fact]
-        [Trait("Identity", "Logout")]
-        public async Task IdentityService_Logout_ShouldReturnSuccessResult()
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_RefreshToken_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh",
+             claimType = "test_type", claimValue = "test_value";
+
+        List<Claim> claims = new() { new Claim(claimType, claimValue) };
+
+        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
+
+        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser
         {
-            // Arrange
-            string userId = Guid.NewGuid().ToString();
-            ApplicationUser user = new ApplicationUser { AccessToken = new AccessToken() };
+            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = refreshTokenValue, ExpiresDate = DateTime.MaxValue } }
+        });
 
-            _userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+        _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
 
-            LogoutRequest request = new()
+        _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
+
+        _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
+
+        RefreshTokenRequest request = new()
+        {
+            Token = new JwtToken
             {
-                UserId = userId
-            };
+                Access = accessTokenValue,
+                Refresh = refreshTokenValue
+            }
+        };
 
-            // Act
-            LogoutResponse response = await _service.LogoutAsync(request);
+        // Act
+        RefreshTokenResponse response = await _service.RefreshTokenAsync(request);
 
-            // Assert
-            Assert.True(response.Success);
-            Assert.Equal(SUCCESS_MESSAGE, response.Message);
-            Assert.Null(user.AccessToken);
-            _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
-            _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Once());
-            
-        }
+        // Assert
+        Assert.True(response.Success);
+        Assert.Equal(Messages.SuccessResult, response.Message);
+        Assert.Equal(accessTokenValue, response.Token.Access);
+        Assert.Equal(refreshTokenValue, response.Token.Refresh);
+        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+    }
 
-        #endregion Logout
+    #endregion Refresh token
+
+    #region Logout
+
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Logout_ShouldReturnNotFoundExceptionIfUserNotFound()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(new ApplicationUser());
+
+        LogoutRequest request = new()
+        {
+            UserId = Guid.NewGuid().ToString()
+        };
+
+        // Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(async () => await _service.LogoutAsync(request));
+        Assert.Equal(Messages.UserNotFound, exception.Message);
+    }
+
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Logout_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        ApplicationUser user = new ApplicationUser { AccessToken = new AccessToken() };
+
+        _userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+
+        LogoutRequest request = new()
+        {
+            UserId = userId
+        };
+
+        // Act
+        LogoutResponse response = await _service.LogoutAsync(request);
+
+        // Assert
+        Assert.True(response.Success);
+        Assert.Equal(Messages.SuccessResult, response.Message);
+        Assert.Null(user.AccessToken);
+        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+        _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Once());
+
+    }
+
+    #endregion Logout
+
+    private static (Guid, ClaimsPrincipal) GetClaimsPrincipal()
+    {
+        Guid userId = Guid.NewGuid();
+        Claim claim = new(ClaimTypes.NameIdentifier, userId.ToString());
+        ClaimsIdentity claimsIdentity = new(new List<Claim> { claim });
+        ClaimsPrincipal principal = new(new List<ClaimsIdentity> { claimsIdentity });
+
+        return (userId, principal);
     }
 }

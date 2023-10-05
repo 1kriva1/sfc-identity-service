@@ -6,42 +6,42 @@ using System.Security.Claims;
 using SFC.Identity.Infrastructure.Extensions;
 using Xunit;
 
-namespace SFC.Identity.Infrastructure.UnitTests.Extensions
+namespace SFC.Identity.Infrastructure.UnitTests.Extensions;
+
+public class TokenExtensionsTests
 {
-    public class TokenExtensionsTests
+    private readonly JwtService _service;
+
+    private readonly JwtSettings _settings = new()
     {
-        private readonly JwtService _service;
+        Key = "key_ahsvdjavsdvqwyvetyqweyvasndvhgavsdghcvahsdc",
+        Issuer = "test_issuer",
+        Audience = "test_audience",
+        RefreshTokenDurationInDays = 7,
+        AccessTokenDurationInMinutes = 2
+    };
 
-        private readonly JwtSettings _settings = new()
-        {
-            Key = "key_ahsvdjavsdvqwyvetyqweyvasndvhgavsdghcvahsdc",
-            Issuer = "test_issuer",
-            Audience = "test_audience",
-            RefreshTokenDurationInDays = 7,
-            AccessTokenDurationInMinutes = 2
-        };
+    public TokenExtensionsTests()
+    {
+        Mock<IOptions<JwtSettings>> jwtSettingsOptionsMock = new();
 
-        public TokenExtensionsTests()
-        {
-            Mock<IOptions<JwtSettings>> jwtSettingsOptionsMock = new();
+        jwtSettingsOptionsMock.Setup(s => s.Value).Returns(_settings);
 
-            jwtSettingsOptionsMock.Setup(s => s.Value).Returns(_settings);
+        _service = new(jwtSettingsOptionsMock.Object);
+    }
 
-            _service = new(jwtSettingsOptionsMock.Object);
-        }
+    [Fact]
+    [Trait("Extension", "Jwt")]
+    public void Extension_Jwt_ShouldCreateAccessToken()
+    {
+        // Arrange
+        IEnumerable<Claim> authClaims = new List<Claim> { };
 
-        [Fact]
-        public void TokenExtensions_CreateAccessToken_ShouldCreate()
-        {
-            // Arrange
-            IEnumerable<Claim> authClaims = new List<Claim> { };
+        // Act
+        AccessToken token = _service.CreateAccessToken(authClaims);
 
-            // Act
-            AccessToken token = _service.CreateAccessToken(authClaims);
-
-            // Assert
-            Assert.NotNull(token);
-            Assert.NotNull(token.RefreshToken);
-        }
+        // Assert
+        Assert.NotNull(token);
+        Assert.NotNull(token.RefreshToken);
     }
 }

@@ -7,11 +7,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>		
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.0" />
+		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.57.0" />		
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
+	  <ProjectReference Include="..\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Infrastructure.Contracts.csproj" />
 	  <ProjectReference Include="..\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
 	</ItemGroup>
 
