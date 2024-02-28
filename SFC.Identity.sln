@@ -34,11 +34,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		global.json = global.json
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Contracts", "src\Infrastructure\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Infrastructure.Contracts.csproj", "{988798D1-5CE7-4615-8692-6F21CC07530E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Infrastructure.Persistence.UnitTests", "tests\SFC.Identity.Infrastructure.Persistence.UnitTests\SFC.Identity.Infrastructure.Persistence.UnitTests.csproj", "{95B9929D-147E-4096-8A32-95EB88CF9268}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Persistence.UnitTests", "tests\SFC.Identity.Infrastructure.Persistence.UnitTests\SFC.Identity.Infrastructure.Persistence.UnitTests.csproj", "{95B9929D-147E-4096-8A32-95EB88CF9268}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

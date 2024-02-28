@@ -37,7 +37,7 @@ public record IdentityService(UserManager<ApplicationUser> UserManager,
         ApplicationUser user = new()
         {
             Email = request.Email,
-            UserName = request.UserName,
+            UserName = request.UserName ?? request.Email,
             EmailConfirmed = true
         };
 
