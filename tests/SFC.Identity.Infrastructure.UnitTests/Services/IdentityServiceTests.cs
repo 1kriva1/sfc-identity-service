@@ -11,8 +11,10 @@ using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Application.Models.Registration;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
+using SFC.Identity.Infrastructure.Settings;
 
 using System.Security.Claims;
 

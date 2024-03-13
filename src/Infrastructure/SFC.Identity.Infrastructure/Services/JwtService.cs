@@ -4,11 +4,13 @@ using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
+using SFC.Identity.Infrastructure.Settings;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using AccessToken = SFC.Identity.Application.Models.Tokens.AccessToken;
 
 namespace SFC.Identity.Infrastructure.Services;
 

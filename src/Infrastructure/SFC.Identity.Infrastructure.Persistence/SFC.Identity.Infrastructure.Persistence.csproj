@@ -15,6 +15,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
+	  <ProjectReference Include="..\..\Core\SFC.Identity.Domain\SFC.Identity.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

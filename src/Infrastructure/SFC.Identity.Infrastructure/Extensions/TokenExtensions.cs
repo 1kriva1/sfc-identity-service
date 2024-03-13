@@ -1,5 +1,7 @@
 ﻿using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
+
 using System.Security.Claims;
 
 namespace SFC.Identity.Infrastructure.Extensions;

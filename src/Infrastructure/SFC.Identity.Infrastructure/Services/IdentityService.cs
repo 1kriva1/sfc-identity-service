@@ -9,6 +9,7 @@ using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Infrastructure.Extensions;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Domain.Entities;
 
 namespace SFC.Identity.Infrastructure.Services;
 
@@ -124,7 +125,7 @@ public record IdentityService(UserManager<ApplicationUser> UserManager,
 
         if (user.AccessToken == null
             || !user.AccessToken.RefreshToken.Value.Equals(request.Token.Refresh, StringComparison.InvariantCultureIgnoreCase)
-            || user.AccessToken.RefreshToken.IsExpired)
+            || DateTime.UtcNow >= user.AccessToken.RefreshToken.ExpiresDate)
         {
             throw new BadRequestException(Messages.ValidationError,
                 (nameof(request.Token.Refresh), Messages.TokenInvalid));

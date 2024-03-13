@@ -8,6 +8,7 @@ using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
+using SFC.Identity.Infrastructure.Settings;
 
 namespace SFC.Identity.Infrastructure;
 

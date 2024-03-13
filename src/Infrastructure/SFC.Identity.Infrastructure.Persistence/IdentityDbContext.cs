@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
 using SFC.Identity.Infrastructure.Persistence.Models;
 
 namespace SFC.Identity.Infrastructure.Persistence;

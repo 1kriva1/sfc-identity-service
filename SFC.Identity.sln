@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Persistence.UnitTests", "tests\SFC.Identity.Infrastructure.Persistence.UnitTests\SFC.Identity.Infrastructure.Persistence.UnitTests.csproj", "{95B9929D-147E-4096-8A32-95EB88CF9268}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Domain", "src\Core\SFC.Identity.Domain\SFC.Identity.Domain.csproj", "{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{95B9929D-147E-4096-8A32-95EB88CF9268}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95B9929D-147E-4096-8A32-95EB88CF9268}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95B9929D-147E-4096-8A32-95EB88CF9268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +111,7 @@ Global
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{988798D1-5CE7-4615-8692-6F21CC07530E} = {C8A24B9E-1A80-48A5-8423-1F39E9433804}
 		{95B9929D-147E-4096-8A32-95EB88CF9268} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
+		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633} = {5665E84D-2C02-4F99-82B7-FF2B54A9EC19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DADF67B-0150-48FA-B103-9460262A7AA4}

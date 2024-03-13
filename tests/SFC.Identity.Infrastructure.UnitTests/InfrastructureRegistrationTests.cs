@@ -6,6 +6,8 @@ using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
+using SFC.Identity.Infrastructure.Settings;
+
 using Xunit;
 
 namespace SFC.Identity.Infrastructure.UnitTests;

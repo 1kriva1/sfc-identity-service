@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
 
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests;
 public class IdentityDbContextTests
@@ -32,13 +33,16 @@ public class IdentityDbContextTests
     public async Task Persistence_DbContext_ShouldHandleAccessTokenEntity()
     {
         // Arrange
+        Guid tokenId = Guid.NewGuid();
         AccessToken entity = new()
         {
+            Id= tokenId,
             CreatedDate = DateTime.UtcNow,
             ExpiresDate = DateTime.UtcNow.AddMinutes(10),
             Value = "access_token",
             RefreshToken = new RefreshToken
             {
+                Id = tokenId,
                 CreatedDate = DateTime.UtcNow,
                 ExpiresDate = DateTime.UtcNow.AddDays(7),
                 Value = "test_refresh_token"
@@ -59,13 +63,16 @@ public class IdentityDbContextTests
     public async Task Persistence_DbContext_ShouldHandleRefreshTokenEntity()
     {
         // Arrange
+        Guid tokenId = Guid.NewGuid();
         RefreshToken entity = new()
         {
+            Id = tokenId,
             CreatedDate = DateTime.UtcNow,
             ExpiresDate = DateTime.UtcNow.AddDays(7),
             Value = "test_refresh_token",
-            Token = new AccessToken
+            AccessToken = new AccessToken
             {
+                Id = tokenId,
                 CreatedDate = DateTime.UtcNow,
                 ExpiresDate = DateTime.UtcNow.AddMinutes(10),
                 Value = "access_token"

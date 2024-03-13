@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using Microsoft.AspNetCore.Identity;
+using SFC.Identity.Domain.Entities;
+using SFC.Identity.Infrastructure.Persistence.Configurations.Token;
 
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests.Configurations;
 public class ConfigurationTests
@@ -24,7 +26,7 @@ public class ConfigurationTests
         // Assert
         IEnumerable<IMutableProperty> properties = builder.Metadata.GetDeclaredProperties();
 
-        Assert.Single(properties);
+        Assert.Equal(4, properties.Count());
 
         IMutableProperty idProperty = properties.First();
 
@@ -37,7 +39,7 @@ public class ConfigurationTests
 
         Assert.Single(foreignKeys);
 
-        Assert.Equal(nameof(RefreshToken.TokenForeignKey), foreignKeys.First().Properties.First().Name);
+        Assert.Equal(nameof(RefreshToken.Id), foreignKeys.First().Properties.First().Name);
 
         IEnumerable<IMutableNavigation> navigations = builder.Metadata.GetNavigations();
 
@@ -79,7 +81,7 @@ public class ConfigurationTests
 
         Assert.Single(foreignKeys);
 
-        Assert.Equal(nameof(AccessToken.UserForeignKey), foreignKeys.First().Properties.First().Name);
+        Assert.Equal(nameof(AccessToken.Id), foreignKeys.First().Properties.First().Name);
 
         IEnumerable<IMutableNavigation> navigations = builder.Metadata.GetNavigations();
 
@@ -177,7 +179,7 @@ public class ConfigurationTests
         // Assert
         IEnumerable<IMutableProperty> properties = builder.Metadata.GetDeclaredProperties();
 
-        Assert.Single(properties);
+        Assert.Equal(4, properties.Count());
 
         IMutableProperty idProperty = properties.First();
 

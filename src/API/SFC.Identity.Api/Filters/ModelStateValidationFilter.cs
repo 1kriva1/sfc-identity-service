@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using SFC.Identity.Application.Common.Models;
+
 using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Application.Models.Base;
 
 namespace SFC.Identity.Api.Filters;
 
