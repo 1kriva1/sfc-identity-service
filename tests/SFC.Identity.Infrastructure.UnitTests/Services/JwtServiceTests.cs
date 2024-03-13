@@ -2,7 +2,10 @@
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
 using SFC.Identity.Infrastructure.Services;
+using SFC.Identity.Infrastructure.Settings;
+
 using System.Security.Claims;
 using Xunit;
 

@@ -84,17 +84,16 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserForeignKey = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AccessTokens", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AccessTokens_Users_UserForeignKey",
-                        column: x => x.UserForeignKey,
+                        name: "FK_AccessTokens_Users_Id",
+                        column: x => x.Id,
                         principalSchema: "Identity",
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -201,36 +200,21 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpiresDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TokenForeignKey = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ExpiresDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RefreshTokens", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RefreshTokens_AccessTokens_TokenForeignKey",
-                        column: x => x.TokenForeignKey,
+                        name: "FK_RefreshTokens_AccessTokens_Id",
+                        column: x => x.Id,
                         principalSchema: "Identity",
                         principalTable: "AccessTokens",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AccessTokens_UserForeignKey",
-                schema: "Identity",
-                table: "AccessTokens",
-                column: "UserForeignKey",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_TokenForeignKey",
-                schema: "Identity",
-                table: "RefreshTokens",
-                column: "TokenForeignKey",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",

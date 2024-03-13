@@ -5,6 +5,8 @@ using SFC.Identity.Infrastructure.Services;
 using System.Security.Claims;
 using SFC.Identity.Infrastructure.Extensions;
 using Xunit;
+using SFC.Identity.Domain.Entities;
+using SFC.Identity.Infrastructure.Settings;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Extensions;
 

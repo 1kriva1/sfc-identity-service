@@ -4,9 +4,9 @@ using System.Net;
 using SystemException = System.Exception;
 using Xunit;
 using System.Text.Json;
-using SFC.Identity.Application.Common.Models;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Application.Models.Base;
 
 namespace SFC.Identity.Api.Tests.Middlewares.Exception;
 

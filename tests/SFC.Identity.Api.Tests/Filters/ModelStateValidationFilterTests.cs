@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 using SFC.Identity.Api.Filters;
 using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Common.Models;
+using SFC.Identity.Application.Models.Base;
+
 using Xunit;
 
 namespace SFC.Identity.Api.Tests.Filters;

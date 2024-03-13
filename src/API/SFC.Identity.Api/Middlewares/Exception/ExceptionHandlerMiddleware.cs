@@ -1,9 +1,9 @@
 ﻿using SFC.Identity.Application.Common.Exceptions;
-using SFC.Identity.Application.Common.Models;
 using System.Net;
 using System.Text.Json;
 using ExceptionType = System.Exception;
 using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Application.Models.Base;
 
 namespace SFC.Identity.Api.Middlewares.Exception;
 

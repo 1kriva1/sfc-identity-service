@@ -1,4 +1,4 @@
-﻿using SFC.Identity.Application.Common.Models;
+﻿using SFC.Identity.Application.Models.Base;
 
 namespace SFC.Identity.Application.Models.Login;
 

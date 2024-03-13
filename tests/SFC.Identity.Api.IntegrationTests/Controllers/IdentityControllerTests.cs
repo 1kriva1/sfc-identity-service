@@ -1,6 +1,6 @@
 ﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
 using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Common.Models;
+using SFC.Identity.Application.Models.Base;
 using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Application.Models.Registration;

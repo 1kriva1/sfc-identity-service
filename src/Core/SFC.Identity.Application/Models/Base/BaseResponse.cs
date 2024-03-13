@@ -1,11 +1,12 @@
 ﻿using SFC.Identity.Application.Common.Constants;
+
 using System.Text.Json.Serialization;
 
-namespace SFC.Identity.Application.Common.Models;
+namespace SFC.Identity.Application.Models.Base;
 
 [JsonDerivedType(typeof(BaseErrorResponse))]
 public class BaseResponse
-{        
+{
     public BaseResponse()
     {
         Success = true;

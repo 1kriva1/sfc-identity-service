@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SFC.Identity.Application.Models.Tokens;
+using SFC.Identity.Domain.Entities;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 
@@ -32,16 +33,15 @@ public class Utilities
         {
             CreatedDate = DateTime.Now,
             ExpiresDate = DateTime.MaxValue,
-            UserForeignKey = USER_ID,
-            Value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiSW50ZWdyYXRpb25UZXN0VXNlciIsImV4cCI6MTY4MjQwNTkxOCwiaXNzIjoiR2xvYm9UaWNrZXRJZGVudGl0eSIsImF1ZCI6Ikdsb2JvVGlja2V0SWRlbnRpdHlVc2VyIn0.sniULKxCa7wBI3OGqJMayaBdKo7zwPdo91XCt7cyleo"
-        });
-
-        context.RefreshTokens.Add(new RefreshToken
-        {
-            TokenForeignKey = accessEntry.Entity.Id,
-            CreatedDate = DateTime.Now,
-            ExpiresDate = DateTime.MaxValue,
-            Value = "kaGWK0agkRpoKjvRvnV+R/jswQJ1aqeszK9V61xN9vj0lD+yBj9EXFeM1GmWjChmtVeXWppJptak1uOOdpkBkA=="
+            Id = USER_ID,
+            Value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiSW50ZWdyYXRpb25UZXN0VXNlciIsImV4cCI6MTY4MjQwNTkxOCwiaXNzIjoiR2xvYm9UaWNrZXRJZGVudGl0eSIsImF1ZCI6Ikdsb2JvVGlja2V0SWRlbnRpdHlVc2VyIn0.sniULKxCa7wBI3OGqJMayaBdKo7zwPdo91XCt7cyleo",
+            RefreshToken = new RefreshToken()
+            {
+                Id = USER_ID,
+                CreatedDate = DateTime.Now,
+                ExpiresDate = DateTime.MaxValue,
+                Value = "kaGWK0agkRpoKjvRvnV+R/jswQJ1aqeszK9V61xN9vj0lD+yBj9EXFeM1GmWjChmtVeXWppJptak1uOOdpkBkA=="
+            }
         });
 
         context.SaveChanges();

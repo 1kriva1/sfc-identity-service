@@ -126,56 +126,52 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("SFC.Identity.Application.Models.Tokens.AccessToken", b =>
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.AccessToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(1);
 
                     b.Property<DateTime>("ExpiresDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserForeignKey")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(2);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnOrder(3);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserForeignKey")
-                        .IsUnique();
 
                     b.ToTable("AccessTokens", "Identity");
                 });
 
-            modelBuilder.Entity("SFC.Identity.Application.Models.Tokens.RefreshToken", b =>
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(1);
 
                     b.Property<DateTime>("ExpiresDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("TokenForeignKey")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(2);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnOrder(3);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TokenForeignKey")
-                        .IsUnique();
 
                     b.ToTable("RefreshTokens", "Identity");
                 });
@@ -325,27 +321,27 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SFC.Identity.Application.Models.Tokens.AccessToken", b =>
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.AccessToken", b =>
                 {
                     b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationUser", null)
                         .WithOne("AccessToken")
-                        .HasForeignKey("SFC.Identity.Application.Models.Tokens.AccessToken", "UserForeignKey")
+                        .HasForeignKey("SFC.Identity.Domain.Entities.AccessToken", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SFC.Identity.Application.Models.Tokens.RefreshToken", b =>
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("SFC.Identity.Application.Models.Tokens.AccessToken", "Token")
+                    b.HasOne("SFC.Identity.Domain.Entities.AccessToken", "AccessToken")
                         .WithOne("RefreshToken")
-                        .HasForeignKey("SFC.Identity.Application.Models.Tokens.RefreshToken", "TokenForeignKey")
+                        .HasForeignKey("SFC.Identity.Domain.Entities.RefreshToken", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Token");
+                    b.Navigation("AccessToken");
                 });
 
-            modelBuilder.Entity("SFC.Identity.Application.Models.Tokens.AccessToken", b =>
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.AccessToken", b =>
                 {
                     b.Navigation("RefreshToken")
                         .IsRequired();
