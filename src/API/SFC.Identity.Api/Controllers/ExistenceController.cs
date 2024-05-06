@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Existence;
 
@@ -8,6 +9,7 @@ namespace SFC.Identity.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [AllowAnonymous]
+[ProducesResponseType(StatusCodes.Status200OK)]
 public class ExistenceController : ControllerBase
 {
     private readonly IExistenceService _existenceService;
@@ -17,9 +19,14 @@ public class ExistenceController : ControllerBase
         _existenceService = existenceService;
     }
 
+    /// <summary>
+    /// Check user existence by name.
+    /// </summary>
+    /// <param name="userName">User name</param>
+    /// <returns>An ActionResult of type ExistenceResponse</returns>
+    /// <response code="200">Returns user existence check result by **name**.</response>
     [HttpGet("name/{userName}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
     public async Task<ActionResult<ExistenceResponse>> CheckExistenceByUserNameAsync([FromRoute] string userName)
     {
         ExistenceResponse response = await _existenceService.CheckByUserNameAsync(userName);
@@ -27,9 +34,13 @@ public class ExistenceController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Check user existence by email.
+    /// </summary>
+    /// <param name="email">User email</param>
+    /// <returns>An ActionResult of type ExistenceResponse</returns>
+    /// <response code="200">Returns user existence check result by **email**.</response>
     [HttpGet("email/{email}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ExistenceResponse>> CheckExistenceByEmailAsync([FromRoute] string email)
     {
         ExistenceResponse response = await _existenceService.CheckByEmailAsync(email);

@@ -2,7 +2,7 @@
 
 package sfc_identity;
 
-option csharp_namespace = "GrpcIdentityService";
+option csharp_namespace = "SFC.Identity.Grpc.Messages.CreatePlayer";
 
 message CreatePlayerRequest {
   int64 player_id = 1;

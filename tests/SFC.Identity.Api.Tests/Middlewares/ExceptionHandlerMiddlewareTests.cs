@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
-using SFC.Identity.Api.Middlewares.Exception;
 using System.Net;
-using SystemException = System.Exception;
 using Xunit;
 using System.Text.Json;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Base;
+using SFC.Identity.Api.Middlewares;
+using SystemException = System.Exception;
 
-namespace SFC.Identity.Api.Tests.Middlewares.Exception;
+namespace SFC.Identity.Api.UnitTests.Middlewares;
 
 public class ExceptionHandlerMiddlewareTests
 {
@@ -27,7 +27,7 @@ public class ExceptionHandlerMiddlewareTests
         await middleware.InvokeAsync(httpContext);
 
         // Assert
-        Assert.Equal("application/json", httpContext.Response.ContentType);
+        Assert.Equal(CommonConstants.CONTENT_TYPE, httpContext.Response.ContentType);
     }
 
     [Fact]

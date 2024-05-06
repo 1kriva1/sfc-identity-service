@@ -2,6 +2,9 @@
 
 namespace SFC.Identity.Application.Models.Base;
 
+/// <summary>
+/// **Base** response model with **errors**.
+/// </summary>
 public class BaseErrorResponse : BaseResponse
 {
     public BaseErrorResponse() { }
@@ -12,6 +15,9 @@ public class BaseErrorResponse : BaseResponse
         Errors = errors;
     }
 
+    /// <summary>
+    /// Response result errors in key/value representation.
+    /// </summary>
     [JsonPropertyOrder(2)]
     public Dictionary<string, IEnumerable<string>>? Errors { get; }
 }

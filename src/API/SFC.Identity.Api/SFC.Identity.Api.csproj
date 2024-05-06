@@ -1,25 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <DocumentationFile>SFC.Identity.Api.xml</DocumentationFile>
+        <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.11">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <NoWarn>1701;1702;1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <NoWarn>1701;1702;1591</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.11">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
-	</ItemGroup>
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
-		<ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
-		<ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure\SFC.Identity.Infrastructure.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure\SFC.Identity.Infrastructure.csproj" />
+    </ItemGroup>
 
 </Project>

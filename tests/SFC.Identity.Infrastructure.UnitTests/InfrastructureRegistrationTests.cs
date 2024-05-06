@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
+using SFC.Data.Infrastructure.Services.Hosted;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence;
@@ -14,19 +16,19 @@ namespace SFC.Identity.Infrastructure.UnitTests;
 
 public class InfrastructureRegistrationTests
 {
-    private readonly ServiceProvider _serviceProvider;
+    private readonly ServiceCollection _serviceCollection = new();
+    private readonly ServiceProvider _serviceProvider;    
 
     public InfrastructureRegistrationTests()
     {
-        ServiceCollection serviceCollection = new();
         IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new KeyValuePair<string, string?>[1] { new KeyValuePair<string, string?>("ConnectionString", "Value") })
             .Build();
-        serviceCollection.AddDbContext<IdentityDbContext>();
-        serviceCollection.AddLogging();
-        serviceCollection.AddInfrastructureServices(configuration);
-        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _serviceCollection.AddDbContext<IdentityDbContext>();
+        _serviceCollection.AddLogging();
+        _serviceCollection.AddInfrastructureServices(configuration);
+        _serviceProvider = _serviceCollection.BuildServiceProvider();
     }
 
     [Fact]
@@ -50,5 +52,6 @@ public class InfrastructureRegistrationTests
         Assert.NotNull(_serviceProvider.GetService<IJwtService>());
         Assert.NotNull(_serviceProvider.GetService<IIdentityService>());
         Assert.NotNull(_serviceProvider.GetService<IExistenceService>());
+        Assert.NotNull(_serviceCollection.FirstOrDefault(s => s.ImplementationType == typeof(DatabaseResetHostedService)));
     }
 }
