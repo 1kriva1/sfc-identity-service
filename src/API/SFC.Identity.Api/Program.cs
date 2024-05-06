@@ -1,16 +1,10 @@
-using SFC.Identity.Api;
-using SFC.Identity.Infrastructure;
+using SFC.Identity.Api.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 WebApplication app = builder
        .ConfigureServices()
        .ConfigurePipeline();
-
-if (app.Environment.IsDevelopment())
-{
-    await app.ResetDatabaseAsync();
-}
 
 app.Run();
 

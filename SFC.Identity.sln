@@ -37,11 +37,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Contracts", "src\Infrastructure\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Infrastructure.Contracts.csproj", "{988798D1-5CE7-4615-8692-6F21CC07530E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Infrastructure.Persistence.UnitTests", "tests\SFC.Identity.Infrastructure.Persistence.UnitTests\SFC.Identity.Infrastructure.Persistence.UnitTests.csproj", "{95B9929D-147E-4096-8A32-95EB88CF9268}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFC.Identity.Domain", "src\Core\SFC.Identity.Domain\SFC.Identity.Domain.csproj", "{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Domain", "src\Core\SFC.Identity.Domain\SFC.Identity.Domain.csproj", "{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{93D51FF1-6C71-401E-B822-51FE3925313C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Contracts", "src\Contracts\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Contracts.csproj", "{C82C4B1C-7774-4E48-8B92-AB5494FF0501}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,10 +83,6 @@ Global
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07}.Release|Any CPU.Build.0 = Release|Any CPU
-		{988798D1-5CE7-4615-8692-6F21CC07530E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{988798D1-5CE7-4615-8692-6F21CC07530E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{988798D1-5CE7-4615-8692-6F21CC07530E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{988798D1-5CE7-4615-8692-6F21CC07530E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{95B9929D-147E-4096-8A32-95EB88CF9268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{95B9929D-147E-4096-8A32-95EB88CF9268}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95B9929D-147E-4096-8A32-95EB88CF9268}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -93,6 +91,10 @@ Global
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,9 +111,10 @@ Global
 		{95A8F806-1D7E-4203-8775-09B9E256D1B6} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{8BA54D5A-3E32-4780-8607-56B76A015320} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{2FE72008-6897-4712-AE6D-9C60C9FE1D07} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
-		{988798D1-5CE7-4615-8692-6F21CC07530E} = {C8A24B9E-1A80-48A5-8423-1F39E9433804}
 		{95B9929D-147E-4096-8A32-95EB88CF9268} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633} = {5665E84D-2C02-4F99-82B7-FF2B54A9EC19}
+		{93D51FF1-6C71-401E-B822-51FE3925313C} = {2C704F95-810B-42CA-987B-C711BF6C3456}
+		{C82C4B1C-7774-4E48-8B92-AB5494FF0501} = {93D51FF1-6C71-401E-B822-51FE3925313C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DADF67B-0150-48FA-B103-9460262A7AA4}

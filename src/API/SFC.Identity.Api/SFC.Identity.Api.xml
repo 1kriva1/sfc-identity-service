@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SFC.Identity.Api</name>
+    </assembly>
+    <members>
+        <member name="M:SFC.Identity.Api.Controllers.ExistenceController.CheckExistenceByUserNameAsync(System.String)">
+            <summary>
+            Check user existence by name.
+            </summary>
+            <param name="userName">User name</param>
+            <returns>An ActionResult of type ExistenceResponse</returns>
+            <response code="200">Returns user existence check result by **name**.</response>
+        </member>
+        <member name="M:SFC.Identity.Api.Controllers.ExistenceController.CheckExistenceByEmailAsync(System.String)">
+            <summary>
+            Check user existence by email.
+            </summary>
+            <param name="email">User email</param>
+            <returns>An ActionResult of type ExistenceResponse</returns>
+            <response code="200">Returns user existence check result by **email**.</response>
+        </member>
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.RegisterAsync(SFC.Identity.Application.Models.Registration.RegistrationRequest)">
+            <summary>
+            Register new user.
+            </summary>
+            <param name="request">Registration request</param>
+            <returns>An ActionResult of type RegistrationResponse</returns>
+            <response code="200">Returns **new** created user id with linked JWT token.</response>
+            <response code="400">Returns **validation** errors.</response>
+            <response code="409">Returns if user **already exist** by name or email.</response>
+        </member>
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.LoginAsync(SFC.Identity.Application.Models.Login.LoginRequest)">
+            <summary>
+            Login user.
+            </summary>
+            <param name="request">Login request</param>
+            <returns>An ActionResult of type LoginResponse</returns>
+            <response code="200">Returns **successfully** authenticated user with id and linked JWT token.</response>
+            <response code="400">Returns **validation** errors.</response>
+            <response code="401">Returns **failed** authentication result.</response>
+            <response code="403">Returns when user is **locked**.</response>
+        </member>
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.LogoutAsync(SFC.Identity.Application.Models.Login.LogoutRequest)">
+            <summary>
+            Logout user.
+            </summary>
+            <param name="request">Logout request</param>
+            <returns>An ActionResult of type LogoutResponse</returns>
+            <response code="200">Returns **successfully** logout user result.</response>
+            <response code="400">Returns **validation** errors.</response>
+            <response code="404">Returns when user **not found** by id.</response>
+        </member>
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.RefreshTokenAsync(SFC.Identity.Application.Models.RefreshToken.RefreshTokenRequest)">
+            <summary>
+            Refresh JWT token.
+            </summary>
+            <param name="request">Refresh token request</param>
+            <returns>An ActionResult of type RefreshTokenResponse</returns>
+            <response code="200">Returns **successfully** refreshed JWT token.</response>
+            <response code="400">Returns **validation** error, when access or refresh tokens are invalid.</response>
+        </member>
+    </members>
+</doc>

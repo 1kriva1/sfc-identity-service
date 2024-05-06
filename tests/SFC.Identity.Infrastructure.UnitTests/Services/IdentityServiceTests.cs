@@ -20,6 +20,8 @@ using System.Security.Claims;
 
 using Xunit;
 
+using InfrastructureIdentityService = SFC.Identity.Infrastructure.Services.IdentityService;
+
 namespace SFC.Identity.Infrastructure.UnitTests.Services;
 
 public class IdentityServiceTests
@@ -39,7 +41,7 @@ public class IdentityServiceTests
         AccessTokenDurationInMinutes = 2
     };
 
-    private readonly IdentityService _service;
+    private readonly InfrastructureIdentityService _service;
 
     public IdentityServiceTests()
     {
@@ -51,7 +53,7 @@ public class IdentityServiceTests
         Mock<IOptions<JwtSettings>> jwtSettingsOptionsMock = new();
         jwtSettingsOptionsMock.Setup(s => s.Value).Returns(_settings);
         _jwtServiceMock = new Mock<IJwtService>();
-        _service = new IdentityService(_userManagerMock.Object, _signInManagerMock.Object, _jwtServiceMock.Object);
+        _service = new InfrastructureIdentityService(_userManagerMock.Object, _signInManagerMock.Object, _jwtServiceMock.Object);
     }
 
     #region Registration

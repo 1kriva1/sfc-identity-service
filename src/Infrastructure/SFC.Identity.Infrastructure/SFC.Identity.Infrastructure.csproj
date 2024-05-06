@@ -12,8 +12,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Contracts\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Contracts.csproj" />
 	  <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
-	  <ProjectReference Include="..\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Infrastructure.Contracts.csproj" />
 	  <ProjectReference Include="..\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
 	</ItemGroup>
 

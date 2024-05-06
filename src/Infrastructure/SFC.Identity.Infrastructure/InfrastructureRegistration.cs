@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using SFC.Data.Infrastructure.Services.Hosted;
 using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
 using SFC.Identity.Infrastructure.Settings;
+
+using InfrastructureIdentityService = SFC.Identity.Infrastructure.Services.IdentityService;
 
 namespace SFC.Identity.Infrastructure;
 
@@ -45,8 +47,10 @@ public static class InfrastructureRegistration
 
         services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
         services.AddTransient<IJwtService, JwtService>();
-        services.AddTransient<IIdentityService, IdentityService>();
+        services.AddTransient<IIdentityService, InfrastructureIdentityService>();
         services.AddTransient<IExistenceService, ExistenceService>();
+
+        services.AddHostedService<DatabaseResetHostedService>();
     }
 
     public static WebApplication UseGrpc(this WebApplication app)

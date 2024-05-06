@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
+using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 
-namespace SFC.Identity.Infrastructure.Persistence.Seeds.Users;
-
-public static class UsersSeed
+namespace SFC.Identity.Infrastructure.Extensions;
+public static class SeedExtensions
 {
+    #region Stub data
+
     private const string TEST_PASSWORD = "Test1234!";
 
     private static readonly List<Guid> USER_IDS = new()
@@ -88,7 +90,9 @@ public static class UsersSeed
         Guid.Parse("{EA968F41-303D-4287-8FB0-5C7500D3DEC5}")
     };
 
-    public static async Task SeedUsers(this IdentityDbContext context)
+    #endregion Stub data
+
+    public static async Task SeedUsersAsync(this IdentityDbContext context)
     {
         ApplicationUser withoutProfileUser = new()
         {

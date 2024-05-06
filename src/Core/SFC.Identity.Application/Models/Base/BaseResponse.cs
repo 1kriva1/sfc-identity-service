@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace SFC.Identity.Application.Models.Base;
 
+/// <summary>
+/// **Base** response model.
+/// </summary>
 [JsonDerivedType(typeof(BaseErrorResponse))]
 public class BaseResponse
 {
@@ -25,9 +28,15 @@ public class BaseResponse
         Message = message;
     }
 
+    /// <summary>
+    /// Determined if response has **success** result.
+    /// </summary>
     [JsonPropertyOrder(0)]
     public bool Success { get; }
 
+    /// <summary>
+    /// Describe response **result**.
+    /// </summary>
     [JsonPropertyOrder(1)]
     public string Message { get; }
 }

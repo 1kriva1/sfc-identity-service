@@ -5,7 +5,7 @@ using ExceptionType = System.Exception;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Base;
 
-namespace SFC.Identity.Api.Middlewares.Exception;
+namespace SFC.Identity.Api.Middlewares;
 
 using Handler = Func<ExceptionType, ExceptionResponse>;
 
@@ -56,7 +56,7 @@ public class ExceptionHandlerMiddleware
 
         context.Response.StatusCode = (int)response.StatusCode;
 
-        context.Response.ContentType = context.Request.ContentType ?? "application/json";
+        context.Response.ContentType = context.Request.ContentType ?? CommonConstants.CONTENT_TYPE;
 
         return context.Response.WriteAsync(JsonSerializer.Serialize(response.Result));
     }

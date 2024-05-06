@@ -1,8 +1,8 @@
 ﻿using Grpc.Core;
 
-using GrpcIdentityService;
+using SFC.Identity.Grpc.Messages.CreatePlayer;
 
-using static GrpcIdentityService.IdentityService;
+using static SFC.Identity.Grpc.Services.IdentityService;
 
 namespace SFC.Identity.Infrastructure.Services;
 public class InternalIdentityService : IdentityServiceBase
