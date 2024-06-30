@@ -7,11 +7,11 @@ using Xunit;
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests;
 public class IdentityDbContextTests
 {
-    private readonly DbContextOptions<IdentityDbContext> dbContextOptions;
+    private readonly DbContextOptions<IdentityDbContext> _dbContextOptions;
 
     public IdentityDbContextTests()
     {
-        dbContextOptions = new DbContextOptionsBuilder<IdentityDbContext>()
+        _dbContextOptions = new DbContextOptionsBuilder<IdentityDbContext>()
             .UseInMemoryDatabase($"IdentityDbContextTestsDb_{DateTime.Now.ToFileTimeUtc()}")
             .Options;
     }
@@ -20,7 +20,7 @@ public class IdentityDbContextTests
     [Trait("Persistence", "DbContext")]
     public void Persistence_DbContext_ShouldHasCorrectDefaultSchema()
     {
-        IdentityDbContext context = new(dbContextOptions);
+        IdentityDbContext context = new(_dbContextOptions);
 
         string? defaultSchema = context.Model.GetDefaultSchema();
 

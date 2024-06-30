@@ -17,6 +17,8 @@ using SFC.Identity.Infrastructure.Settings;
 
 using Xunit;
 
+using Environments = SFC.Identity.Application.Common.Constants.Environments;
+
 namespace SFC.Identity.Infrastructure.UnitTests.Services.Hosted;
 public class DatabaseResetHostedServiceTests
 {
@@ -101,7 +103,7 @@ public class DatabaseResetHostedServiceTests
         services.AddSingleton(persistedGrantContext);
 
         Mock<IHostEnvironment> hostEnvironmentMock = new();
-        hostEnvironmentMock.Setup(m => m.EnvironmentName).Returns("Development");
+        hostEnvironmentMock.Setup(m => m.EnvironmentName).Returns(Environments.Testing);
 
         return (new DatabaseResetHostedService(_loggerMock.Object, services.BuildServiceProvider(), hostEnvironmentMock.Object, _identitySettingsMock.Object),
             identityContext, configurationContext, persistedGrantContext);

@@ -7,7 +7,7 @@ namespace SFC.Identity.Api.IntegrationTests.Fixtures;
 
 public class Utilities
 {
-    public static Guid USER_ID = Guid.Parse("{6313179F-7837-473A-A4D5-A5571B43E6A6}");
+    private static readonly Guid USER_ID = Guid.Parse("{6313179F-7837-473A-A4D5-A5571B43E6A6}");
 
     public static void InitializeDbForTests(IdentityDbContext context)
     {
