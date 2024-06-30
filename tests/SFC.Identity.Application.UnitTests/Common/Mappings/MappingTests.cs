@@ -15,16 +15,12 @@ using Xunit;
 namespace SFC.Identity.Application.UnitTests.Common.Mappings;
 public class MappingTests
 {
-    private readonly IConfigurationProvider _configuration;
+    private readonly MapperConfiguration _configuration;
     private readonly IMapper _mapper;
 
     public MappingTests()
     {
-        _configuration = new MapperConfiguration(config =>
-        {
-            config.AddProfile<MappingProfile>();
-        });
-
+        _configuration = new MapperConfiguration(config => config.AddProfile<MappingProfile>());
         _mapper = _configuration.CreateMapper();
     }
 
