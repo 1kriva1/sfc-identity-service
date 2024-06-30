@@ -154,27 +154,6 @@ public class ExceptionHandlerMiddlewareTests
 
     [Fact]
     [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnNotFound()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
-
-        string errorMessage = "not_found_error";
-
-        Task Next(HttpContext httpContext) => Task.FromException<NotFoundException>(new NotFoundException(errorMessage));
-
-        ExceptionHandlerMiddleware middleware = new(Next);
-
-        // Act
-        await middleware.InvokeAsync(httpContext);
-
-        // Assert
-        AssertBaseResponse(HttpStatusCode.NotFound, httpContext.Response, errorMessage, out string _);
-    }
-
-    [Fact]
-    [Trait("API", "Middleware")]
     public async Task API_Middleware_Exception_ShouldReturnUnauthorized()
     {
         // Arrange
@@ -213,27 +192,6 @@ public class ExceptionHandlerMiddlewareTests
 
         // Assert
         AssertBaseResponse(HttpStatusCode.Forbidden, httpContext.Response, errorMessage, out string _);
-    }
-
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnBadRequestForJwtException()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
-
-        string errorMessage = "jwt_error";
-
-        Task Next(HttpContext httpContext) => Task.FromException<JwtException>(new JwtException(errorMessage));
-
-        ExceptionHandlerMiddleware middleware = new(Next);
-
-        // Act
-        await middleware.InvokeAsync(httpContext);
-
-        // Assert
-        AssertBaseResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, out string _);
     }
 
     private void AssertBaseResponse(HttpStatusCode statusCode, HttpResponse httpResponse, string errorMessage, out string responseBody)

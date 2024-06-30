@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>		
-		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.57.0" />		
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
+		<PackageReference Include="Duende.IdentityServer" Version="7.0.5" />		
+		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="7.0.5" />				
+		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.63.0" />
 	</ItemGroup>
 
 	<ItemGroup>

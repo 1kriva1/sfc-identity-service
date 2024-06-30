@@ -1,0 +1,50 @@
+@use "ngx-sfc-common/styles/index" as *;
+
+:host {
+  .container {
+    background: transparent;
+
+    .content {
+      .designed {
+        position: absolute;
+        left: 0;
+        padding-left: 5em;
+
+        span.designer {
+          color: $color-yellow-0;
+          font-weight: bold;
+        }
+      }
+
+      .year {
+        span {
+          &.brand {
+            color: $color-yellow-0;
+            font-weight: bold;
+          }
+        }
+      }
+
+      .designed,
+      .year {
+        @include theme-value(color, $color-default, $color-dark);
+
+        margin: 0;
+        padding: 1em;
+        font-size: 0.8em;
+        text-align: center;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      .content {
+        .designed {
+          position: relative;
+          padding-left: 0;
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Duende.IdentityServer.Events;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Services;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -6,54 +11,38 @@ using Moq;
 
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Exceptions;
-using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.RefreshToken;
+using SFC.Identity.Application.Models.Logout;
 using SFC.Identity.Application.Models.Registration;
-using SFC.Identity.Application.Models.Tokens;
-using SFC.Identity.Domain.Entities;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
 using SFC.Identity.Infrastructure.Settings;
 
-using System.Security.Claims;
-
 using Xunit;
 
-using InfrastructureIdentityService = SFC.Identity.Infrastructure.Services.IdentityService;
+using Client = Duende.IdentityServer.Models.Client;
+using LogoutRequest = Duende.IdentityServer.Models.LogoutRequest;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Services;
 
 public class IdentityServiceTests
 {
-    private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
+    private Mock<UserManager<ApplicationUser>> _userManagerMock = default!;
 
-    private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
+    private Mock<SignInManager<ApplicationUser>> _signInManagerMock = default!;
 
-    private readonly Mock<IJwtService> _jwtServiceMock;
+    private Mock<IIdentityServerInteractionService> _identityServerInteractionServiceMock = default!;
 
-    private readonly JwtSettings _settings = new()
-    {
-        Key = "key_ahsvdjavsdvqwyvetyqweyvasndvhgavsdghcvahsdc",
-        Issuer = "test_issuer",
-        Audience = "test_audience",
-        RefreshTokenDurationInDays = 7,
-        AccessTokenDurationInMinutes = 2
-    };
+    private Mock<IServerUrls> _serverUrlsMock = default!;
 
-    private readonly InfrastructureIdentityService _service;
+    private Mock<IEventService> _eventServiceMock = default!;
+
+    private IdentityService _service = default!;
 
     public IdentityServiceTests()
     {
-        Mock<IUserStore<ApplicationUser>> userStore = new();
-        _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStore.Object, null!, null!, null!, null!, null!, null!, null!, null!);
-        _signInManagerMock = new Mock<SignInManager<ApplicationUser>>(_userManagerMock.Object,
-            Mock.Of<IHttpContextAccessor>(), Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(),
-            null!, null!, null!, null!);
-        Mock<IOptions<JwtSettings>> jwtSettingsOptionsMock = new();
-        jwtSettingsOptionsMock.Setup(s => s.Value).Returns(_settings);
-        _jwtServiceMock = new Mock<IJwtService>();
-        _service = new InfrastructureIdentityService(_userManagerMock.Object, _signInManagerMock.Object, _jwtServiceMock.Object);
+        IdentitySettings settings = BuildIdentitySettings();
+        InitMocks(settings);
     }
 
     #region Registration
@@ -67,7 +56,7 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
-        RegistrationRequest request = new()
+        RegistrationModel model = new()
         {
             UserName = username,
             Password = "password",
@@ -75,7 +64,7 @@ public class IdentityServiceTests
         };
 
         // Assert
-        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(request));
+        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(model));
         Assert.Equal(Messages.UserAlreadyExist, exception.Message);
     }
 
@@ -88,7 +77,7 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
 
-        RegistrationRequest request = new()
+        RegistrationModel model = new()
         {
             Email = email,
             Password = "password",
@@ -96,7 +85,7 @@ public class IdentityServiceTests
         };
 
         // Assert
-        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(request));
+        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(model));
         Assert.Equal(Messages.UserAlreadyExist, exception.Message);
     }
 
@@ -108,25 +97,25 @@ public class IdentityServiceTests
         string email = "email@mail.com", username = "username", errorCode = "100", errorDescription = "100 error description",
             password = "password";
 
-        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync((ApplicationUser)null!);
 
-        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync((ApplicationUser)null!);
 
         _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
-            .Returns(Task.FromResult(IdentityResult.Failed(new IdentityError[1] {
-                new IdentityError { Code =errorCode, Description = errorDescription }
-            })));
+            .Returns(Task.FromResult(IdentityResult.Failed([
+                new() { Code =errorCode, Description = errorDescription }
+            ])));
 
-        RegistrationRequest request = new()
+        RegistrationModel model = new()
         {
-            Email = "email_new@mail.com",
-            UserName = "username_new",
+            Email = email,
+            UserName = username,
             Password = password,
             ConfirmPassword = password
         };
 
         // Assert
-        IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(request));
+        IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(model));
         Assert.Equal(Messages.UserRegistrationError, exception.Message);
         Assert.True(exception.Errors.ContainsKey(errorCode));
         Assert.Single(exception.Errors[errorCode]);
@@ -135,50 +124,83 @@ public class IdentityServiceTests
 
     [Fact]
     [Trait("Service", "Identity")]
-    public async Task Service_Identity_Register_ShouldReturnSuccessResponse()
+    public async Task Service_Identity_Register_ShouldReturnAuthorizationExceptionIfLoginAfterRegistrationNotSuccess()
     {
         // Arrange
         string email = "email@mail.com", username = "username", password = "password",
-            claimType = "test_type", claimValue = "test_value",
-            accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+            returnUrl = "https:\\localhost:4200", clientId = "sfc";
 
-        Guid userId = Guid.NewGuid();
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync((ApplicationUser)null!);
 
-        List<Claim> claims = new() { new Claim(claimType, claimValue) };
-
-        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
-
-        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
-
-        _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync((ApplicationUser)null!);
 
         _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
             .Returns(Task.FromResult(IdentityResult.Success));
 
-        _userManagerMock.Setup(mock => mock.UpdateAsync(It.IsAny<ApplicationUser>())).Callback<ApplicationUser>(user => user.Id = userId);
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Failed);
 
-        _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
-
-        _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
-
-        RegistrationRequest request = new()
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetAuthorizationContextAsync(returnUrl)).ReturnsAsync(new AuthorizationRequest
         {
-            Email = "email_new@mail.com",
-            UserName = "username_new",
+            Client = new Client { ClientId = clientId }
+        });
+
+        RegistrationModel model = new()
+        {
+            Email = email,
+            UserName = username,
             Password = password,
             ConfirmPassword = password
         };
 
+        // Assert
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.RegisterAsync(model));
+        Assert.Equal(Messages.AuthorizationError, exception.Message);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
+    }
+
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Register_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        string email = "email@mail.com", username = "username", password = "password",
+            returnUrl = "https:\\localhost:4200", clientId = "sfc";
+
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync((ApplicationUser)null!);
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync((ApplicationUser)null!);
+
+        _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
+            .Returns(Task.FromResult(IdentityResult.Success));
+
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Success);
+
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetAuthorizationContextAsync(returnUrl)).ReturnsAsync(new AuthorizationRequest
+        {
+            Client = new Client { ClientId = clientId }
+        });
+
+        RegistrationModel model = new()
+        {
+            Email = email,
+            UserName = username,
+            Password = password,
+            ConfirmPassword = password,
+            ReturnUrl = returnUrl
+        };
+
         // Act
-        RegistrationResponse response = await _service.RegisterAsync(request);
+        RegistrationResult result = await _service.RegisterAsync(model);
 
         // Assert
-        Assert.True(response.Success);
-        Assert.Equal(Messages.SuccessResult, response.Message);
-        Assert.Equal(accessTokenValue, response.Token.Access);
-        Assert.Equal(refreshTokenValue, response.Token.Refresh);
-        Assert.Equal(userId, response.UserId);
-        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+        Assert.Equal(returnUrl, result.ReturnUrl);
+        Assert.Equal(username, result.UserName);
+        Assert.Equal(Guid.Empty, result.UserId);
+
+        AuthenticationProperties properties = (AuthenticationProperties)result.Properties;
+        Assert.False(properties.IsPersistent);
+        Assert.NotNull(properties.ExpiresUtc);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginSuccessEvent>()), Times.Once());
     }
 
     #endregion Registration
@@ -196,7 +218,7 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
-        LoginRequest request = new()
+        LoginModel model = new()
         {
             UserName = "username_test",
             Password = "password",
@@ -204,8 +226,9 @@ public class IdentityServiceTests
         };
 
         // Assert
-        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(request));
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(model));
         Assert.Equal(Messages.AuthorizationError, exception.Message);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
     [Fact]
@@ -221,7 +244,7 @@ public class IdentityServiceTests
 
         _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Failed);
 
-        LoginRequest request = new()
+        LoginModel model = new()
         {
             UserName = username,
             Password = password,
@@ -229,8 +252,9 @@ public class IdentityServiceTests
         };
 
         // Assert
-        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(request));
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(model));
         Assert.Equal(Messages.AuthorizationError, exception.Message);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
     [Fact]
@@ -246,7 +270,7 @@ public class IdentityServiceTests
 
         _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.LockedOut);
 
-        LoginRequest request = new()
+        LoginModel model = new()
         {
             UserName = username,
             Password = password,
@@ -254,337 +278,274 @@ public class IdentityServiceTests
         };
 
         // Assert
-        ForbiddenException exception = await Assert.ThrowsAsync<ForbiddenException>(async () => await _service.LoginAsync(request));
+        ForbiddenException exception = await Assert.ThrowsAsync<ForbiddenException>(async () => await _service.LoginAsync(model));
         Assert.Equal(Messages.AccountLocked, exception.Message);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
     [Fact]
     [Trait("Service", "Identity")]
-    public async Task Service_Identity_Login_ShouldReturnSuccessResponse()
+    public async Task Service_Identity_Login_ShouldReturnSuccessResult()
     {
         // Arrange
         string email = "email@mail.com", username = "username", password = "password",
-           claimType = "test_type", claimValue = "test_value",
-           accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
+            returnUrl = "https:\\localhost:4200", clientId = "sfc";
+        bool rememberMe = true;
 
-        Guid userId = Guid.NewGuid();
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser { UserName = username });
 
-        List<Claim> claims = new() { new Claim(claimType, claimValue) };
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser { UserName = username });
 
-        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, rememberMe, true)).ReturnsAsync(SignInResult.Success);
 
-        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetAuthorizationContextAsync(returnUrl)).ReturnsAsync(new AuthorizationRequest
+        {
+            Client = new Client { ClientId = clientId }
+        });
 
-        _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
-
-        _userManagerMock.Setup(mock => mock.UpdateAsync(It.IsAny<ApplicationUser>())).Callback<ApplicationUser>(user => user.Id = userId);
-
-        _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
-
-        _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
-
-        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Success);
-
-        LoginRequest request = new()
+        LoginModel model = new()
         {
             UserName = username,
             Password = password,
-            Email = email
+            Email = email,
+            ReturnUrl = returnUrl,
+            RememberMe = rememberMe
         };
 
         // Act
-        LoginResponse response = await _service.LoginAsync(request);
+        LoginResult result = await _service.LoginAsync(model);
 
         // Assert
-        Assert.True(response.Success);
-        Assert.Equal(Messages.SuccessResult, response.Message);
-        Assert.Equal(accessTokenValue, response.Token.Access);
-        Assert.Equal(refreshTokenValue, response.Token.Refresh);
-        Assert.Equal(userId, response.UserId);
-        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+        Assert.Equal(returnUrl, result.ReturnUrl);
+        Assert.Equal(username, result.UserName);
+        Assert.Equal(Guid.Empty, result.UserId);
+
+        AuthenticationProperties properties = (AuthenticationProperties)result.Properties;
+        Assert.False(properties.IsPersistent);
+        Assert.NotNull(properties.ExpiresUtc);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginSuccessEvent>()), Times.Once());
+    }
+
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Login_ShouldSetPersistentAndExpires()
+    {
+        // Arrange
+        IdentitySettings settings = BuildIdentitySettings();
+        settings.Login = new LoginSettings { AllowRememberLogin = true, RememberLoginDuration = 60 };
+        InitMocks(settings);
+
+        string email = "email@mail.com", username = "username", password = "password",
+            returnUrl = "https:\\localhost:4200", clientId = "sfc";
+        bool rememberMe = true;
+
+        _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser { UserName = username });
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser { UserName = username });
+
+        _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, rememberMe, true)).ReturnsAsync(SignInResult.Success);
+
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetAuthorizationContextAsync(returnUrl)).ReturnsAsync(new AuthorizationRequest
+        {
+            Client = new Client { ClientId = clientId }
+        });
+
+        LoginModel model = new()
+        {
+            UserName = username,
+            Password = password,
+            Email = email,
+            ReturnUrl = returnUrl,
+            RememberMe = rememberMe
+        };
+
+        // Act
+        LoginResult result = await _service.LoginAsync(model);
+
+        // Assert
+        AuthenticationProperties properties = (AuthenticationProperties)result.Properties;
+        Assert.True(properties.IsPersistent);
+        Assert.True(properties.ExpiresUtc > DateTimeOffset.UtcNow);
     }
 
     #endregion Login
-
-    #region Refresh token
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfPrincipalNotFound()
-    {
-        // Arrange
-        string accessTokenValue = "test_access";
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(null as ClaimsPrincipal);
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue
-            }
-        };
-
-        // Assert
-        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-        Assert.Equal(Messages.ValidationError, exception.Message);
-        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Access)));
-        Assert.Single(exception.Errors[nameof(request.Token.Access)]);
-        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Access)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnAuthorizationExceptionIfUserNotFound()
-    {
-        // Arrange
-        string accessTokenValue = "test_access";
-        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
-
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(null as ApplicationUser);
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue
-            }
-        };
-
-        // Assert
-        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.RefreshTokenAsync(request));
-        Assert.Equal(Messages.IncorrectTokenError, exception.Message);
-    }
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUserHasNotAccessToken()
-    {
-        // Arrange
-        string accessTokenValue = "test_access";
-        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
-
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser { AccessToken = null });
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue
-            }
-        };
-
-        // Assert
-        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-        Assert.Equal(Messages.ValidationError, exception.Message);
-        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Refresh)));
-        Assert.Single(exception.Errors[nameof(request.Token.Refresh)]);
-        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Refresh)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenNotEqualToRequestRefreshToken()
-    {
-        // Arrange
-        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
-        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
-
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser
-        {
-            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = "another_refresh" } }
-        });
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue,
-                Refresh = refreshTokenValue
-            }
-        };
-
-        // Assert
-        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-        Assert.Equal(Messages.ValidationError, exception.Message);
-        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Refresh)));
-        Assert.Single(exception.Errors[nameof(request.Token.Refresh)]);
-        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Refresh)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUserHasNotNameIdentifierClaim()
-    {
-        // Arrange
-        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(new ClaimsPrincipal());
-
-        _userManagerMock.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new ApplicationUser
-        {
-            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = "another_refresh" } }
-        });
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue,
-                Refresh = refreshTokenValue
-            }
-        };
-
-        // Assert
-        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-        Assert.Equal(Messages.ValidationError, exception.Message);
-        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Access)));
-        Assert.Single(exception.Errors[nameof(request.Token.Access)]);
-        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Access)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnBadRequestExceptionIfUsersRefreshTokenExpired()
-    {
-        // Arrange
-        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh";
-        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
-
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser
-        {
-            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = refreshTokenValue, ExpiresDate = DateTime.MinValue } }
-        });
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue,
-                Refresh = refreshTokenValue
-            }
-        };
-
-        // Assert
-        BadRequestException exception = await Assert.ThrowsAsync<BadRequestException>(async () => await _service.RefreshTokenAsync(request));
-        Assert.Equal(Messages.ValidationError, exception.Message);
-        Assert.True(exception.Errors.ContainsKey(nameof(request.Token.Refresh)));
-        Assert.Single(exception.Errors[nameof(request.Token.Refresh)]);
-        Assert.Equal(Messages.TokenInvalid, exception.Errors[nameof(request.Token.Refresh)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Service", "Identity")]
-    public async Task Service_Identity_RefreshToken_ShouldReturnSuccessResponse()
-    {
-        // Arrange
-        string accessTokenValue = "test_access", refreshTokenValue = "test_refresh",
-             claimType = "test_type", claimValue = "test_value";
-
-        List<Claim> claims = new() { new Claim(claimType, claimValue) };
-
-        (Guid userId, ClaimsPrincipal principal) = GetClaimsPrincipal();
-
-        _jwtServiceMock.Setup(jwt => jwt.GetPrincipalFromExpiredToken(accessTokenValue)).Returns(principal);
-
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId.ToString())).ReturnsAsync(new ApplicationUser
-        {
-            AccessToken = new AccessToken { RefreshToken = new RefreshToken { Value = refreshTokenValue, ExpiresDate = DateTime.MaxValue } }
-        });
-
-        _userManagerMock.Setup(um => um.GetClaimsAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(claims);
-
-        _jwtServiceMock.Setup(jwt => jwt.GenerateAccessToken(claims)).Returns(new AccessToken { Value = accessTokenValue });
-
-        _jwtServiceMock.Setup(jwt => jwt.GenerateRefreshToken()).Returns(new RefreshToken { Value = refreshTokenValue });
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = accessTokenValue,
-                Refresh = refreshTokenValue
-            }
-        };
-
-        // Act
-        RefreshTokenResponse response = await _service.RefreshTokenAsync(request);
-
-        // Assert
-        Assert.True(response.Success);
-        Assert.Equal(Messages.SuccessResult, response.Message);
-        Assert.Equal(accessTokenValue, response.Token.Access);
-        Assert.Equal(refreshTokenValue, response.Token.Refresh);
-        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
-    }
-
-    #endregion Refresh token
 
     #region Logout
 
     [Fact]
     [Trait("Service", "Identity")]
-    public async Task Service_Identity_Logout_ShouldReturnNotFoundExceptionIfUserNotFound()
+    public async Task Service_Identity_Logout_ShouldProcessWithShowSignoutPrompt()
     {
         // Arrange
-        string userId = Guid.NewGuid().ToString();
+        string logoutId = "logout_id";
+        IdentitySettings settings = BuildIdentitySettings();
+        settings.Logout = new LogoutSettings { ShowLogoutPrompt = true };
+        InitMocks(settings);
 
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(new ApplicationUser());
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetLogoutContextAsync(logoutId))
+            .ReturnsAsync(new LogoutRequest(logoutId, new LogoutMessage()));
 
-        LogoutRequest request = new()
+        LogoutModel model = new()
         {
-            UserId = Guid.NewGuid().ToString()
+            LogoutId = logoutId,
+            User = new LogoutUserModel { IsAuthenticated = true }
         };
 
+        // Act
+        LogoutResult result = await _service.LogoutAsync(model);
+
         // Assert
-        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(async () => await _service.LogoutAsync(request));
-        Assert.Equal(Messages.UserNotFound, exception.Message);
+        Assert.True(result.ShowLogoutPrompt);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLogoutSuccessEvent>()), Times.Never());
+        _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Never());
     }
 
     [Fact]
     [Trait("Service", "Identity")]
-    public async Task Service_Identity_Logout_ShouldReturnSuccessResult()
+    public async Task Service_Identity_Logout_ShouldProcessWithPostLogoutWhenNotShowLogoutPromptInSettings()
     {
         // Arrange
-        string userId = Guid.NewGuid().ToString();
-        ApplicationUser user = new ApplicationUser { AccessToken = new AccessToken() };
+        string logoutId = "logout_id", postLogoutRedirectUri = "https:\\localhost:4200", clientName = "client_name",
+            signOutIFrameUrl = "https:\\localhost:5200";
+        IdentitySettings settings = BuildIdentitySettings();
+        settings.Logout = new LogoutSettings { ShowLogoutPrompt = false, AutomaticRedirectAfterSignOut = true };
+        InitMocks(settings);
 
-        _userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetLogoutContextAsync(logoutId))
+            .ReturnsAsync(new LogoutRequest(signOutIFrameUrl, new LogoutMessage
+            {
+                PostLogoutRedirectUri = postLogoutRedirectUri,
+                ClientName = clientName
+            }));
 
-        LogoutRequest request = new()
+        LogoutModel model = new()
         {
-            UserId = userId
+            LogoutId = logoutId,
+            User = new LogoutUserModel { IsAuthenticated = true }
         };
 
         // Act
-        LogoutResponse response = await _service.LogoutAsync(request);
+        LogoutResult result = await _service.LogoutAsync(model);
 
         // Assert
-        Assert.True(response.Success);
-        Assert.Equal(Messages.SuccessResult, response.Message);
-        Assert.Null(user.AccessToken);
-        _userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once());
+        Assert.False(result.ShowLogoutPrompt);
+        Assert.True(result.AutomaticRedirectAfterSignOut);
+        Assert.Equal(postLogoutRedirectUri, result.PostLogoutRedirectUrl);
+        Assert.Equal(clientName, result.ClientName);
+        Assert.Equal(signOutIFrameUrl, result.SignOutIFrameUrl);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLogoutSuccessEvent>()), Times.Once());
         _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Once());
+    }
 
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_Logout_ShouldProcessWithPostLogoutWhenNotAuthenticated()
+    {
+        // Arrange
+        string logoutId = "logout_id", postLogoutRedirectUri = "https:\\localhost:4200", clientName = "client_name",
+            signOutIFrameUrl = "https:\\localhost:5200";
+        IdentitySettings settings = BuildIdentitySettings();
+        settings.Logout = new LogoutSettings { ShowLogoutPrompt = true };
+        InitMocks(settings);
+
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetLogoutContextAsync(logoutId))
+            .ReturnsAsync(new LogoutRequest(signOutIFrameUrl, new LogoutMessage
+            {
+                PostLogoutRedirectUri = postLogoutRedirectUri,
+                ClientName = clientName
+            }));
+
+        LogoutModel model = new()
+        {
+            LogoutId = logoutId,
+            User = new LogoutUserModel { IsAuthenticated = false }
+        };
+
+        // Act
+        LogoutResult result = await _service.LogoutAsync(model);
+
+        // Assert
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLogoutSuccessEvent>()), Times.Once());
+        _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Once());
     }
 
     #endregion Logout
 
-    private static (Guid, ClaimsPrincipal) GetClaimsPrincipal()
-    {
-        Guid userId = Guid.NewGuid();
-        Claim claim = new(ClaimTypes.NameIdentifier, userId.ToString());
-        ClaimsIdentity claimsIdentity = new(new List<Claim> { claim });
-        ClaimsPrincipal principal = new(new List<ClaimsIdentity> { claimsIdentity });
+    #region Post Logout
 
-        return (userId, principal);
+    [Fact]
+    [Trait("Service", "Identity")]
+    public async Task Service_Identity_PostLogout_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        string logoutId = "logout_id", postLogoutRedirectUri = "https:\\localhost:4200",
+            clientId = "client_id", signOutIFrameUrl = "https:\\localhost:5200";
+        IdentitySettings settings = BuildIdentitySettings();
+        settings.Logout = new LogoutSettings { ShowLogoutPrompt = false, AutomaticRedirectAfterSignOut = true };
+        InitMocks(settings);
+
+        _identityServerInteractionServiceMock.Setup(mock => mock.GetLogoutContextAsync(logoutId))
+            .ReturnsAsync(new LogoutRequest(signOutIFrameUrl, new LogoutMessage
+            {
+                PostLogoutRedirectUri = postLogoutRedirectUri,
+                ClientId = clientId,
+                ClientName = null
+            }));
+
+        LogoutModel model = new()
+        {
+            LogoutId = logoutId,
+            User = new LogoutUserModel { IsAuthenticated = true }
+        };
+
+        // Act
+        LogoutResult result = await _service.LogoutAsync(model);
+
+        // Assert
+        Assert.False(result.ShowLogoutPrompt);
+        Assert.True(result.AutomaticRedirectAfterSignOut);
+        Assert.Equal(postLogoutRedirectUri, result.PostLogoutRedirectUrl);
+        Assert.Equal(clientId, result.ClientName);
+        Assert.Equal(signOutIFrameUrl, result.SignOutIFrameUrl);
+        _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLogoutSuccessEvent>()), Times.Once());
+        _signInManagerMock.Verify(um => um.SignOutAsync(), Times.Once());
     }
+
+    #endregion Post Logout
+
+    #region Private
+
+    private void InitMocks(IdentitySettings settings)
+    {
+        Mock<IUserStore<ApplicationUser>> userStore = new();
+        _userManagerMock = new Mock<UserManager<ApplicationUser>>(userStore.Object, null!, null!, null!, null!, null!, null!, null!, null!);
+        _signInManagerMock = new Mock<SignInManager<ApplicationUser>>(_userManagerMock.Object,
+            Mock.Of<IHttpContextAccessor>(), Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(),
+            null!, null!, null!, null!);
+        Mock<IOptions<IdentitySettings>> identitySettingsOptionsMock = new();
+        identitySettingsOptionsMock.Setup(s => s.Value).Returns(settings);
+        _identityServerInteractionServiceMock = new Mock<IIdentityServerInteractionService>();
+        _serverUrlsMock = new Mock<IServerUrls>();
+        _eventServiceMock = new Mock<IEventService>();
+        _service = new IdentityService(_userManagerMock.Object, _signInManagerMock.Object,
+            _identityServerInteractionServiceMock.Object, _serverUrlsMock.Object,
+            _eventServiceMock.Object, identitySettingsOptionsMock.Object);
+    }
+
+    private static IdentitySettings BuildIdentitySettings()
+    {
+        return new()
+        {
+            Clients = [new ClientSetting { Id = "id" }],
+            Api = new ApiSettings
+            {
+                Resources = [new ApiResourceSetting { Name = "sfc.data" }],
+                Scopes = [new ApiScopeSetting { Name = "sfc.data.full" }]
+            },
+            Login = new LoginSettings(),
+            Logout = new LogoutSettings()
+        };
+    }
+
+    #endregion Private
 }

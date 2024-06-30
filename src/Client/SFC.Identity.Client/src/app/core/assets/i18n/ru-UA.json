@@ -1,0 +1,18 @@
+{
+  "to": "до",
+  "back": "Назад",
+  "yes": "Так",
+  "no": "Ні",
+  "interceptor.error.error-value-part": "Виникла помилка:",
+  "interceptor.error.error-title": "На жаль, сталася помилка!",
+  "component.footer.designed": "Спроектований ",
+  "component.footer.reserved": " Всі права захищені.",
+  "page.not-found.page-title": "Не знайшли",
+  "page.not-found.title": "Ой!",
+  "page.not-found.description": "Ви вийшли за рамки",
+  "page.not-found.button-back": "Повернутися",
+  "page.error.page-title": "Помилка",
+  "page.error.title": "Ой!",
+  "page.error.description": "Вибачте, але, схоже, сталося щось несподіване",
+  "page.error.button-back": "Назад до SFC"
+}

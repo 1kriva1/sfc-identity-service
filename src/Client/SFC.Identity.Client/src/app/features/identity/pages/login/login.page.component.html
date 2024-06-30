@@ -1,0 +1,76 @@
+<div class="container">
+  <div class="left">
+    <h1 class="title" i18n="@@feature.identity.login.page.title">Welcome to Street Football Club!</h1>
+    <sfc-slider [items]="Constants.SLIDER_ITEMS" [showCount]="false" [showAutomaticToggle]="false"
+      [type]="SliderType.Automatic">
+    </sfc-slider>
+    <div class="description">
+      <h3 i18n="@@feature.identity.login.page.description.1">Choosing a WordPress Theme for</h3>
+      <p i18n="@@feature.identity.login.page.description.2">
+        Here is your best destination for finding players, creating teams, planning games and more!
+        We believes in the passion, joy and sense of community that football brings.
+      </p>
+    </div>
+  </div>
+  <div class="right">
+    <sfc-logo [sfcComponentSize] [customSize]="1.3"></sfc-logo>
+    <div class="content">
+      <form [formGroup]="form" autocomplete="off">
+        <div class="part">
+          <sfc-text-input id="username-email" formControlName="userNameEmail"
+            [label]="Localization.INPUT.USERNAME_EMAIL.LABEL_PLACEHOLDER"
+            [placeholder]="Localization.INPUT.USERNAME_EMAIL.LABEL_PLACEHOLDER" [bordered]="true" [validations]="{
+                            required: Localization.INPUT.USERNAME_EMAIL.VALIDATIONS.REQUIRED
+                        }">
+          </sfc-text-input>
+        </div>
+
+        <div class="part">
+          <sfc-text-input id="password" formControlName="password"
+            [label]="Localization.INPUT.PASSWORD.LABEL_PLACEHOLDER"
+            [placeholder]="Localization.INPUT.PASSWORD.LABEL_PLACEHOLDER" [bordered]="true" type="password"
+            [validations]="{
+                            required: Localization.INPUT.PASSWORD.VALIDATIONS.REQUIRED
+                        }">
+          </sfc-text-input>
+        </div>
+
+        <div class="part remember">
+          <sfc-checkbox-input id="remember" formControlName="remember" [checkmarkType]="CheckmarkType.Rounded"
+            [sideLabel]="Localization.INPUT.REMEMBER.LABEL">
+          </sfc-checkbox-input>
+          <a class="forgot" routerLink="/identity/registration" i18n="@@feature.identity.login.page.forgot">Forgot
+            password ?</a>
+        </div>
+
+        <div [sfcShowHideElement]="error !== null" class="part errors">
+          <span class="error-message">{{error?.Message}}</span>
+        </div>
+
+        <div class="part action">
+          <sfc-button #submitBtn [text]="Localization.SIGN_IN_BUTTON_TEXT"
+            [types]="[ButtonType.Rounded, ButtonType.Filled]" [disabled]="submitted && form.invalid">
+          </sfc-button>
+
+          <sfc-delimeter [label]="Localization.DELIMETER_TEXT" [direction]="Direction.Horizontal">
+          </sfc-delimeter>
+
+          <div class="sso">
+            <div class="google">
+              <a class="sso-link" href="https://google.com">
+                <img src="app/core/assets/images/providers/google.png">
+                <p i18n="@@feature.identity.login.page.sso.google"> Sign in with Google </p>
+              </a>
+            </div>
+          </div>
+
+          <div class="redirect">
+            <span i18n="@@feature.identity.login.page.redirect.question">Don't have an account? </span>
+            <a [routerLink]="registrationLinkModel.link" [queryParams]="registrationLinkModel.params"
+              i18n="@@feature.identity.login.page.redirect">Sign Up</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

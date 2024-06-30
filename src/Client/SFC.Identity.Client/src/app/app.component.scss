@@ -1,0 +1,48 @@
+@use "ngx-sfc-common/styles/index" as *;
+@import "../styles/index";
+
+:host {
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    transition: background $transition-theme-backround-duration $transition-theme-backround-timing-function;
+
+    sfc-header {
+      padding: 2em 0;
+    }
+
+    .content {
+      display: flex;
+      flex-grow: 1;
+    }
+
+    .notifications {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: right;
+      padding: 0 2em;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      sfc-notification {
+        padding: 1em;
+        max-width: 20em;
+      }
+    }
+  }
+
+  &.sfc-default-theme {
+    .container {
+      background: $background-default;
+    }
+  }
+
+  &.sfc-dark-theme {
+    .container {
+      background: $background-dark;
+    }
+  }
+}

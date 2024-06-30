@@ -26,7 +26,7 @@
             </summary>
             <param name="request">Registration request</param>
             <returns>An ActionResult of type RegistrationResponse</returns>
-            <response code="200">Returns **new** created user id with linked JWT token.</response>
+            <response code="200">Returns when **new** user was created.</response>
             <response code="400">Returns **validation** errors.</response>
             <response code="409">Returns if user **already exist** by name or email.</response>
         </member>
@@ -36,29 +36,26 @@
             </summary>
             <param name="request">Login request</param>
             <returns>An ActionResult of type LoginResponse</returns>
-            <response code="200">Returns **successfully** authenticated user with id and linked JWT token.</response>
+            <response code="200">Returns when user was **successfully** authenticated.</response>
             <response code="400">Returns **validation** errors.</response>
             <response code="401">Returns **failed** authentication result.</response>
             <response code="403">Returns when user is **locked**.</response>
         </member>
-        <member name="M:SFC.Identity.Api.Controllers.IdentityController.LogoutAsync(SFC.Identity.Application.Models.Login.LogoutRequest)">
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.LogoutAsync(System.String)">
             <summary>
             Logout user.
             </summary>
-            <param name="request">Logout request</param>
+            <param name="logoutId">Logout identificator</param>
             <returns>An ActionResult of type LogoutResponse</returns>
             <response code="200">Returns **successfully** logout user result.</response>
-            <response code="400">Returns **validation** errors.</response>
-            <response code="404">Returns when user **not found** by id.</response>
         </member>
-        <member name="M:SFC.Identity.Api.Controllers.IdentityController.RefreshTokenAsync(SFC.Identity.Application.Models.RefreshToken.RefreshTokenRequest)">
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.PostLogoutAsync(System.String)">
             <summary>
-            Refresh JWT token.
+            Logout user after confirmation.
             </summary>
-            <param name="request">Refresh token request</param>
-            <returns>An ActionResult of type RefreshTokenResponse</returns>
-            <response code="200">Returns **successfully** refreshed JWT token.</response>
-            <response code="400">Returns **validation** error, when access or refresh tokens are invalid.</response>
+            <param name="logoutId">Logout identificator</param>
+            <returns>An ActionResult of type LogoutResponse</returns>
+            <response code="200">Returns **successfully** logout user result.</response>
         </member>
     </members>
 </doc>

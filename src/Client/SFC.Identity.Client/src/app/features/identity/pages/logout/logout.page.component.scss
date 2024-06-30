@@ -1,0 +1,121 @@
+@use "ngx-sfc-common/styles/index" as *;
+@import "mixins";
+
+:host {
+  flex-grow: 1;
+
+  .container {
+    @include center;
+
+    flex-direction: column;
+    height: 100%;
+    padding: 0.5em;
+
+    .redirect-container {
+      a {
+        width: 100%;
+        margin: 2em 0;
+
+        @include button;
+
+        sfc-button {
+          width: 100%;
+        }
+      }
+    }
+
+    .prompt-container {
+      @include center;
+
+      flex-direction: column;
+      text-align: center;
+
+      .actions {
+        display: flex;
+        width: 100%;
+
+        @include button;
+
+        sfc-button {
+          width: 100%;
+          margin: 0 1em;
+        }
+      }
+    }
+
+    .redirect-container,
+    .automatic-container {
+      @include center;
+
+      flex-direction: column;
+      text-align: center;
+
+      fa-icon {
+        margin-bottom: 0.5em;
+      }
+
+      h1 {
+        margin: 0;
+      }
+
+      p {
+        font-size: 0.8em;
+        font-weight: bold;
+
+        span.client {
+          color: $color-yellow-0;
+        }
+      }
+    }
+  }
+
+  &.automatic {
+    .container {
+      .automatic-container {
+        fa-icon {
+          color: $color-yellow-1;
+        }
+
+        h1 {
+          color: $color-default;
+        }
+
+        p {
+          color: $color-yellow-0;
+        }
+      }
+    }
+  }
+
+  &.redirect {
+    .container {
+      .redirect-container {
+        fa-icon {
+          color: $color-yellow-0;
+        }
+
+        h1 {
+          color: $color-0;
+        }
+
+        p {
+          color: $color-0;
+        }
+      }
+    }
+  }
+
+  &.prompt {
+    .container {
+      .prompt-container {
+        fa-icon {
+          color: $color-yellow-0;
+        }
+
+        h1 {
+          color: $color-0;
+        }
+      }
+    }
+  }
+}

@@ -12,8 +12,6 @@ namespace SFC.Identity.Api.IntegrationTests.Fixtures;
 public class CustomWebApplicationFactory<TStartup>
        : WebApplicationFactory<TStartup> where TStartup : class
 {
-    private const string TEST_ENVIROMENT = "Testing";
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -44,7 +42,7 @@ public class CustomWebApplicationFactory<TStartup>
             });
         });
 
-        builder.UseEnvironment(TEST_ENVIROMENT);
+        builder.UseEnvironment(Constants.TEST_ENVIROMENT);
     }
 
     public void InitializeDbForTests()

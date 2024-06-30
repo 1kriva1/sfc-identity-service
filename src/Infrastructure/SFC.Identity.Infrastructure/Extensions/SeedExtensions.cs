@@ -10,8 +10,8 @@ public static class SeedExtensions
 
     private const string TEST_PASSWORD = "Test1234!";
 
-    private static readonly List<Guid> USER_IDS = new()
-    {
+    private static readonly List<Guid> USER_IDS =
+    [
         Guid.Parse("{836A7FB9-73FE-4107-91F2-4D916158E242}"),
         Guid.Parse("{615C2665-1D2A-4C36-A675-3AD6E466670C}"),
         Guid.Parse("{D635FA2A-670A-4C10-A271-751BE1A353FE}"),
@@ -88,11 +88,13 @@ public static class SeedExtensions
         Guid.Parse("{040076D8-96AB-4493-99A8-B16BF44E6269}"),
         Guid.Parse("{A7B4D868-4679-4199-BDD0-086DC08DABDF}"),
         Guid.Parse("{EA968F41-303D-4287-8FB0-5C7500D3DEC5}")
-    };
+    ];
 
     #endregion Stub data
 
-    public static async Task SeedUsersAsync(this IdentityDbContext context)
+    #region Public
+
+    public static async Task SeedUsersAsync(this IdentityDbContext context, CancellationToken cancellationToken)
     {
         ApplicationUser withoutProfileUser = new()
         {
@@ -109,10 +111,14 @@ public static class SeedExtensions
 
         IEnumerable<ApplicationUser> profileUsers = USER_IDS.Select(BuildUser);
 
-        await context.Users.AddAsync(withoutProfileUser);
-        await context.Users.AddRangeAsync(profileUsers);
-        await context.SaveChangesAsync();
+        await context.Users.AddAsync(withoutProfileUser, cancellationToken);
+        await context.Users.AddRangeAsync(profileUsers, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
+
+    #endregion Public
+
+    #region Private
 
     private static ApplicationUser BuildUser(Guid userId, int index)
     {
@@ -129,4 +135,6 @@ public static class SeedExtensions
             PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null!, TEST_PASSWORD)
         };
     }
+
+    #endregion Private
 }

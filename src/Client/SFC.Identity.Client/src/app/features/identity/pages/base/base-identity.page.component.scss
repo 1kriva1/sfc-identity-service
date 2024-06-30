@@ -1,0 +1,232 @@
+@use "ngx-sfc-common/styles/index" as *;
+@import "mixins";
+
+:host {
+  display: block;
+  height: 100vh;
+  width: 100%;
+
+  .container {
+    display: flex;
+    background: $color-2;
+    height: 100%;
+
+    .left {
+      @include center;
+
+      flex-direction: column;
+      flex: 1;
+      user-select: none;
+      background: $color-yellow-0;
+
+      .title {
+        color: $color-0;
+        text-align: center;
+      }
+
+      .description {
+        @include center-wrap;
+
+        text-align: center;
+        width: 80%;
+
+        h3 {
+          color: $color-default;
+          font-size: 1.5em;
+          font-weight: bold;
+        }
+
+        p {
+          color: $color-8;
+          text-align: center;
+          line-height: 1.5em;
+          font-size: 0.7em;
+          font-weight: bold;
+          max-width: 80%;
+        }
+      }
+    }
+
+    .right {
+      @include center;
+
+      flex-direction: column;
+      flex: 2;
+
+      sfc-logo {
+        color: $color-default;
+        padding-bottom: 2em;
+
+        ::ng-deep {
+          .container {
+            a {
+              flex-direction: column;
+
+              span {
+                padding: 1em 0;
+              }
+            }
+          }
+        }
+      }
+
+      .content {
+        width: 35%;
+
+        form {
+          @include center;
+
+          flex-direction: column;
+
+          .part {
+            width: 100%;
+            padding: 1.2em 0;
+            position: relative;
+
+            &.errors {
+              min-height: 1.2em;
+
+              @include error-message;
+            }
+
+            &.action {
+              width: 60%;
+              user-select: none;
+              padding: 0;
+
+              sfc-button {
+                width: 100%;
+                padding: 1em 0 2em;
+              }
+
+              .sso {
+                text-align: center;
+
+                .google {
+                  padding: 1em 0;
+
+                  a.sso-link {
+                    @include center;
+
+                    display: inline-flex;
+
+                    img {
+                      width: 1.5em;
+                      padding: 0 1em 0 0;
+                    }
+
+                    p {
+                      text-align: center;
+                      color: $color-9;
+                      font-size: 0.8em;
+                      font-weight: bold;
+                    }
+                  }
+                }
+              }
+
+              .redirect {
+                text-align: center;
+
+                span {
+                  color: $color-default;
+                  font-size: 0.9em;
+                  user-select: none;
+                }
+
+                a {
+                  color: $color-yellow-1;
+                  transition: color $transition-duration-default $transition-timing-function-default;
+                  text-decoration: underline;
+                  text-underline-offset: 2px;
+                  word-break: break-word;
+
+                  &:hover {
+                    color: $color-hover-default;
+                  }
+                }
+              }
+            }
+
+            sfc-text-input {
+              ::ng-deep .sfc-input {
+                &:-webkit-autofill {
+                  box-shadow: 0 0 0 30px $color-2 inset;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .left,
+    .right {
+      padding: 2em;
+    }
+  }
+
+  @media (max-width: 1280px) {
+    .container {
+      .left {
+        padding: 0.5em;
+
+        .description {
+          width: 100%;
+        }
+      }
+
+      .right {
+        .content {
+          width: 60%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      .left {
+        display: none;
+      }
+
+      .right {
+        .content {
+          width: 60%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 425px) {
+    .container {
+      .right {
+        .content {
+          width: 100%;
+
+          form {
+            .part {
+              &.action {
+                .sso {
+                  .google {
+                    a.sso-link {
+                      flex-direction: column;
+
+                      img {
+                        padding: 0;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-height: 680px) {
+    height: 100%;
+  }
+}

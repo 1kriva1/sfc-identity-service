@@ -1,0 +1,41 @@
+<div class="container" *ngIf="model$ | async as model">
+  <ng-container [ngSwitch]="state">
+    <div *ngSwitchCase="LogoutState.Prompt" class="prompt-container">
+      <fa-icon [icon]="faQuestionCircle" [sfcComponentSize] [customSize]="4"></fa-icon>
+      <h1 i18n="@@feature.identity.logout.page.prompt.question">Would you like to logout?</h1>
+      <div class="actions">
+        <sfc-button [text]="Localization.YES" (click)="confirm()" [types]="[ButtonType.Rounded, ButtonType.Filled]">
+        </sfc-button>
+        <sfc-button [text]="Localization.NO" (click)="cancel()" [types]="[ButtonType.Rounded, ButtonType.Filled]">
+        </sfc-button>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="LogoutState.Redirect" class="redirect-container">
+      <ng-container *ngTemplateOutlet="redirect_automatic;context:{$implicit: Localization.TITLE.REDIRECT}">
+      </ng-container>
+      <a [href]="model.postLogoutRedirectUrl">
+        <sfc-button [text]="model.buttonText" [types]="[ButtonType.Rounded, ButtonType.Filled]">
+        </sfc-button>
+      </a>
+    </div>
+
+    <div *ngSwitchCase="LogoutState.IFrame" class="iframe-container">
+      <iframe *ngIf="model.signOutIFrameUrl && !model.postLogoutRedirectUrl"
+        [src]="sanitizer.bypassSecurityTrustResourceUrl(model.signOutIFrameUrl)">
+      </iframe>
+    </div>
+
+    <div *ngSwitchCase="LogoutState.Automatic" class="automatic-container">
+      <ng-container *ngTemplateOutlet="redirect_automatic;context:{$implicit: Localization.TITLE.AUTOMATIC}">
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <ng-template #redirect_automatic let-title>
+    <fa-icon [icon]="faRightFromBracket" [sfcComponentSize] [customSize]="4"></fa-icon>
+    <h1>{{title}}</h1>
+    <p>{{Localization.DESCRIPTION_1}} <span class="client">{{model.clientName?.toUpperCase()}}</span>
+      {{Localization.DESCRIPTION_2}}</p>
+  </ng-template>
+</div>

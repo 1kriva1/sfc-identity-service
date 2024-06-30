@@ -27,7 +27,7 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string userName = "IntegrationTestUser";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/existence/name/{userName}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -52,7 +52,7 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string userName = "IntegrationTestUser_Another";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/existence/name/{userName}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -75,12 +75,12 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
 
         string userName = "IntegrationTestUser_Another";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/existence/name/{userName}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -100,7 +100,7 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string email = "integrationtestemail@mail.com";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/existence/email/{email}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -125,7 +125,7 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string email = "testemail_another@mail.com";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/existence/email/{email}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -147,12 +147,12 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
 
         string email = "integrationtestemail@mail.com";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"/api/existence/email/{email}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

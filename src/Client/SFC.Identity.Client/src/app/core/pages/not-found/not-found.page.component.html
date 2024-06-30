@@ -1,0 +1,21 @@
+<div class="container">
+    <div class="content">
+        <div class="title">
+            <h1 i18n="@@core.page.not-found.title">OOPS!</h1>
+            <div class="description">
+                <p i18n="@@core.page.not-found.description">You're out of line</p>
+                <img src="app/core/assets/images/pages/not-found/flag.png">
+            </div>
+            <a [href]="environment.client_url">
+                <sfc-button [types]="[ButtonType.Rounded, ButtonType.Filled]" [text]="BUTTON_BACK_TEXT">
+                </sfc-button>
+            </a>
+        </div>
+
+        <div class="status-code" [style.fontSize.em]="size">
+            <span class="number">4</span>
+            <canvas sfcCanvasBall [size]="size"></canvas>
+            <span class="number">4</span>
+        </div>
+    </div>
+</div>

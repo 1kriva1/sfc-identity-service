@@ -35,4 +35,9 @@ public class RegistrationRequest
     [Required(ErrorMessage = "ConfirmPasswordRequired")]
     [Compare(nameof(Password), ErrorMessage = "ConfirmPasswordInvalid")]
     public string ConfirmPassword { get; set; } = null!;
+
+    /// <summary>
+    /// Return URI.
+    /// </summary>
+    public string? ReturnUrl { get; set; }
 }

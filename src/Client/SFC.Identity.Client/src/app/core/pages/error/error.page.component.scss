@@ -1,0 +1,49 @@
+@use "ngx-sfc-common/styles/index" as *;
+@import "mixins";
+
+:host {
+  flex-grow: 1;
+
+  .container {
+    @include center;
+
+    flex-direction: column;
+    text-align: center;
+    height: 100%;
+    padding: 0.5em;
+
+    .content {
+      @include center;
+
+      flex-direction: column;
+      text-align: center;
+
+      fa-icon {
+        color: $color-yellow-0;
+        margin-bottom: 0.5em;
+      }
+
+      h1 {
+        color: $color-0;
+        margin: 0;
+      }
+
+      p {
+        color: $color-0;
+        font-size: 0.8em;
+        font-weight: bold;
+      }
+
+      a {
+        width: 100%;
+        margin: 2em 0;
+
+        @include button;
+
+        sfc-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

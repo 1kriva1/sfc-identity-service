@@ -1,9 +1,9 @@
 ﻿using SFC.Identity.Application.Common.Exceptions;
 using System.Net;
 using System.Text.Json;
-using ExceptionType = System.Exception;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Base;
+using ExceptionType = System.Exception;
 
 namespace SFC.Identity.Api.Middlewares;
 
@@ -23,10 +23,8 @@ public class ExceptionHandlerMiddleware
         {
             { typeof(ConflictException), HandleConflictException },
             { typeof(IdentityException), HandleIdentityException },
-            { typeof(NotFoundException), HandleNotFoundException },
             { typeof(AuthorizationException), HandleAuthorizationException },
             { typeof(ForbiddenException), HandleForbiddenException },
-            { typeof(JwtException), HandleJwtException },
             { typeof(BadRequestException), HandleBadRequestException }
         };
         _next = next;
@@ -73,11 +71,6 @@ public class ExceptionHandlerMiddleware
         return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseErrorResponse(exception.Message, validationErrors));
     }
 
-    private ExceptionResponse HandleNotFoundException(ExceptionType exception)
-    {
-        return new ExceptionResponse(HttpStatusCode.NotFound, new BaseResponse(exception.Message, false));
-    }
-
     private ExceptionResponse HandleAuthorizationException(ExceptionType exception)
     {
         return new ExceptionResponse(HttpStatusCode.Unauthorized, new BaseResponse(exception.Message, false));
@@ -86,11 +79,6 @@ public class ExceptionHandlerMiddleware
     private ExceptionResponse HandleForbiddenException(ExceptionType exception)
     {
         return new ExceptionResponse(HttpStatusCode.Forbidden, new BaseResponse(exception.Message, false));
-    }
-
-    private ExceptionResponse HandleJwtException(ExceptionType exception)
-    {
-        return new ExceptionResponse(HttpStatusCode.BadRequest, new BaseResponse(exception.Message, false));
     }
 
     private ExceptionResponse HandleBadRequestException(ExceptionType exception)

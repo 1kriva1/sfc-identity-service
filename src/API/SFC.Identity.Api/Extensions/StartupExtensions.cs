@@ -1,12 +1,8 @@
-﻿using System.Reflection;
+﻿using Microsoft.AspNetCore.Mvc;
 
-using Microsoft.AspNetCore.Mvc;
-
-using SFC.Identity.Api.Extensions;
-using SFC.Identity.Api.Filters;
 using SFC.Identity.Application;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure;
+using SFC.Identity.Infrastructure.Extensions;
 
 namespace SFC.Identity.Api.Extensions;
 
@@ -33,6 +29,11 @@ public static class StartupExtensions
             builder.Services.AddSwagger();
         }
 
+        if (builder.Environment.IsProduction())
+        {
+            builder.Services.AddSpa();
+        }
+
         return builder.Build();
     }
 
@@ -50,18 +51,32 @@ public static class StartupExtensions
             app.UseSwagger();
         }
 
+        if (app.Environment.IsProduction())
+        {
+            app.UseSpaStaticFiles();
+        }
+
         // commented for GRPC
-        //app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
         app.UseLocalization();
 
-        app.UseAuthorization();
-
         app.UseCustomExceptionHandler();
+
+        app.UseRouting();
+
+        app.UseEndpoints(configure => { });
+
+        // add identity server (Duende) to pipeline
+        app.UseIdentityServer();
+
+        app.UseAuthorization();
 
         app.MapControllers();
 
         app.UseGrpc();
+
+        app.UseSpa();
 
         return app;
     }

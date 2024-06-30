@@ -1,0 +1,48 @@
+@use "ngx-sfc-common/styles/index" as *;
+
+:host {
+  .container {
+    .right {
+      .content {
+        form {
+          .part {
+            &.remember {
+              display: flex;
+              align-items: baseline;
+              justify-content: space-between;
+              flex-wrap: wrap;
+
+              a.forgot {
+                float: right;
+                transition: color $transition-duration-default $transition-timing-function-default;
+                color: $color-yellow-1;
+                font-size: 0.8em;
+                user-select: none;
+
+                &:hover {
+                  color: $color-hover-default;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 425px) {
+    .container {
+      .right {
+        .content {
+          form {
+            .part {
+              &.remember {
+                justify-content: center;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

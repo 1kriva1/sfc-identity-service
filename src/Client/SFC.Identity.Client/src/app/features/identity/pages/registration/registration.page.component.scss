@@ -1,0 +1,22 @@
+@use "ngx-sfc-common/styles/index" as *;
+
+:host {
+  .container {
+    .right {
+      .content {
+        form {
+          .part {
+            &.action {
+              .redirect {
+                strong {
+                  padding: 0 0.1em;
+                  color: $color-yellow-1;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,9 +2,7 @@
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Base;
 using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.RefreshToken;
 using SFC.Identity.Application.Models.Registration;
-using SFC.Identity.Application.Models.Tokens;
 
 using System.Net;
 using System.Net.Http.Json;
@@ -38,7 +36,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -71,7 +69,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -105,7 +103,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -135,7 +133,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -165,7 +163,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -190,14 +188,14 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
 
         RegistrationRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!", ConfirmPassword = "Test1234!" };
 
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -222,7 +220,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -257,7 +255,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -269,8 +267,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         Assert.IsType<RegistrationResponse>(responseValue);
         Assert.True(responseValue.Success);
         Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.True(responseValue.UserId != Guid.Empty);
-        Assert.NotNull(responseValue.Token);
+        Assert.NotEmpty(responseValue.ReturnUrl);
     }
 
     #endregion Registration
@@ -289,7 +286,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -314,14 +311,14 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
 
         LoginRequest request = new() { UserName = null, Email = null, Password = null! };
 
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -346,7 +343,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -376,7 +373,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -411,7 +408,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -435,8 +432,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         Assert.IsType<LoginResponse>(responseValue);
         Assert.True(responseValue.Success);
         Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.Equal(Utilities.USER_ID, responseValue.UserId);
-        Assert.NotNull(responseValue.Token);
+        Assert.NotEmpty(responseValue.ReturnUrl);
     }
 
     #endregion Login
@@ -445,17 +441,13 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
 
     [Fact]
     [Trait("Identity", "Logout")]
-    public async Task Identity_Logout_ShouldReturnValidationErrorForUserIdExistence()
+    public async Task Identity_Logout_ShouldReturnBadRequest()
     {
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        LogoutRequest request = new() { UserId = null! };
-
-        JsonContent content = JsonContent.Create(request);
-
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout");
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -468,26 +460,22 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         Assert.False(responseValue.Success);
         Assert.Equal(Messages.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
-        Assert.True(responseValue.Errors.ContainsKey(nameof(LogoutRequest.UserId)));
-        Assert.Single(responseValue.Errors[nameof(LogoutRequest.UserId)]);
-        Assert.Equal("The UserId field is required.", responseValue.Errors[nameof(LogoutRequest.UserId)].FirstOrDefault());
+        Assert.True(responseValue.Errors.ContainsKey(Constants.LOGOUT_ID_QUERY_PARAMETER_NAME));
+        Assert.Single(responseValue.Errors[Constants.LOGOUT_ID_QUERY_PARAMETER_NAME]);
+        Assert.Equal($"The {Constants.LOGOUT_ID_QUERY_PARAMETER_NAME} field is required.",
+            responseValue.Errors[Constants.LOGOUT_ID_QUERY_PARAMETER_NAME].FirstOrDefault());
     }
 
     [Fact]
     [Trait("Identity", "Logout")]
-    public async Task Identity_Logout_ShouldReturnLocalizedValidationErrorForUserIdExistence()
+    public async Task Identity_Logout_ShouldReturnLocalizedValidationErrorForMissingLogoutId()
     {
         // Arrange
         HttpClient client = _factory.CreateClient();
-
-        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
-
-        LogoutRequest request = new() { UserId = null! };
-
-        JsonContent content = JsonContent.Create(request);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout");
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -497,33 +485,8 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.Equal("Валідаційна помилка.", responseValue!.Message);
-        Assert.Equal("Поле UserId обов’язкове.", responseValue!.Errors![nameof(LogoutRequest.UserId)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Identity", "Logout")]
-    public async Task Identity_Logout_ShouldNotLogoutUser()
-    {
-        // Arrange
-        HttpClient client = _factory.CreateClient();
-
-        LogoutRequest request = new() { UserId = Guid.NewGuid().ToString() };
-
-        JsonContent content = JsonContent.Create(request);
-
-        // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
-        string responseString = await response.Content.ReadAsStringAsync();
-
-        BaseResponse? responseValue = JsonSerializer.Deserialize<BaseResponse>(responseString);
-
-        Assert.IsType<BaseResponse>(responseValue);
-        Assert.False(responseValue.Success);
-        Assert.Equal(Messages.UserNotFound, responseValue.Message);
+        Assert.Equal($"Поле {Constants.LOGOUT_ID_QUERY_PARAMETER_NAME} обов’язкове.",
+            responseValue?.Errors![Constants.LOGOUT_ID_QUERY_PARAMETER_NAME].FirstOrDefault());
     }
 
     [Fact]
@@ -533,12 +496,10 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        LogoutRequest request = new() { UserId = Utilities.USER_ID.ToString() };
-
-        JsonContent content = JsonContent.Create(request);
+        string logoutId = "logout_id";
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/logout", content);
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout?{Constants.LOGOUT_ID_QUERY_PARAMETER_NAME}={logoutId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -550,25 +511,26 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         Assert.IsType<LogoutResponse>(responseValue);
         Assert.True(responseValue.Success);
         Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Null(responseValue?.SignOutIFrameUrl);
+        Assert.Null(responseValue?.ClientName);
+        Assert.Null(responseValue?.PostLogoutRedirectUrl);
+        Assert.True(responseValue?.AutomaticRedirectAfterSignOut);
+        Assert.False(responseValue?.ShowLogoutPrompt);
     }
 
     #endregion Logout
 
-    #region RefreshToken
+    #region Post Logout
 
     [Fact]
-    [Trait("Identity", "RefreshToken")]
-    public async Task Identity_RefreshToken_ShouldReturnValidationErrorForTokenExistence()
+    [Trait("Identity", "PostLogout")]
+    public async Task Identity_PostLogout_ShouldReturnBadRequest()
     {
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        RefreshTokenRequest request = new() { Token = null! };
-
-        JsonContent content = JsonContent.Create(request);
-
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout", null);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -581,26 +543,22 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         Assert.False(responseValue.Success);
         Assert.Equal(Messages.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
-        Assert.True(responseValue.Errors.ContainsKey(nameof(RefreshTokenRequest.Token)));
-        Assert.Single(responseValue.Errors[nameof(RefreshTokenRequest.Token)]);
-        Assert.Equal("The Token field is required.", responseValue.Errors[nameof(RefreshTokenRequest.Token)].FirstOrDefault());
+        Assert.True(responseValue.Errors.ContainsKey(Constants.LOGOUT_ID_QUERY_PARAMETER_NAME));
+        Assert.Single(responseValue.Errors[Constants.LOGOUT_ID_QUERY_PARAMETER_NAME]);
+        Assert.Equal($"The {Constants.LOGOUT_ID_QUERY_PARAMETER_NAME} field is required.",
+            responseValue.Errors[Constants.LOGOUT_ID_QUERY_PARAMETER_NAME].FirstOrDefault());
     }
 
     [Fact]
-    [Trait("Identity", "RefreshToken")]
-    public async Task Identity_RefreshToken_ShouldReturnLocalizedValidationErrorForTokenExistence()
+    [Trait("Identity", "PostLogout")]
+    public async Task Identity_PostLogout_ShouldReturnLocalizedValidationErrorForMissingLogoutId()
     {
         // Arrange
         HttpClient client = _factory.CreateClient();
-
-        client.DefaultRequestHeaders.Add("Accept-Language", CommonConstants.SUPPORTED_CULTURES[1]);
-
-        RefreshTokenRequest request = new() { Token = null! };
-
-        JsonContent content = JsonContent.Create(request);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout", null);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -610,85 +568,42 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.Equal("Валідаційна помилка.", responseValue!.Message);
-        Assert.Equal("Поле Token є обов’язковим для заповнення.", responseValue!.Errors![nameof(RefreshTokenRequest.Token)].FirstOrDefault());
+        Assert.Equal($"Поле {Constants.LOGOUT_ID_QUERY_PARAMETER_NAME} обов’язкове.",
+            responseValue?.Errors![Constants.LOGOUT_ID_QUERY_PARAMETER_NAME].FirstOrDefault());
     }
 
     [Fact]
-    [Trait("Identity", "RefreshToken")]
-    public async Task Identity_RefreshToken_ShouldNotRefreshToken()
+    [Trait("Identity", "PostLogout")]
+    public async Task Identity_PostLogout_ShouldLogoutUser()
     {
         // Arrange
-        LoginResponse? loginResponse = await LoginPlayer();
-
         HttpClient client = _factory.CreateClient();
 
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = loginResponse!.Token.Access,
-                Refresh = "test_refresh"
-            }
-        };
-
-        JsonContent content = JsonContent.Create(request);
+        string logoutId = "logout_id";
 
         // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-        string responseString = await response.Content.ReadAsStringAsync();
-
-        BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
-
-        Assert.IsType<BaseErrorResponse>(responseValue);
-        Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
-        Assert.NotNull(responseValue.Errors);
-        Assert.True(responseValue.Errors.ContainsKey(nameof(RefreshTokenRequest.Token.Refresh)));
-        Assert.Single(responseValue.Errors[nameof(RefreshTokenRequest.Token.Refresh)]);
-        Assert.Equal(Messages.TokenInvalid, responseValue.Errors[nameof(RefreshTokenRequest.Token.Refresh)].FirstOrDefault());
-    }
-
-    [Fact]
-    [Trait("Identity", "RefreshToken")]
-    public async Task Identity_RefreshToken_ShouldRefreshToken()
-    {
-        // Arrange
-        LoginResponse? loginResponse = await LoginPlayer();
-
-        HttpClient client = _factory.CreateClient();
-
-        RefreshTokenRequest request = new()
-        {
-            Token = new JwtToken
-            {
-                Access = loginResponse!.Token.Access,
-                Refresh = loginResponse!.Token.Refresh
-            }
-        };
-
-        JsonContent content = JsonContent.Create(request);
-
-        // Act
-        HttpResponseMessage response = await client.PostAsync("/api/identity/refresh", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout?{Constants.LOGOUT_ID_QUERY_PARAMETER_NAME}={logoutId}", null);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         string responseString = await response.Content.ReadAsStringAsync();
 
-        RefreshTokenResponse? responseValue = JsonSerializer.Deserialize<RefreshTokenResponse>(responseString);
+        LogoutResponse? responseValue = JsonSerializer.Deserialize<LogoutResponse>(responseString);
 
-        Assert.IsType<RefreshTokenResponse>(responseValue);
+        Assert.IsType<LogoutResponse>(responseValue);
         Assert.True(responseValue.Success);
         Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.NotNull(responseValue.Token);
+        Assert.Null(responseValue?.SignOutIFrameUrl);
+        Assert.Null(responseValue?.ClientName);
+        Assert.Null(responseValue?.PostLogoutRedirectUrl);
+        Assert.True(responseValue?.AutomaticRedirectAfterSignOut);
+        Assert.False(responseValue?.ShowLogoutPrompt);
     }
 
-    #endregion RefreshToken
+    #endregion Post Logout
+
+    #region Private
 
     private async Task<LoginResponse?> LoginPlayer()
     {
@@ -698,7 +613,7 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
 
         JsonContent content = JsonContent.Create(request);
 
-        HttpResponseMessage response = await client.PostAsync("/api/identity/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -708,4 +623,6 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
 
         return responseValue;
     }
+
+    #endregion Private
 }

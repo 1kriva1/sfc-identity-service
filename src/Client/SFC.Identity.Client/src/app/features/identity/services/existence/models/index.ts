@@ -1,0 +1,1 @@
+export { IExistenceResponse } from './existence.response';

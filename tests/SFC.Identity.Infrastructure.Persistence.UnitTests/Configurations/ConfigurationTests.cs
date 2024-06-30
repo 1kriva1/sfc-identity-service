@@ -1,53 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SFC.Identity.Infrastructure.Persistence.Configurations;
-using SFC.Identity.Application.Models.Tokens;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using Microsoft.AspNetCore.Identity;
-using SFC.Identity.Domain.Entities;
-using SFC.Identity.Infrastructure.Persistence.Configurations.Token;
+using Xunit;
 
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests.Configurations;
 public class ConfigurationTests
 {
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_AccessToken_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        AccessTokenConfiguration sut = new();
-        EntityTypeBuilder<AccessToken> builder = GetEntityBuilder<AccessToken>();
-
-        // Act
-        sut.Configure(builder);
-
-        // Assert
-        IEnumerable<IMutableProperty> properties = builder.Metadata.GetDeclaredProperties();
-
-        Assert.Equal(4, properties.Count());
-
-        IMutableProperty idProperty = properties.First();
-
-        Assert.True(idProperty.IsKey());
-        Assert.False(idProperty.IsColumnNullable());
-        Assert.Equal(ValueGenerated.OnAdd, idProperty.ValueGenerated);
-        Assert.Equal(nameof(AccessToken.Id), idProperty.Name);
-
-        IEnumerable<IMutableForeignKey> foreignKeys = builder.Metadata.GetDeclaredReferencingForeignKeys();
-
-        Assert.Single(foreignKeys);
-
-        Assert.Equal(nameof(RefreshToken.Id), foreignKeys.First().Properties.First().Name);
-
-        IEnumerable<IMutableNavigation> navigations = builder.Metadata.GetNavigations();
-
-        Assert.Single(navigations);
-
-        Assert.Equal(nameof(RefreshToken), navigations.First().Name);
-    }
-
     [Fact]
     [Trait("Persistence", "Configuration")]
     public void Persistence_Configuration_ApplicationRole_ShouldHaveCorrectConfiguration()
@@ -76,18 +38,6 @@ public class ConfigurationTests
 
         // Assert
         Assert.Equal("Users", builder.Metadata.GetTableName());
-
-        IEnumerable<IMutableForeignKey> foreignKeys = builder.Metadata.GetDeclaredReferencingForeignKeys();
-
-        Assert.Single(foreignKeys);
-
-        Assert.Equal(nameof(AccessToken.Id), foreignKeys.First().Properties.First().Name);
-
-        IEnumerable<IMutableNavigation> navigations = builder.Metadata.GetNavigations();
-
-        Assert.Single(navigations);
-
-        Assert.Equal(nameof(AccessToken), navigations.First().Name);
     }
 
     [Fact]
@@ -163,30 +113,6 @@ public class ConfigurationTests
 
         // Assert
         Assert.Equal("UserTokens", builder.Metadata.GetTableName());
-    }
-
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_RefreshToken_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        RefreshTokenConfiguration sut = new();
-        EntityTypeBuilder<RefreshToken> builder = GetEntityBuilder<RefreshToken>();
-
-        // Act
-        sut.Configure(builder);
-
-        // Assert
-        IEnumerable<IMutableProperty> properties = builder.Metadata.GetDeclaredProperties();
-
-        Assert.Equal(4, properties.Count());
-
-        IMutableProperty idProperty = properties.First();
-
-        Assert.True(idProperty.IsKey());
-        Assert.False(idProperty.IsColumnNullable());
-        Assert.Equal(ValueGenerated.OnAdd, idProperty.ValueGenerated);
-        Assert.Equal(nameof(AccessToken.Id), idProperty.Name);
     }
 
     private static EntityTypeBuilder<T> GetEntityBuilder<T>() where T : class

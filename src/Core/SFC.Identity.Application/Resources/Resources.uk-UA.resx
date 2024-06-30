@@ -141,8 +141,8 @@
   <data name="FailedResult" xml:space="preserve">
     <value>Невдалий результат.</value>
   </data>
-  <data name="IncorrectTokenError" xml:space="preserve">
-    <value>Користувача не знайдено або неправильний токен.</value>
+  <data name="LogoutIdRequired" xml:space="preserve">
+    <value>Поле logoutId обов’язкове.</value>
   </data>
   <data name="PasswordInvalid" xml:space="preserve">
     <value>Пароль повинен містити принаймні 6 символів, один небуквено-цифровий символ, одну цифру ('0'-'9'), один верхній регістр ('A'-'Z'), один нижній регістр ('a'-'z').</value>
@@ -156,9 +156,6 @@
   <data name="SuccessResult" xml:space="preserve">
     <value>Успішний результат.</value>
   </data>
-  <data name="TokenInvalid" xml:space="preserve">
-    <value>Невалідний токен.</value>
-  </data>
   <data name="TokenRequired" xml:space="preserve">
     <value>Поле Token є обов’язковим для заповнення.</value>
   </data>
@@ -170,9 +167,6 @@
   </data>
   <data name="UserNameInvalid" xml:space="preserve">
     <value>Ім'я користувача може містити лише літери, цифри та спеціальні символи -._@+</value>
-  </data>
-  <data name="UserNotFound" xml:space="preserve">
-    <value>Користувач не знайдений.</value>
   </data>
   <data name="UserRegistrationError" xml:space="preserve">
     <value>Під час реєстрації користувача сталася помилка.</value>
