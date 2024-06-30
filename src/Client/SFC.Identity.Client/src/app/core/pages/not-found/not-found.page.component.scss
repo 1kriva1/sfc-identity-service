@@ -1,0 +1,120 @@
+@use "ngx-sfc-common/styles/index" as *;
+@import "mixins";
+
+:host {
+  display: block;
+  height: 100vh;
+  width: 100%;
+
+  .container {
+    background-image: url("../../assets/images/pages/not-found/background.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: $color-2;
+    height: 100%;
+    user-select: none;
+
+    @include center;
+
+    .content {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+      width: 100%;
+      padding: 2em;
+
+      .title {
+        @include center;
+
+        flex-direction: column;
+        padding: 2em 0;
+
+        h1 {
+          font-size: 7em;
+          margin: 0;
+        }
+
+        .description {
+          @include center;
+
+          img {
+            max-width: 4em;
+          }
+
+          p {
+            font-size: 2em;
+            margin: 0;
+          }
+        }
+
+        a {
+          @include button;
+
+          width: 100%;
+          margin-top: 2em;
+
+          sfc-button {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .status-code {
+      @include center;
+
+      .number {
+        font-weight: 700;
+        padding: 0 20px;
+      }
+
+      canvas {
+        cursor: pointer;
+      }
+    }
+  }
+
+  @media (max-width: 1440px) {
+    .container {
+      .content {
+        .title {
+          font-size: 0.9em;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .container {
+      .content {
+        .title {
+          font-size: 0.8em;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      .content {
+        flex-direction: column-reverse;
+
+        .title {
+          font-size: 0.7em;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 425px) {
+    .container {
+      .content {
+        .title {
+          font-size: 0.5em;
+        }
+      }
+    }
+  }
+}

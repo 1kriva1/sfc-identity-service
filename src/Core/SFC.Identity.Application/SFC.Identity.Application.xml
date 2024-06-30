@@ -59,29 +59,24 @@
             Password.
             </summary>
         </member>
+        <member name="P:SFC.Identity.Application.Models.Login.LoginRequest.RememberMe">
+            <summary>
+            Define if login persistent.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Application.Models.Login.LoginRequest.ReturnUrl">
+            <summary>
+            Return URL.
+            </summary>
+        </member>
         <member name="T:SFC.Identity.Application.Models.Login.LoginResponse">
             <summary>
             **Login** response model.
             </summary>
         </member>
-        <member name="P:SFC.Identity.Application.Models.Login.LoginResponse.UserId">
+        <member name="P:SFC.Identity.Application.Models.Login.LoginResponse.ReturnUrl">
             <summary>
-            User identification.
-            </summary>
-        </member>
-        <member name="P:SFC.Identity.Application.Models.Login.LoginResponse.Token">
-            <summary>
-            JWT token.
-            </summary>
-        </member>
-        <member name="T:SFC.Identity.Application.Models.Login.LogoutRequest">
-            <summary>
-            **Logout** model.
-            </summary>
-        </member>
-        <member name="P:SFC.Identity.Application.Models.Login.LogoutRequest.UserId">
-            <summary>
-            User identification.
+            Return URL to application.
             </summary>
         </member>
         <member name="T:SFC.Identity.Application.Models.Login.LogoutResponse">
@@ -89,24 +84,29 @@
             **Logout** response model.
             </summary>
         </member>
-        <member name="T:SFC.Identity.Application.Models.RefreshToken.RefreshTokenRequest">
+        <member name="P:SFC.Identity.Application.Models.Login.LogoutResponse.PostLogoutRedirectUrl">
             <summary>
-            **Refresh token** model.
+            URL where user will be redirected after success log out.
             </summary>
         </member>
-        <member name="P:SFC.Identity.Application.Models.RefreshToken.RefreshTokenRequest.Token">
+        <member name="P:SFC.Identity.Application.Models.Login.LogoutResponse.ClientName">
             <summary>
-            JWT token.
+            Client name.
             </summary>
         </member>
-        <member name="T:SFC.Identity.Application.Models.RefreshToken.RefreshTokenResponse">
+        <member name="P:SFC.Identity.Application.Models.Login.LogoutResponse.SignOutIFrameUrl">
             <summary>
-            **Refresh token** response model.
+            URL of sign out iframe.
             </summary>
         </member>
-        <member name="P:SFC.Identity.Application.Models.RefreshToken.RefreshTokenResponse.Token">
+        <member name="P:SFC.Identity.Application.Models.Login.LogoutResponse.AutomaticRedirectAfterSignOut">
             <summary>
-            Refreshed JWT token.
+            Determine if user will be automatically redirected to application after success log out.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Application.Models.Login.LogoutResponse.ShowLogoutPrompt">
+            <summary>
+            Determine if user must confirm logout flow.
             </summary>
         </member>
         <member name="T:SFC.Identity.Application.Models.Registration.RegistrationRequest">
@@ -134,34 +134,19 @@
             Confirm password value (must be equal to Password value).
             </summary>
         </member>
+        <member name="P:SFC.Identity.Application.Models.Registration.RegistrationRequest.ReturnUrl">
+            <summary>
+            Return URI.
+            </summary>
+        </member>
         <member name="T:SFC.Identity.Application.Models.Registration.RegistrationResponse">
             <summary>
             **Registration** response model.
             </summary>
         </member>
-        <member name="P:SFC.Identity.Application.Models.Registration.RegistrationResponse.UserId">
+        <member name="P:SFC.Identity.Application.Models.Registration.RegistrationResponse.ReturnUrl">
             <summary>
-            User identification.
-            </summary>
-        </member>
-        <member name="P:SFC.Identity.Application.Models.Registration.RegistrationResponse.Token">
-            <summary>
-            JWT token.
-            </summary>
-        </member>
-        <member name="T:SFC.Identity.Application.Models.Tokens.JwtToken">
-            <summary>
-            **JWT** model.
-            </summary>
-        </member>
-        <member name="P:SFC.Identity.Application.Models.Tokens.JwtToken.Access">
-            <summary>
-            Access token value.
-            </summary>
-        </member>
-        <member name="P:SFC.Identity.Application.Models.Tokens.JwtToken.Refresh">
-            <summary>
-            Refresh token value.
+            Return URL to application.
             </summary>
         </member>
     </members>

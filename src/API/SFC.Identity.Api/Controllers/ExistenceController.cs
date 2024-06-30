@@ -6,19 +6,10 @@ using SFC.Identity.Application.Models.Existence;
 
 namespace SFC.Identity.Api.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
 [AllowAnonymous]
 [ProducesResponseType(StatusCodes.Status200OK)]
-public class ExistenceController : ControllerBase
+public class ExistenceController(IExistenceService existenceService) : ApiControllerBase
 {
-    private readonly IExistenceService _existenceService;
-
-    public ExistenceController(IExistenceService existenceService)
-    {
-        _existenceService = existenceService;
-    }
-
     /// <summary>
     /// Check user existence by name.
     /// </summary>
@@ -29,7 +20,7 @@ public class ExistenceController : ControllerBase
 
     public async Task<ActionResult<ExistenceResponse>> CheckExistenceByUserNameAsync([FromRoute] string userName)
     {
-        ExistenceResponse response = await _existenceService.CheckByUserNameAsync(userName);
+        ExistenceResponse response = await existenceService.CheckByUserNameAsync(userName);
 
         return Ok(response);
     }
@@ -43,7 +34,7 @@ public class ExistenceController : ControllerBase
     [HttpGet("email/{email}")]
     public async Task<ActionResult<ExistenceResponse>> CheckExistenceByEmailAsync([FromRoute] string email)
     {
-        ExistenceResponse response = await _existenceService.CheckByEmailAsync(email);
+        ExistenceResponse response = await existenceService.CheckByEmailAsync(email);
 
         return Ok(response);
     }

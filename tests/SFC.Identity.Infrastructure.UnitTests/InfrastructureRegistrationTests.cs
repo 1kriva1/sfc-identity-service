@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Duende.IdentityServer.Services;
+using Duende.IdentityServer.Validation;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using SFC.Data.Infrastructure.Services.Hosted;
 using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Settings;
@@ -23,7 +25,7 @@ public class InfrastructureRegistrationTests
     {
         IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
-                new KeyValuePair<string, string?>[1] { new KeyValuePair<string, string?>("ConnectionString", "Value") })
+                [new("ConnectionString", "Value")])
             .Build();
         _serviceCollection.AddDbContext<IdentityDbContext>();
         _serviceCollection.AddLogging();
@@ -41,6 +43,8 @@ public class InfrastructureRegistrationTests
         Assert.NotNull(_serviceProvider.GetService<RoleManager<ApplicationRole>>());
         Assert.NotNull(_serviceProvider.GetService<IUserStore<ApplicationUser>>());
         Assert.NotNull(_serviceProvider.GetService<IRoleStore<ApplicationRole>>());
+        Assert.NotNull(_serviceProvider.GetService<IExtensionGrantValidator>());
+        Assert.NotNull(_serviceProvider.GetService<IProfileService>());
     }
 
     [Fact]
@@ -48,8 +52,7 @@ public class InfrastructureRegistrationTests
     public void InfrastructureRegistration_Execute_CustomServicesAreRegistered()
     {
         // Assert
-        Assert.NotNull(_serviceProvider.GetService<IOptions<JwtSettings>>());
-        Assert.NotNull(_serviceProvider.GetService<IJwtService>());
+        Assert.NotNull(_serviceProvider.GetService<IOptions<IdentitySettings>>());
         Assert.NotNull(_serviceProvider.GetService<IIdentityService>());
         Assert.NotNull(_serviceProvider.GetService<IExistenceService>());
         Assert.NotNull(_serviceCollection.FirstOrDefault(s => s.ImplementationType == typeof(DatabaseResetHostedService)));

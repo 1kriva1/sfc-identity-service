@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Xunit;
+
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests;
 public class PersistenceRegistrationTests
 {
@@ -10,9 +12,7 @@ public class PersistenceRegistrationTests
     {
         // Arrange
         IConfiguration configuration = new ConfigurationBuilder()
-           .AddInMemoryCollection(
-               new KeyValuePair<string, string?>[1] { new KeyValuePair<string, string?>("ConnectionString", "Value") })
-           .Build();
+           .AddInMemoryCollection([new("ConnectionString", "Value")]).Build();
         ServiceCollection serviceCollection = new();
         serviceCollection.AddPersistenceServices(configuration);
 

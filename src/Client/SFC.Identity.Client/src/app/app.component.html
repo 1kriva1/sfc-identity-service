@@ -1,0 +1,13 @@
+<div class="container">
+  <sfc-header *ngIf="layout.header"></sfc-header>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+  <sfc-footer *ngIf="layout.footer"></sfc-footer>
+  <div *ngIf="notificationService.notifications$ | async as notifications" class="notifications">
+    <sfc-notification *ngFor="let notification of notifications" [model]="notification"
+      [autoCloseModel]="notificationAutoCloseModel">
+    </sfc-notification>
+  </div>
+  <sfc-bounce-loader></sfc-bounce-loader>
+</div>

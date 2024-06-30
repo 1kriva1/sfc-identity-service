@@ -1,35 +1,46 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.Registration;
-using SFC.Identity.Application.Models.Tokens;
 using SFC.Identity.Infrastructure.Persistence.Models;
-using SFC.Identity.Application.Models.RefreshToken;
-using SFC.Identity.Infrastructure.Extensions;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Domain.Entities;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Services;
+using Microsoft.AspNetCore.Authentication;
+using Duende.IdentityServer.Events;
+using Microsoft.Extensions.Options;
+using SFC.Identity.Infrastructure.Settings;
+using SFC.Identity.Application.Models.Logout;
+using SFC.Identity.Application.Models.Base;
+
+using LogoutRequest = Duende.IdentityServer.Models.LogoutRequest;
 
 namespace SFC.Identity.Infrastructure.Services;
 
-public record IdentityService(UserManager<ApplicationUser> UserManager,
+public record IdentityService(
+    UserManager<ApplicationUser> UserManager,
     SignInManager<ApplicationUser> SignInManager,
-    IJwtService JwtService) : IIdentityService
+    IIdentityServerInteractionService InteractionService,
+    IServerUrls ServerUrls,
+    IEventService Events,
+    IOptions<IdentitySettings> IdentitySettings) : IIdentityService
 {
-    public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
+    #region Public
+
+    public async Task<RegistrationResult> RegisterAsync(RegistrationModel model)
     {
-        if (!string.IsNullOrEmpty(request.UserName))
+        if (!string.IsNullOrEmpty(model.UserName))
         {
-            if (await UserManager.FindByNameAsync(request.UserName) != null)
+            if (await UserManager.FindByNameAsync(model.UserName) != null)
             {
                 throw new ConflictException(Messages.UserAlreadyExist);
             }
         }
 
-        if (!string.IsNullOrEmpty(request.Email))
+        if (!string.IsNullOrEmpty(model.Email))
         {
-            if (await UserManager.FindByEmailAsync(request.Email) != null)
+            if (await UserManager.FindByEmailAsync(model.Email) != null)
             {
                 throw new ConflictException(Messages.UserAlreadyExist);
             }
@@ -37,138 +48,153 @@ public record IdentityService(UserManager<ApplicationUser> UserManager,
 
         ApplicationUser user = new()
         {
-            Email = request.Email,
-            UserName = request.UserName ?? request.Email,
+            Email = model.Email,
+            UserName = model.UserName ?? model.Email,
             EmailConfirmed = true
         };
 
-        IdentityResult result = await UserManager.CreateAsync(user, request.Password);
+        IdentityResult createResult = await UserManager.CreateAsync(user, model.Password);
 
-        if (result.Succeeded)
+        if (createResult.Succeeded)
         {
-            AccessToken token = await CreateTokenAsync(user);
+            SignInResult signInResult = await SignInManager.PasswordSignInAsync(user.UserName!, model.Password, false, lockoutOnFailure: true);
 
-            return new RegistrationResponse
+            AuthorizationRequest? context = await GetAuthorizationRequest(model.ReturnUrl, out string? url);
+
+            if (!signInResult.Succeeded)
             {
-                UserId = user.Id,
-                Token = new JwtToken
-                {
-                    Access = token.Value,
-                    Refresh = token.RefreshToken.Value
-                }
-            };
+                await Events.RaiseAsync(new UserLoginFailureEvent(model.UserName, Messages.AuthorizationError, clientId: context?.Client.ClientId));
+                throw new AuthorizationException(Messages.AuthorizationError);
+            }
+
+            await Events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
+
+            return BuildBaseResult<RegistrationResult>(user, context, url);
         }
         else
         {
             throw new IdentityException(Messages.UserRegistrationError,
-                result.Errors.ToDictionary(e => e.Code, e => new List<string> { e.Description }.AsEnumerable()));
+                createResult.Errors.ToDictionary(e => e.Code, e => new List<string> { e.Description }.AsEnumerable()));
         }
     }
 
-    public async Task<LoginResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResult> LoginAsync(LoginModel model)
     {
         ApplicationUser? user = null;
 
-        if (!string.IsNullOrEmpty(request.UserName))
+        if (!string.IsNullOrEmpty(model.UserName))
         {
-            user = await UserManager.FindByNameAsync(request.UserName);
+            user = await UserManager.FindByNameAsync(model.UserName);
         }
-        else if (!string.IsNullOrEmpty(request.Email))
+        else if (!string.IsNullOrEmpty(model.Email))
         {
-            user = await UserManager.FindByEmailAsync(request.Email);
+            user = await UserManager.FindByEmailAsync(model.Email);
         }
+
+        AuthorizationRequest? context = await GetAuthorizationRequest(model.ReturnUrl, out string? url);
 
         if (user == null)
         {
+            await Events.RaiseAsync(new UserLoginFailureEvent(model.UserName, Messages.AuthorizationError, clientId: context?.Client.ClientId));
             throw new AuthorizationException(Messages.AuthorizationError);
         }
 
-        string username = (string.IsNullOrEmpty(request.UserName) ? request.Email : request.UserName) ?? string.Empty;
+        string username = (string.IsNullOrEmpty(model.UserName) ? model.Email : model.UserName) ?? string.Empty;
 
-        SignInResult result = await SignInManager.PasswordSignInAsync(username, request.Password, false, lockoutOnFailure: true);
+        SignInResult result = await SignInManager.PasswordSignInAsync(username, model.Password, model.RememberMe, lockoutOnFailure: true);
 
         if (!result.Succeeded)
         {
             if (result.IsLockedOut)
             {
+                await Events.RaiseAsync(new UserLoginFailureEvent(model.UserName, Messages.AccountLocked, clientId: context?.Client.ClientId));
                 throw new ForbiddenException(Messages.AccountLocked);
             }
 
+            await Events.RaiseAsync(new UserLoginFailureEvent(model.UserName, Messages.AuthorizationError, clientId: context?.Client.ClientId));
             throw new AuthorizationException(Messages.AuthorizationError);
         }
 
-        AccessToken token = await CreateTokenAsync(user);
+        await Events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id.ToString(), user.UserName, clientId: context?.Client.ClientId));
 
-        return new LoginResponse
-        {
-            UserId = user.Id,
-            Token = new JwtToken
-            {
-                Access = token.Value,
-                Refresh = token.RefreshToken.Value
-            }
-        };
+        return BuildBaseResult<LoginResult>(user, context, url, model.RememberMe);
     }
 
-    public async Task<RefreshTokenResponse> RefreshTokenAsync(RefreshTokenRequest request)
+    public async Task<LogoutResult> LogoutAsync(LogoutModel model)
     {
-        ClaimsPrincipal principal = JwtService.GetPrincipalFromExpiredToken(request.Token.Access)
-            ?? throw new BadRequestException(Messages.ValidationError,
-                    (nameof(request.Token.Access), Messages.TokenInvalid));
+        bool showLogoutPrompt = IdentitySettings.Value.Logout.ShowLogoutPrompt;
 
-        Claim? userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)
-            ?? throw new BadRequestException(Messages.ValidationError,
-                    (nameof(request.Token.Access), Messages.TokenInvalid));
-
-        ApplicationUser user = await UserManager.FindByIdAsync(userIdClaim.Value)
-            ?? throw new AuthorizationException(Messages.IncorrectTokenError);
-
-        if (user.AccessToken == null
-            || !user.AccessToken.RefreshToken.Value.Equals(request.Token.Refresh, StringComparison.InvariantCultureIgnoreCase)
-            || DateTime.UtcNow >= user.AccessToken.RefreshToken.ExpiresDate)
+        if (!model.User.IsAuthenticated)
         {
-            throw new BadRequestException(Messages.ValidationError,
-                (nameof(request.Token.Refresh), Messages.TokenInvalid));
+            // if the user is not authenticated, then just show logged out page
+            showLogoutPrompt = false;
+        }
+        else
+        {
+            LogoutRequest context = await InteractionService.GetLogoutContextAsync(model.LogoutId);
+
+            if (context?.ShowSignoutPrompt == false)
+            {
+                // it's safe to automatically sign-out
+                showLogoutPrompt = false;
+            }
         }
 
-        AccessToken token = await CreateTokenAsync(user);
-
-        return new RefreshTokenResponse
+        if (!showLogoutPrompt)
         {
-            Token = new JwtToken
-            {
-                Access = token.Value,
-                Refresh = token.RefreshToken.Value
-            }
-        };
+            // if the request for logout was properly authenticated from IdentityServer, then
+            // we don't need to show the prompt and can just log the user out directly.
+            return await PostLogoutAsync(model);
+        }
+
+        return new LogoutResult { ShowLogoutPrompt = showLogoutPrompt };
     }
 
-    public async Task<LogoutResponse> LogoutAsync(LogoutRequest request)
+    public async Task<LogoutResult> PostLogoutAsync(LogoutModel model)
     {
-        ApplicationUser? user = await UserManager.FindByIdAsync(request.UserId)
-            ?? throw new NotFoundException(Messages.UserNotFound);
+        LogoutRequest logoutRequest = await InteractionService.GetLogoutContextAsync(model.LogoutId);
 
         await SignInManager.SignOutAsync();
 
-        user.AccessToken = null;
+        // raise the logout event
+        await Events.RaiseAsync(new UserLogoutSuccessEvent(model.User.Id, model.User.DisplayName));
 
-        await UserManager.UpdateAsync(user);
-
-        return new LogoutResponse();
+        return new LogoutResult
+        {
+            AutomaticRedirectAfterSignOut = IdentitySettings.Value.Logout.AutomaticRedirectAfterSignOut,
+            PostLogoutRedirectUrl = logoutRequest?.PostLogoutRedirectUri,
+            ClientName = string.IsNullOrEmpty(logoutRequest?.ClientName) ? logoutRequest?.ClientId : logoutRequest?.ClientName,
+            SignOutIFrameUrl = logoutRequest?.SignOutIFrameUrl
+        };
     }
 
-    private async Task<AccessToken> CreateTokenAsync(ApplicationUser user)
+    #endregion Public
+
+    #region Private
+
+    private Task<AuthorizationRequest?> GetAuthorizationRequest(string? returnUrl, out string? url)
     {
-        IList<Claim> userClaims = await UserManager.GetClaimsAsync(user);
+        url = returnUrl != null ? Uri.UnescapeDataString(returnUrl) : null;
 
-        userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-
-        AccessToken token = JwtService.CreateAccessToken(userClaims);
-
-        user.AccessToken = token;
-
-        await UserManager.UpdateAsync(user);
-
-        return token;
+        return InteractionService.GetAuthorizationContextAsync(url);
     }
+
+    private T BuildBaseResult<T>(ApplicationUser user, AuthorizationRequest? context, string? url, bool rememberMe = false) where T : BaseResult, new()
+    {
+        AuthenticationProperties properties = new()
+        {
+            IsPersistent = IdentitySettings.Value.Login.AllowRememberLogin && rememberMe,
+            ExpiresUtc = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(IdentitySettings.Value.Login.RememberLoginDuration))
+        };
+
+        return new T
+        {
+            ReturnUrl = context != null ? url! : ServerUrls.BaseUrl,
+            UserId = user.Id,
+            UserName = user.UserName,
+            Properties = properties
+        };
+    }
+
+    #endregion Private
 }

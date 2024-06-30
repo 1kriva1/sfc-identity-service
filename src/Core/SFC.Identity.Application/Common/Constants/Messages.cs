@@ -7,7 +7,6 @@ public class Messages
 {
     private const string AUTHORIZATION_ERROR_MESSAGE = "User not found or incorrect password.";
     private const string USER_ALREADY_EXIST_ERROR_MESSAGE = "User already exists.";
-    private const string INVALID_TOKEN_ERROR_MESSAGE = "Invalid token.";
 
     private static IStringLocalizer<Resources> _localizer = default!;
 
@@ -60,18 +59,6 @@ public class Messages
     public static string AccountLocked =>
                     GetValue(_localizer?.GetString("AccountLocked"),
                         "User account locked out.")!;
-
-    public static string TokenInvalid =>
-                    GetValue(_localizer?.GetString("TokenInvalid"),
-                        INVALID_TOKEN_ERROR_MESSAGE)!;
-
-    public static string IncorrectTokenError =>
-                    GetValue(_localizer?.GetString("IncorrectTokenError"),
-                        "User not found or incorrect token.")!;
-
-    public static string UserNotFound =>
-                    GetValue(_localizer?.GetString("UserNotFound"),
-                        "User not found.")!;
 
     private static string GetValue(LocalizedString? @string, string defaultValue)
     {

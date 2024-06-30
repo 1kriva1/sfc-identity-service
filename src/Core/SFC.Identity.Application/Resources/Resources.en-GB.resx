@@ -141,8 +141,8 @@
   <data name="FailedResult" xml:space="preserve">
     <value>Failed result.</value>
   </data>
-  <data name="IncorrectTokenError" xml:space="preserve">
-    <value>User not found or incorrect token.</value>
+  <data name="LogoutIdRequired" xml:space="preserve">
+    <value>The logoutId field is required.</value>
   </data>
   <data name="PasswordInvalid" xml:space="preserve">
     <value>Passwords must have at least 6 characters, one non alphanumeric character, one digit ('0'-'9'), one uppercase ('A'-'Z'), one lowercase ('a'-'z').</value>
@@ -156,9 +156,6 @@
   <data name="SuccessResult" xml:space="preserve">
     <value>Success result.</value>
   </data>
-  <data name="TokenInvalid" xml:space="preserve">
-    <value>Invalid token.</value>
-  </data>
   <data name="TokenRequired" xml:space="preserve">
     <value>The Token field is required.</value>
   </data>
@@ -170,9 +167,6 @@
   </data>
   <data name="UserNameInvalid" xml:space="preserve">
     <value>User name can only have letters, numbers and special characters -._@+.</value>
-  </data>
-  <data name="UserNotFound" xml:space="preserve">
-    <value>User not found.</value>
   </data>
   <data name="UserRegistrationError" xml:space="preserve">
     <value>Error occurred during user registration process.</value>

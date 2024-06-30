@@ -1,26 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Duende.IdentityServer.EntityFramework.DbContexts;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using SFC.Identity.Infrastructure.Extensions;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Services.Hosted;
+using SFC.Identity.Infrastructure.Settings;
 
 namespace SFC.Data.Infrastructure.Services.Hosted;
-public class DatabaseResetHostedService : BaseInitializationService
+public class DatabaseResetHostedService(
+    ILogger<DatabaseResetHostedService> logger,
+    IServiceProvider services,
+    IHostEnvironment hostEnvironment,
+    IOptions<IdentitySettings> identitySettings) : BaseInitializationService(logger)
 {
-    private readonly IServiceProvider _services;
-    private readonly IHostEnvironment _hostEnvironment;
-
-    public DatabaseResetHostedService(
-        ILogger<DatabaseResetHostedService> logger,
-        IServiceProvider services,
-        IHostEnvironment hostEnvironment):base(logger)
-    {
-        _services = services;
-        _hostEnvironment = hostEnvironment;
-    }
+    private readonly IServiceProvider _services = services;
+    private readonly IHostEnvironment _hostEnvironment = hostEnvironment;
+    private readonly IOptions<IdentitySettings> _identitySettings = identitySettings;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -28,20 +28,28 @@ public class DatabaseResetHostedService : BaseInitializationService
 
         using IServiceScope scope = _services.CreateScope();
 
-        IdentityDbContext context = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        IdentityDbContext identityContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+
+        ConfigurationDbContext configurationContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
 
         if (_hostEnvironment.IsDevelopment())
         {
-            await context.Database.EnsureDeletedAsync(cancellationToken);
+            PersistedGrantDbContext persistedGrantContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();            
 
-            if (context.Database.IsRelational())
+            await identityContext.Database.EnsureDeletedAsync(cancellationToken);
+
+            if (identityContext.Database.IsRelational())
             {
-                await context.Database.MigrateAsync(cancellationToken);
+                await identityContext.Database.MigrateAsync(cancellationToken);
+                await persistedGrantContext.Database.MigrateAsync(cancellationToken);
+                await configurationContext.Database.MigrateAsync(cancellationToken);
             }
 
-            await context.SeedUsersAsync();
+            await identityContext.SeedUsersAsync(cancellationToken);            
         }
 
-        await context.Database.EnsureCreatedAsync(cancellationToken);
+        await configurationContext.EnsureIdentityConfigurationExistAsync(_identitySettings.Value, cancellationToken);
+
+        await identityContext.Database.EnsureCreatedAsync(cancellationToken);
     }
 }

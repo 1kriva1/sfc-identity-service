@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Existence;
 using SFC.Identity.Infrastructure.Persistence.Models;
@@ -11,13 +12,13 @@ public record ExistenceService(UserManager<ApplicationUser> UserManager) : IExis
     {
         ApplicationUser? user = await UserManager.FindByNameAsync(userName);
 
-        return new ExistenceResponse { Exist = user != null };
+        return new ExistenceResponse { Exist = user is not null };
     }
 
     public async Task<ExistenceResponse> CheckByEmailAsync(string email)
     {
         ApplicationUser? user = await UserManager.FindByEmailAsync(email);
 
-        return new ExistenceResponse { Exist = user != null };
+        return new ExistenceResponse { Exist = user is not null };
     }
 }

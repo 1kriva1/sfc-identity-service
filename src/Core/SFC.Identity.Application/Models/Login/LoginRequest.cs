@@ -25,4 +25,14 @@ public class LoginRequest
     /// </summary>
     [Required(ErrorMessage = "PasswordRequired")]
     public string Password { get; set; } = null!;
+
+    /// <summary>
+    /// Define if login persistent.
+    /// </summary>
+    public bool RememberMe { get; set; }
+
+    /// <summary>
+    /// Return URL.
+    /// </summary>
+    public string? ReturnUrl { get; set; }
 }

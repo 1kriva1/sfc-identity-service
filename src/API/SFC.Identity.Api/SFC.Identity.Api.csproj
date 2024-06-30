@@ -1,36 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
-        <DocumentationFile>SFC.Identity.Api.xml</DocumentationFile>
-        <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>SFC.Identity.Api.xml</DocumentationFile>
+    <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <NoWarn>1701;1702;1591</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <NoWarn>1701;1702;1591</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.11">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure\SFC.Identity.Infrastructure.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Client\SFC.Identity.Client\SFC.Identity.Client.esproj" />
+    <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure\SFC.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
 
 </Project>

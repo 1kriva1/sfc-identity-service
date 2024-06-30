@@ -17,7 +17,7 @@ public static class SwaggerExtensions
             {
                 Title = TITLE,
                 Version = "1",
-                Description = "Through this API you can register, login, logout, check existence of users and handle JWT tokens.",
+                Description = "Through this API you can register, login, logout and check existence of users.",
                 Contact = new()
                 {
                     Email = "krivorukandrey@gmail.com",

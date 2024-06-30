@@ -1,0 +1,11 @@
+<div class="container">
+    <div class="content">
+        <fa-icon [icon]="faCircleXmark" [sfcComponentSize] [customSize]="4"></fa-icon>
+        <h1 i18n="@@core.page.error.title">Whoops!</h1>
+        <p i18n="@@core.page.error.description">We are sorry, but it looks like something unexpected happened</p>
+        <a [href]="environment.client_url">
+            <sfc-button [text]="BUTTON_BACK" [types]="[ButtonType.Rounded, ButtonType.Filled]">
+            </sfc-button>
+        </a>
+    </div>
+</div>

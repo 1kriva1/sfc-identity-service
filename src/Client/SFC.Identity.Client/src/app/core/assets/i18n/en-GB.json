@@ -1,0 +1,18 @@
+{
+  "to": "to",
+  "back": "Back",
+  "yes": "Yes",
+  "no": "No",
+  "interceptor.error.error-value-part": "An error occurred:",
+  "interceptor.error.error-title": "Opps, error occured!",
+  "component.footer.designed": "Designed by ",
+  "component.footer.reserved": " All Rights Reserved.",
+  "page.not-found.page-title": "Not found",
+  "page.not-found.title": "OOPS!",
+  "page.not-found.description": "You're out of line",
+  "page.not-found.button-back": "BACK THE GAME",
+  "page.error.page-title": "Error",
+  "page.error.title": "Whoops!",
+  "page.error.description": "We are sorry, but it looks like something unexpected happened",
+  "page.error.button-back": "Back to SFC"
+}

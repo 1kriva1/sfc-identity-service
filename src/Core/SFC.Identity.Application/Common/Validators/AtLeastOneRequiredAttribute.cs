@@ -20,12 +20,12 @@ public class AtLeastOneRequiredAttribute : ValidationAttribute
 
         if (!TryGetProperty(_field1, validationContext, out PropertyInfo? property1))
         {
-            return new ValidationResult(string.Format(Messages.AtLeastOneRequiredUnknownProperty, _field1), new[] { _field1 });
+            return new ValidationResult(string.Format(Messages.AtLeastOneRequiredUnknownProperty, _field1), [_field1]);
         }
 
         if (!TryGetProperty(_field2, validationContext, out PropertyInfo? property2))
         {
-            return new ValidationResult(string.Format(Messages.AtLeastOneRequiredUnknownProperty, _field2), new[] { _field2 });
+            return new ValidationResult(string.Format(Messages.AtLeastOneRequiredUnknownProperty, _field2), [_field2]);
         }
 
         object? value1 = property1?.GetValue(validationContext.ObjectInstance);
@@ -37,7 +37,7 @@ public class AtLeastOneRequiredAttribute : ValidationAttribute
             return ValidationResult.Success;
         }
 
-        return new ValidationResult(ErrorMessage, new[] { _field1, _field2 });
+        return new ValidationResult(ErrorMessage, [_field1, _field2]);
     }
 
     private static bool TryGetProperty(string fieldName, ValidationContext validateionContext, out PropertyInfo? propertyInfo)

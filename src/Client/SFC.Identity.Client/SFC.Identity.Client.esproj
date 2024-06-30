@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.271090-alpha">
+  <PropertyGroup>
+    <StartupCommand>npm start</StartupCommand>
+    <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>
+    <!-- Allows the build (or compile) script located on package.json to run on Build -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <!-- Folder where production build objects will be placed -->
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\sfc-identity\</BuildOutputFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\app\core\assets\i18n\" />
+    <Folder Include="src\app\core\enums\" />
+    <Folder Include="src\app\core\initializers\i18n\" />
+    <Folder Include="src\app\core\constants\" />
+    <Folder Include="src\app\core\interceptors\content-type\" />
+    <Folder Include="src\app\core\interceptors\error\" />
+    <Folder Include="src\app\core\interceptors\loader\" />
+    <Folder Include="src\app\core\interceptors\locale\" />
+    <Folder Include="src\app\core\interceptors\logging\" />
+    <Folder Include="src\app\core\interceptors\retry\" />
+    <Folder Include="src\app\core\models\http\" />
+    <Folder Include="src\app\core\types\" />
+    <Folder Include="src\app\core\services\message\" />
+    <Folder Include="src\app\core\services\notification\" />
+    <Folder Include="src\app\core\services\storage\" />
+    <Folder Include="src\app\core\utils\form\" />
+    <Folder Include="src\app\core\utils\routing\" />
+    <Folder Include="src\app\features\identity\assets\i18n\" />
+    <Folder Include="src\app\features\identity\pages\base\" />
+    <Folder Include="src\app\features\identity\services\existence\" />
+    <Folder Include="src\app\features\identity\services\identity\models\login\" />
+    <Folder Include="src\app\share\" />
+    <Folder Include="src\environments\" />
+    <Folder Include="src\styles\themes\" />
+  </ItemGroup>
+</Project>

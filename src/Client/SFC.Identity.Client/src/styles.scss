@@ -1,0 +1,16 @@
+@use "ngx-sfc-common/styles/index" as *;
+
+html {
+  body {
+    font-family: Helvetica, sans-serif;
+    font-size: 1em;
+    margin: 0;
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  @include scroll("&");
+}

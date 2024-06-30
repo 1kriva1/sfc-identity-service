@@ -10,7 +10,7 @@ public static class PersistenceRegistration
 {
     public static void AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("IdentityConnectionString"),
+        services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("Database"),
             b => b.MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName)));
     }
 }

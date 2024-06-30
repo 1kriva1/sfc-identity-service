@@ -1,16 +1,16 @@
 ﻿using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.RefreshToken;
+using SFC.Identity.Application.Models.Logout;
 using SFC.Identity.Application.Models.Registration;
 
 namespace SFC.Identity.Application.Interfaces;
 
 public interface IIdentityService
 {
-    Task<RegistrationResponse> RegisterAsync(RegistrationRequest request);
+    Task<RegistrationResult> RegisterAsync(RegistrationModel model);
 
-    Task<LoginResponse> LoginAsync(LoginRequest request);
+    Task<LoginResult> LoginAsync(LoginModel model);
 
-    Task<LogoutResponse> LogoutAsync(LogoutRequest request);
+    Task<LogoutResult> LogoutAsync(LogoutModel model);
 
-    Task<RefreshTokenResponse> RefreshTokenAsync(RefreshTokenRequest request);
+    Task<LogoutResult> PostLogoutAsync(LogoutModel model);
 }
