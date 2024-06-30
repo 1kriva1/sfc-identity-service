@@ -1,6 +1,8 @@
 ﻿using Duende.IdentityServer.EntityFramework.DbContexts;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,24 +34,44 @@ public class DatabaseResetHostedService(
 
         ConfigurationDbContext configurationContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
 
+        PersistedGrantDbContext persistedGrantContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
+
         if (_hostEnvironment.IsDevelopment())
         {
-            PersistedGrantDbContext persistedGrantContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();            
-
             await identityContext.Database.EnsureDeletedAsync(cancellationToken);
+            await persistedGrantContext.Database.EnsureDeletedAsync(cancellationToken);
+            await configurationContext.Database.EnsureDeletedAsync(cancellationToken);
+        }
 
-            if (identityContext.Database.IsRelational())
-            {
-                await identityContext.Database.MigrateAsync(cancellationToken);
-                await persistedGrantContext.Database.MigrateAsync(cancellationToken);
-                await configurationContext.Database.MigrateAsync(cancellationToken);
-            }
+        if (_hostEnvironment.IsTesting())
+        {
+            await EnsureCreatedAsync(identityContext, cancellationToken);
+            await EnsureCreatedAsync(persistedGrantContext, cancellationToken);
+            await EnsureCreatedAsync(configurationContext, cancellationToken);
+        }
+        else
+        {
+            await identityContext.Database.MigrateAsync(cancellationToken);
+            await persistedGrantContext.Database.MigrateAsync(cancellationToken);
+            await configurationContext.Database.MigrateAsync(cancellationToken);
+        }
 
-            await identityContext.SeedUsersAsync(cancellationToken);            
+        if (_hostEnvironment.IsDevelopment())
+        {
+            await identityContext.SeedUsersAsync(cancellationToken);
         }
 
         await configurationContext.EnsureIdentityConfigurationExistAsync(_identitySettings.Value, cancellationToken);
+    }
 
-        await identityContext.Database.EnsureCreatedAsync(cancellationToken);
+    private static Task EnsureCreatedAsync<C>(C context, CancellationToken cancellationToken) where C : DbContext
+    {
+        if (!context.Database.IsRelational())
+        {
+            return Task.CompletedTask;
+        }
+
+        IRelationalDatabaseCreator creator = context.GetService<IRelationalDatabaseCreator>();
+        return creator.CreateTablesAsync(cancellationToken);
     }
 }
