@@ -1,7 +1,5 @@
 ﻿using SFC.Identity.Application.Common.Exceptions;
 
-using Xunit;
-
 namespace SFC.Identity.Application.UnitTests.Common.Exceptions;
 public class ForbiddenExceptionTests
 {

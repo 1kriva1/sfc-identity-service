@@ -1,6 +1,5 @@
 ﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
 using System.Net;
-using Xunit;
 using System.Text.Json;
 using SFC.Identity.Application.Models.Existence;
 using SFC.Identity.Application.Common.Constants;

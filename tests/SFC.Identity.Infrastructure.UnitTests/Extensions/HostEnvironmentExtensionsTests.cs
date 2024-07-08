@@ -4,8 +4,6 @@ using Microsoft.Extensions.Hosting.Internal;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure.Extensions;
 
-using Xunit;
-
 using Environments = SFC.Identity.Application.Common.Constants.Environments;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Extensions;

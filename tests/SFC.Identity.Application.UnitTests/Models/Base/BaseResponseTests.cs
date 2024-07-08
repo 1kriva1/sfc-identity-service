@@ -4,8 +4,6 @@ using Newtonsoft.Json.Linq;
 
 using SFC.Identity.Application.Models.Base;
 
-using Xunit;
-
 using Localization = SFC.Identity.Application.Common.Constants.Messages;
 
 namespace SFC.Identity.Application.UnitTests.Models.Base;

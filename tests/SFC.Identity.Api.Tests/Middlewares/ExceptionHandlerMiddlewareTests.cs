@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Net;
-using Xunit;
 using System.Text.Json;
 using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Base;
 using SFC.Identity.Api.Middlewares;
+
 using SystemException = System.Exception;
 
 namespace SFC.Identity.Api.UnitTests.Middlewares;

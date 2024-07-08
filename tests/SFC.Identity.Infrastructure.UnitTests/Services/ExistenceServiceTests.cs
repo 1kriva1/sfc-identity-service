@@ -6,8 +6,6 @@ using SFC.Identity.Application.Models.Existence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.UnitTests.Services;
 
 public class ExistenceServiceTests

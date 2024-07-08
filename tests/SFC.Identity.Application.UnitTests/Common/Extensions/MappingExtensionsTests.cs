@@ -2,8 +2,6 @@
 
 using SFC.Identity.Application.Common.Extensions;
 
-using Xunit;
-
 namespace SFC.Identity.Application.UnitTests.Common.Extensions;
 public class MappingExtensionsTests
 {

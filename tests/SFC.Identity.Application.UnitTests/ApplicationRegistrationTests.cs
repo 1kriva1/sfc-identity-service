@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace SFC.Identity.Application.UnitTests;
 

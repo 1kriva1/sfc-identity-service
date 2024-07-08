@@ -1,7 +1,6 @@
 ﻿using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Validators;
 using System.ComponentModel.DataAnnotations;
-using Xunit;
 
 namespace SFC.Identity.Application.UnitTests.Common.Validators;
 

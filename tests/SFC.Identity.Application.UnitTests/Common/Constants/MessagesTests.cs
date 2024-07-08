@@ -2,8 +2,6 @@
 
 using Moq;
 
-using Xunit;
-
 using Localization = SFC.Identity.Application.Common.Constants.Messages;
 
 namespace SFC.Identity.Application.UnitTests.Common.Constants;

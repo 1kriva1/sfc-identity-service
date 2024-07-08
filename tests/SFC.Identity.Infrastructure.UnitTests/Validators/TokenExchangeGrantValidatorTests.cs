@@ -11,8 +11,6 @@ using Moq;
 
 using SFC.Identity.Infrastructure.Validators;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.UnitTests.Validators;
 public class TokenExchangeGrantValidatorTests
 {

@@ -7,8 +7,6 @@ using SFC.Identity.Api.Filters;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Models.Base;
 
-using Xunit;
-
 namespace SFC.Identity.Api.Tests.Filters;
 
 public class ModelStateValidationFilterTests

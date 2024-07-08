@@ -14,7 +14,7 @@ public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : Id
     {
         base.OnModelCreating(builder);
 
-        builder.HasDefaultSchema(DbConstants.DEFAULT_SCHEMA_NAME);
+        builder.HasDefaultSchema(DatabaseConstants.DEFAULT_SCHEMA_NAME);
 
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }

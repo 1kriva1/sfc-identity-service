@@ -5,8 +5,6 @@ using IdentityModel;
 using SFC.Identity.Api.Extensions;
 using SFC.Identity.Application.Models.Logout;
 
-using Xunit;
-
 namespace SFC.Identity.Api.UnitTests.Extensions;
 public class ModelExtensionsTests
 {

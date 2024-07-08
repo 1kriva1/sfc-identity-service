@@ -18,8 +18,6 @@ using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Services;
 using SFC.Identity.Infrastructure.Settings;
 
-using Xunit;
-
 using Client = Duende.IdentityServer.Models.Client;
 using LogoutRequest = Duende.IdentityServer.Models.LogoutRequest;
 

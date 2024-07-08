@@ -2,8 +2,6 @@
 
 using SFC.Identity.Infrastructure.Configuration;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.UnitTests.Configuration;
 public class IdentityConfigurationTests
 {

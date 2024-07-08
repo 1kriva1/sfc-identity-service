@@ -80,7 +80,7 @@ public static class IdentityExtensions
             options.ConfigureDbContext = builder =>
                 builder.UseSqlServer(connectionString,
                     sql => sql.MigrationsAssembly(migrationsAssemblyName));
-            options.DefaultSchema = DbConstants.DEFAULT_SCHEMA_NAME;
+            options.DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME;
         })
         // this adds the operational data from DB (codes, tokens, consents)
         .AddOperationalStore(options =>
@@ -88,7 +88,7 @@ public static class IdentityExtensions
             options.ConfigureDbContext = builder =>
                 builder.UseSqlServer(connectionString,
                     sql => sql.MigrationsAssembly(migrationsAssemblyName));
-            options.DefaultSchema = DbConstants.DEFAULT_SCHEMA_NAME;
+            options.DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME;
 
             // this enables automatic token cleanup. this is optional.
             options.EnableTokenCleanup = true;

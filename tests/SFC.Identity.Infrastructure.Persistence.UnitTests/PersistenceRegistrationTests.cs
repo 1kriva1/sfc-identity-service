@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests;
 public class PersistenceRegistrationTests
 {

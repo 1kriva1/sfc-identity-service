@@ -6,8 +6,6 @@ using IdentityModel;
 
 using SFC.Identity.Infrastructure.Services;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.UnitTests.Services;
 public class ProfileServiceTests
 {

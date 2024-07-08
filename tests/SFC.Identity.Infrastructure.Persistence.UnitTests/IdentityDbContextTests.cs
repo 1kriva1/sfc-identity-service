@@ -2,8 +2,6 @@
 
 using SFC.Identity.Application.Common.Constants;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests;
 public class IdentityDbContextTests
 {
@@ -24,6 +22,6 @@ public class IdentityDbContextTests
 
         string? defaultSchema = context.Model.GetDefaultSchema();
 
-        Assert.Equal(DbConstants.DEFAULT_SCHEMA_NAME, defaultSchema);
+        Assert.Equal(DatabaseConstants.DEFAULT_SCHEMA_NAME, defaultSchema);
     }
 }

@@ -12,14 +12,12 @@ using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using SFC.Identity.Infrastructure.Settings;
 
-using Xunit;
-
 namespace SFC.Identity.Infrastructure.UnitTests;
 
 public class InfrastructureRegistrationTests
 {
     private readonly ServiceCollection _serviceCollection = new();
-    private readonly ServiceProvider _serviceProvider;    
+    private readonly ServiceProvider _serviceProvider;
 
     public InfrastructureRegistrationTests()
     {

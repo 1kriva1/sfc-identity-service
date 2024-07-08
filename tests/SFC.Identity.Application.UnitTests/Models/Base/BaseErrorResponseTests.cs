@@ -4,8 +4,6 @@ using Newtonsoft.Json.Linq;
 
 using SFC.Identity.Application.Models.Base;
 
-using Xunit;
-
 namespace SFC.Identity.Application.UnitTests.Models.Base;
 public class BaseErrorResponseTests
 {

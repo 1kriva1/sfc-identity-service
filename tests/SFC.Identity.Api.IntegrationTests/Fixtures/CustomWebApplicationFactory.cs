@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Data.Sqlite;
 using System.Data.Common;
 using Duende.IdentityServer.EntityFramework.DbContexts;
-using SFC.Identity.Application.Common.Constants;
+
 using Environments = SFC.Identity.Application.Common.Constants.Environments;
 
 namespace SFC.Identity.Api.IntegrationTests.Fixtures;

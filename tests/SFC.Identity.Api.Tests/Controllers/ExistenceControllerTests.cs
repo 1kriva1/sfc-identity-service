@@ -4,7 +4,6 @@ using SFC.Identity.Api.Controllers;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Interfaces;
 using SFC.Identity.Application.Models.Existence;
-using Xunit;
 
 namespace SFC.Identity.Api.Tests.Controllers;
 

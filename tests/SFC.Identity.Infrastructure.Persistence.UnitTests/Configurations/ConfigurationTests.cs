@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
 using SFC.Identity.Infrastructure.Persistence.Models;
 using Microsoft.AspNetCore.Identity;
-using Xunit;
 
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests.Configurations;
 public class ConfigurationTests

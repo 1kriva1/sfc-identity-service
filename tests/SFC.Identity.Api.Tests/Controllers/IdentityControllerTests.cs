@@ -18,8 +18,6 @@ using SFC.Identity.Application.Models.Login;
 using SFC.Identity.Application.Models.Logout;
 using SFC.Identity.Application.Models.Registration;
 
-using Xunit;
-
 namespace SFC.Identity.Api.Tests.Controllers;
 
 public class IdentityControllerTests

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFC.Identity.Infrastructure.Extensions;
-
-using Xunit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using SFC.Identity.Infrastructure.Persistence.Models;
@@ -65,8 +63,9 @@ public class IdentityExtensionsTests
         ICollection<ApiResourceSetting> assertApiResources = [new() { Name = "sfc.data" }];
 
         // Act
-        await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings { 
-            Api = new ApiSettings { Resources = assertApiResources } 
+        await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings
+        {
+            Api = new ApiSettings { Resources = assertApiResources }
         }, CancellationToken.None);
 
         // Assert
@@ -97,7 +96,7 @@ public class IdentityExtensionsTests
     {
         //Arrange
         ConfigurationDbContext context = CreateConfigurationDbContext();
-        ICollection<ClientSetting> assertClients = [new() {  Name = "Name", Id = "sfc" }];
+        ICollection<ClientSetting> assertClients = [new() { Name = "Name", Id = "sfc" }];
 
         // Act
         await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings
@@ -118,7 +117,7 @@ public class IdentityExtensionsTests
         {
             StoreOptions = new ConfigurationStoreOptions
             {
-                DefaultSchema = DbConstants.DEFAULT_SCHEMA_NAME
+                DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME
             }
         };
     }

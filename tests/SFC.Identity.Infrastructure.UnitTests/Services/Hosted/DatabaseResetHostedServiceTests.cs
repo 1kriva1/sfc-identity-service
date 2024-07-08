@@ -15,8 +15,6 @@ using SFC.Identity.Infrastructure.Configuration;
 using SFC.Identity.Infrastructure.Persistence;
 using SFC.Identity.Infrastructure.Settings;
 
-using Xunit;
-
 using Environments = SFC.Identity.Application.Common.Constants.Environments;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Services.Hosted;
@@ -86,7 +84,7 @@ public class DatabaseResetHostedServiceTests
         {
             StoreOptions = new ConfigurationStoreOptions
             {
-                DefaultSchema = DbConstants.DEFAULT_SCHEMA_NAME
+                DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME
             }
         };
         services.AddSingleton(configurationContext);
@@ -97,7 +95,7 @@ public class DatabaseResetHostedServiceTests
         {
             StoreOptions = new OperationalStoreOptions
             {
-                DefaultSchema = DbConstants.DEFAULT_SCHEMA_NAME
+                DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME
             }
         };
         services.AddSingleton(persistedGrantContext);
