@@ -6,6 +6,7 @@ public static class SpaExtensions
 {
     private const string SOURCE_PATH = "../../Client/SFC.Identity.Client";
     private const string ROOT_PATH = "/dist/sfc-identity";
+    private const int STARTUP_TIMEOUT = 300;
 
     public static void AddSpa(this IServiceCollection services)
     {
@@ -19,6 +20,7 @@ public static class SpaExtensions
             if (app.Environment.IsDevelopment())
             {
                 spa.Options.SourcePath = SOURCE_PATH;
+                spa.Options.StartupTimeout = TimeSpan.FromSeconds(STARTUP_TIMEOUT);
                 spa.UseAngularCliServer(npmScript: "start");
             }
         });

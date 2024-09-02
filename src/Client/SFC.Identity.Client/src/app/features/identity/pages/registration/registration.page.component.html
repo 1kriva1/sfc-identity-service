@@ -18,7 +18,7 @@
             <form [formGroup]="form" autocomplete="off">
                 <div class="part">
                     <sfc-text-input [id]="Constants.USERNAME_EMAIL_ID" formControlName="userNameEmail"
-                        [label]="Localization.INPUT.USERNAME_EMAIL.LABEL_PLACEHOLDER"
+                        [sfcFocusInput]="true" [label]="Localization.INPUT.USERNAME_EMAIL.LABEL_PLACEHOLDER"
                         [placeholder]="Localization.INPUT.USERNAME_EMAIL.LABEL_PLACEHOLDER" [bordered]="true"
                         [validations]="{
                             required: Localization.INPUT.USERNAME_EMAIL.VALIDATIONS.REQUIRED,
