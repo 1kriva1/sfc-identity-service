@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>SFC.Identity.Messages</PackageId>
+    <Version>0.0.6</Version>
+    <Authors>Andrii Kryvoruk</Authors>
+    <Company>SFC</Company>
+    <Product>SFC</Product>
+    <PackageTags>Street Football Club;SFC;messages</PackageTags>
+    <Description>
+      Messages from Identity service for SFC project
+    </Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+</Project>

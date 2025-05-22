@@ -2,6 +2,8 @@
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 
+using MassTransit;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,10 +13,10 @@ using Moq;
 
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Exceptions;
-using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.Logout;
-using SFC.Identity.Application.Models.Registration;
-using SFC.Identity.Infrastructure.Persistence.Models;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Login;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Logout;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Registration;
+using SFC.Identity.Infrastructure.Persistence.Entities;
 using SFC.Identity.Infrastructure.Services;
 using SFC.Identity.Infrastructure.Settings;
 
@@ -35,6 +37,8 @@ public class IdentityServiceTests
 
     private Mock<IEventService> _eventServiceMock = default!;
 
+    private Mock<IPublishEndpoint> _publishEndpointMock = default!;
+
     private IdentityService _service = default!;
 
     public IdentityServiceTests()
@@ -54,7 +58,7 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
-        RegistrationModel model = new()
+        RegistrationModelDto model = new()
         {
             UserName = username,
             Password = "password",
@@ -62,8 +66,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(model));
-        Assert.Equal(Messages.UserAlreadyExist, exception.Message);
+        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.UserAlreadyExist, exception.Message);
     }
 
     [Fact]
@@ -75,7 +79,7 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
 
-        RegistrationModel model = new()
+        RegistrationModelDto model = new()
         {
             Email = email,
             Password = "password",
@@ -83,8 +87,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(model));
-        Assert.Equal(Messages.UserAlreadyExist, exception.Message);
+        ConflictException exception = await Assert.ThrowsAsync<ConflictException>(async () => await _service.RegisterAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.UserAlreadyExist, exception.Message);
     }
 
     [Fact]
@@ -101,10 +105,10 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.CreateAsync(It.IsAny<ApplicationUser>(), password))
             .Returns(Task.FromResult(IdentityResult.Failed([
-                new() { Code =errorCode, Description = errorDescription }
+                new() { Code = errorCode, Description = errorDescription }
             ])));
 
-        RegistrationModel model = new()
+        RegistrationModelDto model = new()
         {
             Email = email,
             UserName = username,
@@ -113,8 +117,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(model));
-        Assert.Equal(Messages.UserRegistrationError, exception.Message);
+        IdentityException exception = await Assert.ThrowsAsync<IdentityException>(async () => await _service.RegisterAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.UserRegistrationError, exception.Message);
         Assert.True(exception.Errors.ContainsKey(errorCode));
         Assert.Single(exception.Errors[errorCode]);
         Assert.Equal(errorDescription, exception.Errors[errorCode].FirstOrDefault());
@@ -142,7 +146,7 @@ public class IdentityServiceTests
             Client = new Client { ClientId = clientId }
         });
 
-        RegistrationModel model = new()
+        RegistrationModelDto model = new()
         {
             Email = email,
             UserName = username,
@@ -151,8 +155,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.RegisterAsync(model));
-        Assert.Equal(Messages.AuthorizationError, exception.Message);
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.RegisterAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.AuthorizationError, exception.Message);
         _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
@@ -178,7 +182,7 @@ public class IdentityServiceTests
             Client = new Client { ClientId = clientId }
         });
 
-        RegistrationModel model = new()
+        RegistrationModelDto model = new()
         {
             Email = email,
             UserName = username,
@@ -188,7 +192,7 @@ public class IdentityServiceTests
         };
 
         // Act
-        RegistrationResult result = await _service.RegisterAsync(model);
+        RegistrationResultDto result = await _service.RegisterAsync(model);
 
         // Assert
         Assert.Equal(returnUrl, result.ReturnUrl);
@@ -216,7 +220,7 @@ public class IdentityServiceTests
 
         _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
-        LoginModel model = new()
+        LoginModelDto model = new()
         {
             UserName = "username_test",
             Password = "password",
@@ -224,8 +228,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(model));
-        Assert.Equal(Messages.AuthorizationError, exception.Message);
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.AuthorizationError, exception.Message);
         _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
@@ -242,7 +246,7 @@ public class IdentityServiceTests
 
         _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.Failed);
 
-        LoginModel model = new()
+        LoginModelDto model = new()
         {
             UserName = username,
             Password = password,
@@ -250,8 +254,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(model));
-        Assert.Equal(Messages.AuthorizationError, exception.Message);
+        AuthorizationException exception = await Assert.ThrowsAsync<AuthorizationException>(async () => await _service.LoginAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.AuthorizationError, exception.Message);
         _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
@@ -268,7 +272,7 @@ public class IdentityServiceTests
 
         _signInManagerMock.Setup(um => um.PasswordSignInAsync(username, password, false, true)).ReturnsAsync(SignInResult.LockedOut);
 
-        LoginModel model = new()
+        LoginModelDto model = new()
         {
             UserName = username,
             Password = password,
@@ -276,8 +280,8 @@ public class IdentityServiceTests
         };
 
         // Assert
-        ForbiddenException exception = await Assert.ThrowsAsync<ForbiddenException>(async () => await _service.LoginAsync(model));
-        Assert.Equal(Messages.AccountLocked, exception.Message);
+        ForbiddenException exception = await Assert.ThrowsAsync<ForbiddenException>(async () => await _service.LoginAsync(model)).ConfigureAwait(false);
+        Assert.Equal(Localization.AccountLocked, exception.Message);
         _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLoginFailureEvent>()), Times.Once());
     }
 
@@ -301,7 +305,7 @@ public class IdentityServiceTests
             Client = new Client { ClientId = clientId }
         });
 
-        LoginModel model = new()
+        LoginModelDto model = new()
         {
             UserName = username,
             Password = password,
@@ -311,7 +315,7 @@ public class IdentityServiceTests
         };
 
         // Act
-        LoginResult result = await _service.LoginAsync(model);
+        LoginResultDto result = await _service.LoginAsync(model);
 
         // Assert
         Assert.Equal(returnUrl, result.ReturnUrl);
@@ -348,7 +352,7 @@ public class IdentityServiceTests
             Client = new Client { ClientId = clientId }
         });
 
-        LoginModel model = new()
+        LoginModelDto model = new()
         {
             UserName = username,
             Password = password,
@@ -358,7 +362,7 @@ public class IdentityServiceTests
         };
 
         // Act
-        LoginResult result = await _service.LoginAsync(model);
+        LoginResultDto result = await _service.LoginAsync(model);
 
         // Assert
         AuthenticationProperties properties = (AuthenticationProperties)result.Properties;
@@ -383,14 +387,14 @@ public class IdentityServiceTests
         _identityServerInteractionServiceMock.Setup(mock => mock.GetLogoutContextAsync(logoutId))
             .ReturnsAsync(new LogoutRequest(logoutId, new LogoutMessage()));
 
-        LogoutModel model = new()
+        LogoutModelDto model = new()
         {
             LogoutId = logoutId,
-            User = new LogoutUserModel { IsAuthenticated = true }
+            User = new LogoutUserModelDto { IsAuthenticated = true }
         };
 
         // Act
-        LogoutResult result = await _service.LogoutAsync(model);
+        LogoutResultDto result = await _service.LogoutAsync(model);
 
         // Assert
         Assert.True(result.ShowLogoutPrompt);
@@ -416,14 +420,14 @@ public class IdentityServiceTests
                 ClientName = clientName
             }));
 
-        LogoutModel model = new()
+        LogoutModelDto model = new()
         {
             LogoutId = logoutId,
-            User = new LogoutUserModel { IsAuthenticated = true }
+            User = new LogoutUserModelDto { IsAuthenticated = true }
         };
 
         // Act
-        LogoutResult result = await _service.LogoutAsync(model);
+        LogoutResultDto result = await _service.LogoutAsync(model);
 
         // Assert
         Assert.False(result.ShowLogoutPrompt);
@@ -453,14 +457,14 @@ public class IdentityServiceTests
                 ClientName = clientName
             }));
 
-        LogoutModel model = new()
+        LogoutModelDto model = new()
         {
             LogoutId = logoutId,
-            User = new LogoutUserModel { IsAuthenticated = false }
+            User = new LogoutUserModelDto { IsAuthenticated = false }
         };
 
         // Act
-        LogoutResult result = await _service.LogoutAsync(model);
+        LogoutResultDto result = await _service.LogoutAsync(model);
 
         // Assert
         _eventServiceMock.Verify(um => um.RaiseAsync(It.IsAny<UserLogoutSuccessEvent>()), Times.Once());
@@ -490,14 +494,14 @@ public class IdentityServiceTests
                 ClientName = null
             }));
 
-        LogoutModel model = new()
+        LogoutModelDto model = new()
         {
             LogoutId = logoutId,
-            User = new LogoutUserModel { IsAuthenticated = true }
+            User = new LogoutUserModelDto { IsAuthenticated = true }
         };
 
         // Act
-        LogoutResult result = await _service.LogoutAsync(model);
+        LogoutResultDto result = await _service.LogoutAsync(model);
 
         // Assert
         Assert.False(result.ShowLogoutPrompt);
@@ -525,9 +529,10 @@ public class IdentityServiceTests
         _identityServerInteractionServiceMock = new Mock<IIdentityServerInteractionService>();
         _serverUrlsMock = new Mock<IServerUrls>();
         _eventServiceMock = new Mock<IEventService>();
+        _publishEndpointMock = new Mock<IPublishEndpoint>();
         _service = new IdentityService(_userManagerMock.Object, _signInManagerMock.Object,
             _identityServerInteractionServiceMock.Object, _serverUrlsMock.Object,
-            _eventServiceMock.Object, identitySettingsOptionsMock.Object);
+            _eventServiceMock.Object, _publishEndpointMock.Object, identitySettingsOptionsMock.Object);
     }
 
     private static IdentitySettings BuildIdentitySettings()

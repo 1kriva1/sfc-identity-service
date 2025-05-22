@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using SFC.Identity.Application.Common.Exceptions;
+
+using Microsoft.AspNetCore.Http;
+
+using SFC.Identity.Api.Infrastructure.Middlewares;
+using SFC.Identity.Api.Infrastructure.Models.Base;
 using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Models.Base;
-using SFC.Identity.Api.Middlewares;
+using SFC.Identity.Application.Common.Exceptions;
+using SFC.Identity.Infrastructure.Constants;
 
 using SystemException = System.Exception;
 
@@ -24,10 +27,10 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(CommonConstants.CONTENT_TYPE, httpContext.Response.ContentType);
+        Assert.Equal(CommonConstants.ContentType, httpContext.Response.ContentType);
     }
 
     [Fact]
@@ -44,7 +47,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(customContentType, httpContext.Response.ContentType);
@@ -62,7 +65,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         Assert.Equal((int)HttpStatusCode.OK, httpContext.Response.StatusCode);
@@ -81,10 +84,10 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
-        AssertBaseResponse(HttpStatusCode.InternalServerError, httpContext.Response, Messages.FailedResult, out string _);
+        AssertBaseResponse(HttpStatusCode.InternalServerError, httpContext.Response, Localization.FailedResult, out string _);
     }
 
     [Fact]
@@ -102,7 +105,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         AssertBaseResponse(HttpStatusCode.Conflict, httpContext.Response, errorMessage, out string _);
@@ -123,7 +126,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         AssertBaseErrorResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, errorCode, errorDescription);
@@ -146,7 +149,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         AssertBaseErrorResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, errorCode, errorDescription);
@@ -167,7 +170,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         AssertBaseResponse(HttpStatusCode.Unauthorized, httpContext.Response, errorMessage, out string _);
@@ -188,7 +191,7 @@ public class ExceptionHandlerMiddlewareTests
         ExceptionHandlerMiddleware middleware = new(Next);
 
         // Act
-        await middleware.InvokeAsync(httpContext);
+        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
 
         // Assert
         AssertBaseResponse(HttpStatusCode.Forbidden, httpContext.Response, errorMessage, out string _);

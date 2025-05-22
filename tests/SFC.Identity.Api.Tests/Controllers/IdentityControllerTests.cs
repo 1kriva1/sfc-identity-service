@@ -11,12 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 
 using SFC.Identity.Api.Controllers;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Login;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Logout;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Registration;
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Application.Common.Mappings;
-using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.Logout;
-using SFC.Identity.Application.Models.Registration;
+using SFC.Identity.Application.Interfaces.Identity;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Login;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Logout;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Registration;
 
 namespace SFC.Identity.Api.Tests.Controllers;
 
@@ -57,7 +60,7 @@ public class IdentityControllerTests
         // Arrange
         string userName = "username", returnUrl = "https:\\localhost4200";
         RegistrationRequest request = new() { UserName = userName, Email = null, Password = "pass", ConfirmPassword = "pass", ReturnUrl = returnUrl };
-        RegistrationResult result = new()
+        RegistrationResultDto result = new()
         {
             UserId = Guid.NewGuid(),
             UserName = userName,
@@ -65,10 +68,10 @@ public class IdentityControllerTests
             Properties = new AuthenticationProperties()
         };
 
-        _identityServiceMock.Setup(es => es.RegisterAsync(It.IsAny<RegistrationModel>())).ReturnsAsync(result);
+        _identityServiceMock.Setup(es => es.RegisterAsync(It.IsAny<RegistrationModelDto>())).ReturnsAsync(result);
 
         // Act
-        ActionResult<RegistrationResponse> response = await _controller.RegisterAsync(request);
+        ActionResult<RegistrationResponse> response = await _controller.RegisterAsync(request).ConfigureAwait(false);
 
         // Assert
         ActionResult<RegistrationResponse> actionResult = Assert.IsType<ActionResult<RegistrationResponse>>(response);
@@ -78,7 +81,7 @@ public class IdentityControllerTests
         RegistrationResponse responseResult = Assert.IsType<RegistrationResponse>(objectResult.Value);
 
         Assert.True(responseResult?.Success);
-        Assert.Equal(Messages.SuccessResult, responseResult?.Message);
+        Assert.Equal(Localization.SuccessResult, responseResult?.Message);
         Assert.Equal(returnUrl, responseResult?.ReturnUrl);
         _authenticationServiceMock.Verify(um => um
             .SignInAsync(It.IsAny<HttpContext>(), It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()),
@@ -92,7 +95,7 @@ public class IdentityControllerTests
         // Arrange
         string userName = "username", returnUrl = "https:\\localhost4200";
         LoginRequest request = new() { UserName = userName, Email = null, Password = "pass", RememberMe = true, ReturnUrl = returnUrl };
-        LoginResult result = new()
+        LoginResultDto result = new()
         {
             UserId = Guid.NewGuid(),
             UserName = userName,
@@ -100,10 +103,10 @@ public class IdentityControllerTests
             Properties = new AuthenticationProperties()
         };
 
-        _identityServiceMock.Setup(es => es.LoginAsync(It.IsAny<LoginModel>())).ReturnsAsync(result);
+        _identityServiceMock.Setup(es => es.LoginAsync(It.IsAny<LoginModelDto>())).ReturnsAsync(result);
 
         // Act
-        ActionResult<LoginResponse> response = await _controller.LoginAsync(request);
+        ActionResult<LoginResponse> response = await _controller.LoginAsync(request).ConfigureAwait(false);
 
         // Assert
         ActionResult<LoginResponse> actionResult = Assert.IsType<ActionResult<LoginResponse>>(response);
@@ -113,7 +116,7 @@ public class IdentityControllerTests
         LoginResponse responseResult = Assert.IsType<LoginResponse>(objectResult.Value);
 
         Assert.True(responseResult?.Success);
-        Assert.Equal(Messages.SuccessResult, responseResult?.Message);
+        Assert.Equal(Localization.SuccessResult, responseResult?.Message);
         Assert.Equal(returnUrl, responseResult?.ReturnUrl);
         _authenticationServiceMock.Verify(um => um
             .SignInAsync(It.IsAny<HttpContext>(), It.IsAny<string>(), It.IsAny<ClaimsPrincipal>(), It.IsAny<AuthenticationProperties>()),
@@ -126,7 +129,7 @@ public class IdentityControllerTests
     {
         // Arrange
         string logoutId = "logout_id";
-        LogoutResult result = new()
+        LogoutResultDto result = new()
         {
             AutomaticRedirectAfterSignOut = true,
             ClientName = "client_name",
@@ -135,10 +138,10 @@ public class IdentityControllerTests
             SignOutIFrameUrl = "https:\\localhost4200"
         };
 
-        _identityServiceMock.Setup(es => es.LogoutAsync(It.IsAny<LogoutModel>())).ReturnsAsync(result);
+        _identityServiceMock.Setup(es => es.LogoutAsync(It.IsAny<LogoutModelDto>())).ReturnsAsync(result);
 
         // Act
-        ActionResult<LogoutResponse> response = await _controller.LogoutAsync(logoutId);
+        ActionResult<LogoutResponse> response = await _controller.LogoutAsync(logoutId).ConfigureAwait(false);
 
         // Assert
         ActionResult<LogoutResponse> actionResult = Assert.IsType<ActionResult<LogoutResponse>>(response);
@@ -148,7 +151,7 @@ public class IdentityControllerTests
         LogoutResponse responseResult = Assert.IsType<LogoutResponse>(objectResult.Value);
 
         Assert.True(responseResult?.Success);
-        Assert.Equal(Messages.SuccessResult, responseResult?.Message);
+        Assert.Equal(Localization.SuccessResult, responseResult?.Message);
         Assert.Equal(result.SignOutIFrameUrl, responseResult?.SignOutIFrameUrl);
         Assert.Equal(result.ClientName, responseResult?.ClientName);
         Assert.Equal(result.PostLogoutRedirectUrl, responseResult?.PostLogoutRedirectUrl);
@@ -164,7 +167,7 @@ public class IdentityControllerTests
     {
         // Arrange
         string logoutId = "logout_id";
-        LogoutResult result = new()
+        LogoutResultDto result = new()
         {
             AutomaticRedirectAfterSignOut = true,
             ClientName = "client_name",
@@ -173,10 +176,10 @@ public class IdentityControllerTests
             SignOutIFrameUrl = "https:\\localhost4200"
         };
 
-        _identityServiceMock.Setup(es => es.LogoutAsync(It.IsAny<LogoutModel>())).ReturnsAsync(result);
+        _identityServiceMock.Setup(es => es.LogoutAsync(It.IsAny<LogoutModelDto>())).ReturnsAsync(result);
 
         // Act
-        ActionResult<LogoutResponse> response = await _controller.LogoutAsync(logoutId);
+        ActionResult<LogoutResponse> response = await _controller.LogoutAsync(logoutId).ConfigureAwait(false);
 
         // Assert
         ActionResult<LogoutResponse> actionResult = Assert.IsType<ActionResult<LogoutResponse>>(response);
@@ -186,7 +189,7 @@ public class IdentityControllerTests
         LogoutResponse responseResult = Assert.IsType<LogoutResponse>(objectResult.Value);
 
         Assert.True(responseResult?.Success);
-        Assert.Equal(Messages.SuccessResult, responseResult?.Message);
+        Assert.Equal(Localization.SuccessResult, responseResult?.Message);
         Assert.Equal(result.SignOutIFrameUrl, responseResult?.SignOutIFrameUrl);
         Assert.Equal(result.ClientName, responseResult?.ClientName);
         Assert.Equal(result.PostLogoutRedirectUrl, responseResult?.PostLogoutRedirectUrl);
@@ -202,7 +205,7 @@ public class IdentityControllerTests
     {
         // Arrange
         string logoutId = "logout_id";
-        LogoutResult result = new()
+        LogoutResultDto result = new()
         {
             AutomaticRedirectAfterSignOut = true,
             ClientName = "client_name",
@@ -211,10 +214,10 @@ public class IdentityControllerTests
             SignOutIFrameUrl = "https:\\localhost4200"
         };
 
-        _identityServiceMock.Setup(es => es.PostLogoutAsync(It.IsAny<LogoutModel>())).ReturnsAsync(result);
+        _identityServiceMock.Setup(es => es.PostLogoutAsync(It.IsAny<LogoutModelDto>())).ReturnsAsync(result);
 
         // Act
-        ActionResult<LogoutResponse> response = await _controller.PostLogoutAsync(logoutId);
+        ActionResult<LogoutResponse> response = await _controller.PostLogoutAsync(logoutId).ConfigureAwait(false);
 
         // Assert
         ActionResult<LogoutResponse> actionResult = Assert.IsType<ActionResult<LogoutResponse>>(response);
@@ -224,7 +227,7 @@ public class IdentityControllerTests
         LogoutResponse responseResult = Assert.IsType<LogoutResponse>(objectResult.Value);
 
         Assert.True(responseResult?.Success);
-        Assert.Equal(Messages.SuccessResult, responseResult?.Message);
+        Assert.Equal(Localization.SuccessResult, responseResult?.Message);
         Assert.Equal(result.SignOutIFrameUrl, responseResult?.SignOutIFrameUrl);
         Assert.Equal(result.ClientName, responseResult?.ClientName);
         Assert.Equal(result.PostLogoutRedirectUrl, responseResult?.PostLogoutRedirectUrl);

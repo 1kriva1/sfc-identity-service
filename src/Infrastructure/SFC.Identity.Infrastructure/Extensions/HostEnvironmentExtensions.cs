@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-using SFC.Identity.Application.Common.Constants;
-
-using Environments = SFC.Identity.Application.Common.Constants.Environments;
+using Environments = SFC.Identity.Infrastructure.Constants.Environments;
 
 namespace SFC.Identity.Infrastructure.Extensions;
 public static class HostEnvironmentEnvExtensions

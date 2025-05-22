@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Metadata;
-using SFC.Identity.Infrastructure.Persistence.Configurations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SFC.Identity.Infrastructure.Persistence.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+using SFC.Identity.Infrastructure.Persistence.Configurations.Identity;
+using SFC.Identity.Infrastructure.Persistence.Entities;
 
 namespace SFC.Identity.Infrastructure.Persistence.UnitTests.Configurations;
 public class ConfigurationTests

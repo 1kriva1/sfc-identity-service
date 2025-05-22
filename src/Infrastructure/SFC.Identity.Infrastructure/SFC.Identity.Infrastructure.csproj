@@ -1,19 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
 	<ItemGroup>		
-		<PackageReference Include="Duende.IdentityServer" Version="7.0.5" />		
-		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="7.0.5" />				
-		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.63.0" />
+		<PackageReference Include="Duende.IdentityServer" Version="7.1.0" />		
+		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="7.0.5" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
+    <PackageReference Include="Grpc.StatusProto" Version="2.67.0" />				
+		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Contracts\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Contracts.csproj" />
+	  <ProjectReference Include="..\..\Contracts\SFC.Identity.Contracts\SFC.Identity.Contracts.csproj" />
+	  <ProjectReference Include="..\..\Contracts\SFC.Identity.Messages\SFC.Identity.Messages.csproj" />
 	  <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
 	  <ProjectReference Include="..\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
 	</ItemGroup>

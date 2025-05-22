@@ -1,12 +1,14 @@
-﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
-using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Models.Base;
-using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.Registration;
-
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+
+using SFC.Identity.Api.Infrastructure.Models.Base;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Login;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Logout;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Registration;
+using SFC.Identity.Api.IntegrationTests.Fixtures;
+using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Infrastructure.Constants;
 
 namespace SFC.Identity.Api.IntegrationTests.Controllers;
 
@@ -34,18 +36,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.ConfirmPassword)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.ConfirmPassword)]);
@@ -67,18 +69,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Password)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Password)]);
@@ -101,18 +103,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.ConfirmPassword)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.ConfirmPassword)]);
@@ -131,18 +133,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.UserName)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.UserName)]);
@@ -161,18 +163,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Email)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Email)]);
@@ -186,19 +188,19 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
         RegistrationRequest request = new() { UserName = "Username", Email = "test_email", Password = "Test1234!", ConfirmPassword = "Test1234!" };
 
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
@@ -218,26 +220,26 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.UserName)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.UserName)]);
-        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+        Assert.Equal(string.Format(Localization.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
             responseValue.Errors[nameof(RegistrationRequest.UserName)].FirstOrDefault());
         Assert.True(responseValue.Errors.ContainsKey(nameof(RegistrationRequest.Email)));
         Assert.Single(responseValue.Errors[nameof(RegistrationRequest.Email)]);
-        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+        Assert.Equal(string.Format(Localization.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
             responseValue.Errors[nameof(RegistrationRequest.Email)].FirstOrDefault());
     }
 
@@ -253,18 +255,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/register", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         RegistrationResponse? responseValue = JsonSerializer.Deserialize<RegistrationResponse>(responseString);
 
         Assert.IsType<RegistrationResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.NotEmpty(responseValue.ReturnUrl);
     }
 
@@ -284,18 +286,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.Password)));
         Assert.Single(responseValue.Errors[nameof(LoginRequest.Password)]);
@@ -309,19 +311,19 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
         LoginRequest request = new() { UserName = null, Email = null, Password = null! };
 
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
@@ -341,18 +343,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.Email)));
         Assert.Single(responseValue.Errors[nameof(LoginRequest.Email)]);
@@ -371,26 +373,26 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.Email)));
         Assert.Single(responseValue.Errors[nameof(LoginRequest.Email)]);
-        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+        Assert.Equal(string.Format(Localization.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
             responseValue.Errors[nameof(LoginRequest.Email)].FirstOrDefault());
         Assert.True(responseValue.Errors.ContainsKey(nameof(LoginRequest.UserName)));
         Assert.Single(responseValue.Errors[nameof(LoginRequest.UserName)]);
-        Assert.Equal(string.Format(Messages.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
+        Assert.Equal(string.Format(Localization.AtLeastOneRequired, nameof(RegistrationRequest.Email), nameof(RegistrationRequest.UserName)),
             responseValue.Errors[nameof(LoginRequest.UserName)].FirstOrDefault());
     }
 
@@ -406,18 +408,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         JsonContent content = JsonContent.Create(request);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseResponse? responseValue = JsonSerializer.Deserialize<BaseResponse>(responseString);
 
         Assert.IsType<BaseResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.AuthorizationError, responseValue.Message);
+        Assert.Equal(Localization.AuthorizationError, responseValue.Message);
     }
 
     [Fact]
@@ -425,11 +427,11 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
     public async Task Identity_Login_ShouldLoginUser()
     {
         // Act
-        LoginResponse? responseValue = await LoginPlayer();
+        LoginResponse? responseValue = await LoginPlayer().ConfigureAwait(false);
 
         Assert.IsType<LoginResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.NotEmpty(responseValue.ReturnUrl);
     }
 
@@ -445,18 +447,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         HttpClient client = _factory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(Constants.LOGOUT_ID_QUERY_PARAMETER_NAME));
         Assert.Single(responseValue.Errors[Constants.LOGOUT_ID_QUERY_PARAMETER_NAME]);
@@ -470,15 +472,15 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
     {
         // Arrange
         HttpClient client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
@@ -497,18 +499,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         string logoutId = "logout_id";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout?{Constants.LOGOUT_ID_QUERY_PARAMETER_NAME}={logoutId}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_IDENTITY}/logout?{Constants.LOGOUT_ID_QUERY_PARAMETER_NAME}={logoutId}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         LogoutResponse? responseValue = JsonSerializer.Deserialize<LogoutResponse>(responseString);
 
         Assert.IsType<LogoutResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.Null(responseValue?.SignOutIFrameUrl);
         Assert.Null(responseValue?.ClientName);
         Assert.Null(responseValue?.PostLogoutRedirectUrl);
@@ -528,18 +530,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         HttpClient client = _factory.CreateClient();
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout", null);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout", null).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
         Assert.IsType<BaseErrorResponse>(responseValue);
         Assert.False(responseValue.Success);
-        Assert.Equal(Messages.ValidationError, responseValue.Message);
+        Assert.Equal(Localization.ValidationError, responseValue.Message);
         Assert.NotNull(responseValue.Errors);
         Assert.True(responseValue.Errors.ContainsKey(Constants.LOGOUT_ID_QUERY_PARAMETER_NAME));
         Assert.Single(responseValue.Errors[Constants.LOGOUT_ID_QUERY_PARAMETER_NAME]);
@@ -553,15 +555,15 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
     {
         // Arrange
         HttpClient client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout", null);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout", null).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         BaseErrorResponse? responseValue = JsonSerializer.Deserialize<BaseErrorResponse>(responseString);
 
@@ -580,18 +582,18 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
         string logoutId = "logout_id";
 
         // Act
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout?{Constants.LOGOUT_ID_QUERY_PARAMETER_NAME}={logoutId}", null);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/logout?{Constants.LOGOUT_ID_QUERY_PARAMETER_NAME}={logoutId}", null).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         LogoutResponse? responseValue = JsonSerializer.Deserialize<LogoutResponse>(responseString);
 
         Assert.IsType<LogoutResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.Null(responseValue?.SignOutIFrameUrl);
         Assert.Null(responseValue?.ClientName);
         Assert.Null(responseValue?.PostLogoutRedirectUrl);
@@ -611,11 +613,11 @@ public class IdentityControllerTests : IClassFixture<CustomWebApplicationFactory
 
         JsonContent content = JsonContent.Create(request);
 
-        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content);
+        HttpResponseMessage response = await client.PostAsync($"{Constants.API_IDENTITY}/login", content).ConfigureAwait(false);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         LoginResponse? responseValue = JsonSerializer.Deserialize<LoginResponse>(responseString);
 

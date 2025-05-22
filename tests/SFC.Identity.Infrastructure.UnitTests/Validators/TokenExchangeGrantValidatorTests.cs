@@ -2,10 +2,9 @@
 using System.Security.Claims;
 using System.Text.Json;
 
+using Duende.IdentityModel;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
-
-using IdentityModel;
 
 using Moq;
 
@@ -44,7 +43,7 @@ public class TokenExchangeGrantValidatorTests
         TokenExchangeGrantValidator validator = new(validatorMock.Object);
 
         // Act
-        await validator.ValidateAsync(context);
+        await validator.ValidateAsync(context).ConfigureAwait(false);
 
         // Assert
         Assert.True(context.Result.IsError);
@@ -70,7 +69,7 @@ public class TokenExchangeGrantValidatorTests
         TokenExchangeGrantValidator validator = new(validatorMock.Object);
 
         // Act
-        await validator.ValidateAsync(context);
+        await validator.ValidateAsync(context).ConfigureAwait(false);
 
         // Assert
         Assert.True(context.Result.IsError);
@@ -97,7 +96,7 @@ public class TokenExchangeGrantValidatorTests
         TokenExchangeGrantValidator validator = new(validatorMock.Object);
 
         // Act
-        await validator.ValidateAsync(context);
+        await validator.ValidateAsync(context).ConfigureAwait(false);
 
         // Assert
         Assert.True(context.Result.IsError);
@@ -130,7 +129,7 @@ public class TokenExchangeGrantValidatorTests
         TokenExchangeGrantValidator validator = new(validatorMock.Object);
 
         // Act
-        await validator.ValidateAsync(context);
+        await validator.ValidateAsync(context).ConfigureAwait(false);
 
         // Assert
         Assert.True(context.Result.IsError);
@@ -166,7 +165,7 @@ public class TokenExchangeGrantValidatorTests
         TokenExchangeGrantValidator validator = new(validatorMock.Object);
 
         // Act
-        await validator.ValidateAsync(context);
+        await validator.ValidateAsync(context).ConfigureAwait(false);
 
         // Assert
         Assert.False(context.Result.IsError);
@@ -175,7 +174,7 @@ public class TokenExchangeGrantValidatorTests
             context.Result.CustomResponse);
         Assert.Equal(clientIdValue, context.Request.ClientId);
         Assert.Equal(validator.GrantType, context.Result.Subject.FindFirstValue(JwtClaimTypes.AuthenticationMethod));
-        Assert.Equal(JsonSerializer.Serialize(new { client_id = clientIdValue }), 
+        Assert.Equal(JsonSerializer.Serialize(new { client_id = clientIdValue }),
             context.Result.Subject.FindFirstValue(JwtClaimTypes.Actor));
     }
 }

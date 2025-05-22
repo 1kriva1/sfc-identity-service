@@ -9,13 +9,13 @@ using Microsoft.Extensions.Options;
 
 using Moq;
 
-using SFC.Data.Infrastructure.Services.Hosted;
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure.Configuration;
-using SFC.Identity.Infrastructure.Persistence;
+using SFC.Identity.Infrastructure.Persistence.Constants;
+using SFC.Identity.Infrastructure.Persistence.Context;
+using SFC.Identity.Infrastructure.Services.Hosted;
 using SFC.Identity.Infrastructure.Settings;
 
-using Environments = SFC.Identity.Application.Common.Constants.Environments;
+using Environments = SFC.Identity.Infrastructure.Constants.Environments;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Services.Hosted;
 public class DatabaseResetHostedServiceTests
@@ -35,7 +35,7 @@ public class DatabaseResetHostedServiceTests
         (IHostedService, IdentityDbContext, ConfigurationDbContext, PersistedGrantDbContext) result = CreateDatabaseResetHostedService();
 
         // Act
-        await result.Item1.StartAsync(new CancellationToken());
+        await result.Item1.StartAsync(new CancellationToken()).ConfigureAwait(false);
 
         // Assert
         Assert.True(result.Item2.Database.CanConnect());
@@ -60,7 +60,7 @@ public class DatabaseResetHostedServiceTests
         (IHostedService, IdentityDbContext, ConfigurationDbContext, PersistedGrantDbContext) result = CreateDatabaseResetHostedService();
 
         // Act
-        await result.Item1.StartAsync(new CancellationToken());
+        await result.Item1.StartAsync(new CancellationToken()).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(assertIdentitySettings.Api.Resources.Count, result.Item3.ApiResources.Count());

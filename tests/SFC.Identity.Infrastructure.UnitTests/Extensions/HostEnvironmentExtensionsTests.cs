@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure.Extensions;
 
-using Environments = SFC.Identity.Application.Common.Constants.Environments;
+using Environments = SFC.Identity.Infrastructure.Constants.Environments;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Extensions;
 public class HostEnvironmentExtensionsTests

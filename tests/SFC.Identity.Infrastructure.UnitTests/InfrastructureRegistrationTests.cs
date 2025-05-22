@@ -1,21 +1,24 @@
 ﻿using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-using SFC.Data.Infrastructure.Services.Hosted;
-using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Infrastructure.Persistence;
-using SFC.Identity.Infrastructure.Persistence.Models;
+using SFC.Identity.Application.Interfaces.Existence;
+using SFC.Identity.Application.Interfaces.Identity;
+using SFC.Identity.Infrastructure.Persistence.Context;
+using SFC.Identity.Infrastructure.Persistence.Entities;
+using SFC.Identity.Infrastructure.Services.Hosted;
 using SFC.Identity.Infrastructure.Settings;
 
 namespace SFC.Identity.Infrastructure.UnitTests;
 
 public class InfrastructureRegistrationTests
 {
+    private readonly WebApplicationBuilder _builder = WebApplication.CreateBuilder();
     private readonly ServiceCollection _serviceCollection = new();
     private readonly ServiceProvider _serviceProvider;
 
@@ -27,7 +30,7 @@ public class InfrastructureRegistrationTests
             .Build();
         _serviceCollection.AddDbContext<IdentityDbContext>();
         _serviceCollection.AddLogging();
-        _serviceCollection.AddInfrastructureServices(configuration);
+        _builder.AddInfrastructureServices();
         _serviceProvider = _serviceCollection.BuildServiceProvider();
     }
 

@@ -174,4 +174,7 @@
   <data name="ValidationError" xml:space="preserve">
     <value>Валідаційна помилка.</value>
   </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Користувача не знайдено.</value>
+  </data>
 </root>

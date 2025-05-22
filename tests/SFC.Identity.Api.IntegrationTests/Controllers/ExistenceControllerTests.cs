@@ -1,8 +1,10 @@
-﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using SFC.Identity.Application.Models.Existence;
+
+using SFC.Identity.Api.Infrastructure.Models.Existence;
+using SFC.Identity.Api.IntegrationTests.Fixtures;
 using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Infrastructure.Constants;
 
 namespace SFC.Identity.Api.IntegrationTests.Controllers;
 
@@ -26,18 +28,18 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string userName = "IntegrationTestUser";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
         Assert.IsType<ExistenceResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.True(responseValue.Exist);
     }
 
@@ -51,18 +53,18 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string userName = "IntegrationTestUser_Another";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
         Assert.IsType<ExistenceResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.False(responseValue.Exist);
     }
 
@@ -74,17 +76,17 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
         string userName = "IntegrationTestUser_Another";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         Assert.Contains("Успішний результат.", responseString);
     }
@@ -99,18 +101,18 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string email = "integrationtestemail@mail.com";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
         Assert.IsType<ExistenceResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.True(responseValue.Exist);
     }
 
@@ -124,18 +126,18 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         string email = "testemail_another@mail.com";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
         Assert.IsType<ExistenceResponse>(responseValue);
         Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
+        Assert.Equal(Localization.SuccessResult, responseValue.Message);
         Assert.False(responseValue.Exist);
     }
 
@@ -146,17 +148,17 @@ public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         HttpClient client = _factory.CreateClient();
 
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
         string email = "integrationtestemail@mail.com";
 
         // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
+        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}").ConfigureAwait(false);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        string responseString = await response.Content.ReadAsStringAsync();
+        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         Assert.Contains("Успішний результат.", responseString);
     }

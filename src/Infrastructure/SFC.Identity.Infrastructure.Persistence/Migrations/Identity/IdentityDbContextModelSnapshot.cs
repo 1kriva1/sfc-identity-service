@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SFC.Identity.Infrastructure.Persistence;
+using SFC.Identity.Infrastructure.Persistence.Contexts;
 
 #nullable disable
 
@@ -126,7 +126,139 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("SFC.Identity.Infrastructure.Persistence.Models.ApplicationRole", b =>
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.Metadata.Metadata", b =>
+                {
+                    b.Property<int>("Service")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Domain")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.HasKey("Service", "Type");
+
+                    b.HasIndex("Domain");
+
+                    b.HasIndex("State");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("Metadata", "Metadata");
+
+                    b.HasData(
+                        new
+                        {
+                            Service = 0,
+                            Type = 0,
+                            Domain = 0,
+                            State = 1
+                        });
+                });
+
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.Metadata.MetadataDomain", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Domains", "Metadata");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            Title = "User"
+                        });
+                });
+
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.Metadata.MetadataService", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Services", "Metadata");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            Title = "Identity"
+                        });
+                });
+
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.Metadata.MetadataState", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("States", "Metadata");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            Title = "Not Required"
+                        },
+                        new
+                        {
+                            Id = 1,
+                            Title = "Required"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Title = "Done"
+                        });
+                });
+
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.Metadata.MetadataType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Types", "Metadata");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 0,
+                            Title = "Seed"
+                        });
+                });
+
+            modelBuilder.Entity("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,7 +286,7 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
                     b.ToTable("Roles", "Identity");
                 });
 
-            modelBuilder.Entity("SFC.Identity.Infrastructure.Persistence.Models.ApplicationUser", b =>
+            modelBuilder.Entity("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,12 +299,24 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -209,6 +353,10 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("LastModifiedBy");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -222,7 +370,7 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationRole", null)
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -231,7 +379,7 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationUser", null)
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -240,7 +388,7 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationUser", null)
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -249,13 +397,13 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationRole", null)
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationUser", null)
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -264,10 +412,52 @@ namespace SFC.Identity.Infrastructure.Persistence.Migrations.Identity
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Models.ApplicationUser", null)
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SFC.Identity.Domain.Entities.Metadata.Metadata", b =>
+                {
+                    b.HasOne("SFC.Identity.Domain.Entities.Metadata.MetadataDomain", null)
+                        .WithMany()
+                        .HasForeignKey("Domain")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SFC.Identity.Domain.Entities.Metadata.MetadataService", null)
+                        .WithMany()
+                        .HasForeignKey("Service")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SFC.Identity.Domain.Entities.Metadata.MetadataState", null)
+                        .WithMany()
+                        .HasForeignKey("State")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SFC.Identity.Domain.Entities.Metadata.MetadataType", null)
+                        .WithMany()
+                        .HasForeignKey("Type")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("SFC.Identity.Infrastructure.Persistence.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("LastModifiedBy")
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

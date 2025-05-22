@@ -2,7 +2,7 @@
 
 using Moq;
 
-using Localization = SFC.Identity.Application.Common.Constants.Messages;
+using Localization = SFC.Identity.Application.Common.Constants.Localization;
 
 namespace SFC.Identity.Application.UnitTests.Common.Constants;
 public class MessagesTests

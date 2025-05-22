@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+package sfc_identity;
+
+import "Models/Common/pagination.proto";
+import "Models/Common/sorting.proto";
+import "Messages/User/Find/Filters/get_users_filter.proto";
+
+option csharp_namespace = "SFC.Identity.Contracts.Messages.User.Find";
+
+message GetUsersRequest
+{
+    Pagination pagination = 1;
+    repeated Sorting sorting = 2;
+    GetUsersFilter filter = 3;
+}

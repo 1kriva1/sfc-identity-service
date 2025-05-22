@@ -11,7 +11,7 @@ public class BadRequestExceptionTests
         string validationMessage = "Test validation message.";
 
         // Act
-        BadRequestException exception = new(validationMessage, []);
+        BadRequestException exception = new(validationMessage, new Dictionary<string, IEnumerable<string>>());
 
         // Assert
         Assert.Equal(validationMessage, exception.Message);

@@ -1,18 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using SFC.Identity.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using SFC.Identity.Infrastructure.Persistence.Models;
-using SFC.Identity.Infrastructure.Persistence;
+﻿using Duende.IdentityServer.EntityFramework.DbContexts;
+using Duende.IdentityServer.EntityFramework.Options;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
-using Duende.IdentityServer.EntityFramework.DbContexts;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SFC.Identity.Infrastructure.Settings;
-using Duende.IdentityServer.EntityFramework.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure.Configuration;
+using SFC.Identity.Infrastructure.Extensions;
+using SFC.Identity.Infrastructure.Persistence.Constants;
+using SFC.Identity.Infrastructure.Persistence.Context;
+using SFC.Identity.Infrastructure.Persistence.Entities;
+using SFC.Identity.Infrastructure.Settings;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Extensions;
 public class IdentityExtensionsTests
@@ -48,7 +51,7 @@ public class IdentityExtensionsTests
         ConfigurationDbContext context = CreateConfigurationDbContext();
 
         // Act
-        await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings(), CancellationToken.None);
+        await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings(), CancellationToken.None).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(IdentityConfiguration.IdentityResources.Count(), context.IdentityResources.Count());
@@ -66,7 +69,7 @@ public class IdentityExtensionsTests
         await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings
         {
             Api = new ApiSettings { Resources = assertApiResources }
-        }, CancellationToken.None);
+        }, CancellationToken.None).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(assertApiResources.Count, context.ApiResources.Count());
@@ -84,7 +87,7 @@ public class IdentityExtensionsTests
         await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings
         {
             Api = new ApiSettings { Scopes = assertApiScopes }
-        }, CancellationToken.None);
+        }, CancellationToken.None).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(assertApiScopes.Count, context.ApiScopes.Count());
@@ -102,7 +105,7 @@ public class IdentityExtensionsTests
         await context.EnsureIdentityConfigurationExistAsync(new IdentitySettings
         {
             Clients = assertClients
-        }, CancellationToken.None);
+        }, CancellationToken.None).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(assertClients.Count, context.Clients.Count());

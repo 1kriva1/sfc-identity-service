@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+
 using Moq;
+
 using SFC.Identity.Api.Controllers;
+using SFC.Identity.Api.Infrastructure.Models.Existence;
 using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Existence;
+using SFC.Identity.Application.Interfaces.Existence;
 
 namespace SFC.Identity.Api.Tests.Controllers;
 
@@ -25,10 +27,10 @@ public class ExistenceControllerTests
         // Arrange
         string userName = "username";
 
-        _existenceServiceMock.Setup(es => es.CheckByUserNameAsync(userName)).ReturnsAsync(new ExistenceResponse { Exist = true });
+        _existenceServiceMock.Setup(es => es.CheckByUserNameAsync(userName)).ReturnsAsync(true);
 
         // Act
-        ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByUserNameAsync(userName);
+        ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByUserNameAsync(userName).ConfigureAwait(false);
 
         // Assert
         AssertResponse(result);
@@ -41,10 +43,10 @@ public class ExistenceControllerTests
         // Arrange
         string email = "email@mail.com";
 
-        _existenceServiceMock.Setup(es => es.CheckByEmailAsync(email)).ReturnsAsync(new ExistenceResponse { Exist = true });
+        _existenceServiceMock.Setup(es => es.CheckByEmailAsync(email)).ReturnsAsync(true);
 
         // Act
-        ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByEmailAsync(email);
+        ActionResult<ExistenceResponse> result = await _controller.CheckExistenceByEmailAsync(email).ConfigureAwait(false);
 
         // Assert
         AssertResponse(result);
@@ -59,7 +61,7 @@ public class ExistenceControllerTests
         ExistenceResponse response = Assert.IsType<ExistenceResponse>(objectResult.Value);
 
         Assert.True(response?.Success);
-        Assert.Equal(Messages.SuccessResult, response?.Message);
+        Assert.Equal(Localization.SuccessResult, response?.Message);
         Assert.True(response?.Exist);
     }
 }

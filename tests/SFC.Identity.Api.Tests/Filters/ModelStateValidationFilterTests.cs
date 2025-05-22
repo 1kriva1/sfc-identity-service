@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-using SFC.Identity.Api.Filters;
+using SFC.Identity.Api.Infrastructure.Filters;
+using SFC.Identity.Api.Infrastructure.Models.Base;
 using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Models.Base;
 
 namespace SFC.Identity.Api.Tests.Filters;
 
@@ -31,7 +31,7 @@ public class ModelStateValidationFilterTests
         Task<ActionExecutedContext> next() => Task.FromResult(actionExecutedContext);
 
         // Act
-        await filter.OnActionExecutionAsync(actionExecutingContext, next);
+        await filter.OnActionExecutionAsync(actionExecutingContext, next).ConfigureAwait(false);
 
         // Assert
         Assert.Null(actionExecutingContext.Result);
@@ -45,7 +45,7 @@ public class ModelStateValidationFilterTests
         string errorCode = "test_code";
 
         // Act
-        ActionExecutingContext context = await ExecuteActionFilterAsync(errorCode);
+        ActionExecutingContext context = await ExecuteActionFilterAsync(errorCode).ConfigureAwait(false);
 
         // Assert
         BadRequestObjectResult result = Assert.IsType<BadRequestObjectResult>(context.Result);
@@ -56,7 +56,7 @@ public class ModelStateValidationFilterTests
         BaseErrorResponse? response = result.Value as BaseErrorResponse;
 
         Assert.False(response?.Success);
-        Assert.Equal(Messages.ValidationError, response?.Message);
+        Assert.Equal(Localization.ValidationError, response?.Message);
         Assert.NotNull(response!.Errors);
         Assert.True(response.Errors.ContainsKey(errorCode));
         Assert.Single(response.Errors[errorCode]);
@@ -68,7 +68,7 @@ public class ModelStateValidationFilterTests
     public async Task API_Filter_Validation_ShouldReturnBadRequestResultForEmptyBody()
     {
         // Act
-        ActionExecutingContext context = await ExecuteActionFilterAsync(string.Empty);
+        ActionExecutingContext context = await ExecuteActionFilterAsync(string.Empty).ConfigureAwait(false);
 
         // Assert
         BadRequestObjectResult result = Assert.IsType<BadRequestObjectResult>(context.Result);
@@ -79,11 +79,11 @@ public class ModelStateValidationFilterTests
         BaseErrorResponse? response = result.Value as BaseErrorResponse;
 
         Assert.False(response?.Success);
-        Assert.Equal(Messages.ValidationError, response?.Message);
+        Assert.Equal(Localization.ValidationError, response?.Message);
         Assert.NotNull(response!.Errors);
         Assert.True(response.Errors.ContainsKey("Body"));
         Assert.Single(response.Errors["Body"]);
-        Assert.Equal(Messages.RequestBodyRequired, response.Errors["Body"].FirstOrDefault());
+        Assert.Equal(Localization.RequestBodyRequired, response.Errors["Body"].FirstOrDefault());
     }
 
     private async Task<ActionExecutingContext> ExecuteActionFilterAsync(string errorCode)
@@ -110,7 +110,7 @@ public class ModelStateValidationFilterTests
         Task<ActionExecutedContext> Next() => Task.FromResult(actionExecutedContext);
 
         // Act
-        await filter.OnActionExecutionAsync(actionExecutingContext, Next);
+        await filter.OnActionExecutionAsync(actionExecutingContext, Next).ConfigureAwait(false);
 
         return actionExecutingContext;
     }

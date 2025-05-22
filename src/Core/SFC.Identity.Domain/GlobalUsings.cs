@@ -1,1 +1,5 @@
-﻿global using SFC.Identity.Domain.Common;
+﻿// metadata
+global using MetadataDomainEnum = SFC.Identity.Domain.Enums.Metadata.MetadataDomain;
+global using MetadataServiceEnum = SFC.Identity.Domain.Enums.Metadata.MetadataService;
+global using MetadataStateEnum = SFC.Identity.Domain.Enums.Metadata.MetadataState;
+global using MetadataTypeEnum = SFC.Identity.Domain.Enums.Metadata.MetadataType;

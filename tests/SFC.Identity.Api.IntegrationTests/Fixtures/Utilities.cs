@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-using SFC.Identity.Infrastructure.Persistence;
-using SFC.Identity.Infrastructure.Persistence.Models;
+using SFC.Identity.Infrastructure.Persistence.Contexts;
+using SFC.Identity.Infrastructure.Persistence.Entities;
 
 namespace SFC.Identity.Api.IntegrationTests.Fixtures;
 
-public class Utilities
+public static class Utilities
 {
     private static readonly Guid USER_ID = Guid.Parse("{6313179F-7837-473A-A4D5-A5571B43E6A6}");
 

@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Data.Common;
+
+using Duende.IdentityServer.EntityFramework.DbContexts;
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using SFC.Identity.Infrastructure.Persistence;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Data.Sqlite;
-using System.Data.Common;
-using Duende.IdentityServer.EntityFramework.DbContexts;
 
-using Environments = SFC.Identity.Application.Common.Constants.Environments;
+using SFC.Identity.Infrastructure.Persistence.Contexts;
+
+using Environments = SFC.Identity.Infrastructure.Constants.Environments;
 
 namespace SFC.Identity.Api.IntegrationTests.Fixtures;
 

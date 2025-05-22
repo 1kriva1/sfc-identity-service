@@ -2,8 +2,7 @@
 
 using Moq;
 
-using SFC.Identity.Application.Models.Existence;
-using SFC.Identity.Infrastructure.Persistence.Models;
+using SFC.Identity.Infrastructure.Persistence.Entities;
 using SFC.Identity.Infrastructure.Services;
 
 namespace SFC.Identity.Infrastructure.UnitTests.Services;
@@ -32,10 +31,10 @@ public class ExistenceServiceTests
         _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
         // Act
-        ExistenceResponse response = await _service.CheckByUserNameAsync(username);
+        bool result = await _service.CheckByUserNameAsync(username);
 
         // Assert
-        Assert.True(response.Exist);
+        Assert.True(result);
     }
 
     [Fact]
@@ -48,10 +47,10 @@ public class ExistenceServiceTests
         _userManagerMock.Setup(um => um.FindByNameAsync(username)).ReturnsAsync(new ApplicationUser());
 
         // Act
-        ExistenceResponse response = await _service.CheckByUserNameAsync("username_another");
+        bool result = await _service.CheckByUserNameAsync("username_another");
 
         // Assert
-        Assert.False(response.Exist);
+        Assert.False(result);
     }
 
     [Fact]
@@ -64,10 +63,10 @@ public class ExistenceServiceTests
         _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
 
         // Act
-        ExistenceResponse response = await _service.CheckByEmailAsync(email);
+        bool result = await _service.CheckByEmailAsync(email);
 
         // Assert
-        Assert.True(response.Exist);
+        Assert.True(result);
     }
 
     [Fact]
@@ -80,9 +79,9 @@ public class ExistenceServiceTests
         _userManagerMock.Setup(um => um.FindByEmailAsync(email)).ReturnsAsync(new ApplicationUser());
 
         // Act
-        ExistenceResponse response = await _service.CheckByEmailAsync("email_another@mail.com");
+        bool result = await _service.CheckByEmailAsync("email_another@mail.com");
 
         // Assert
-        Assert.False(response.Exist);
+        Assert.False(result);
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 
-using IdentityModel;
+using Duende.IdentityModel;
 
-using SFC.Identity.Api.Extensions;
-using SFC.Identity.Application.Models.Logout;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Logout;
+using SFC.Identity.Infrastructure.Extensions;
 
 namespace SFC.Identity.Api.UnitTests.Extensions;
 public class ModelExtensionsTests
@@ -14,13 +14,13 @@ public class ModelExtensionsTests
     {
         // Arrange
         string logoutId = "logout_id", subjectValue = "subject";
-        ClaimsPrincipal principal = new(new ClaimsIdentity(new List<Claim> {
+        ClaimsPrincipal principal = new(new ClaimsIdentity([
                 new(JwtClaimTypes.AuthenticationMethod, OidcConstants.GrantTypes.AuthorizationCode),
-                new(JwtClaimTypes.Subject, subjectValue)
-        }));
+            new(JwtClaimTypes.Subject, subjectValue)
+        ]));
 
         // Act
-        LogoutModel result = principal.BuildLogoutModel(logoutId);
+        LogoutModelDto result = principal.BuildLogoutModel(logoutId);
 
         // Assert
         Assert.Equal(logoutId, result.LogoutId);
@@ -35,12 +35,12 @@ public class ModelExtensionsTests
     {
         // Arrange
         string logoutId = "logout_id", subjectValue = "subject";
-        ClaimsPrincipal principal = new(new ClaimsIdentity(new List<Claim> {
+        ClaimsPrincipal principal = new(new ClaimsIdentity([
                 new(JwtClaimTypes.Subject, subjectValue)
-        }));
+        ]));
 
         // Act
-        LogoutModel result = principal.BuildLogoutModel(logoutId);
+        LogoutModelDto result = principal.BuildLogoutModel(logoutId);
 
         // Assert
         Assert.Equal(logoutId, result.LogoutId);

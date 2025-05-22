@@ -1,59 +1,30 @@
 ﻿using System.Reflection;
 
-using AutoMapper;
+using SFC.GeneralTemplate.Application.Features.Common.Dto.Pagination;
+using SFC.Identity.Application.Common.Mappings.Base;
+using SFC.Identity.Application.Features.Common.Dto.Pagination;
+using SFC.Identity.Application.Features.Common.Models.Find.Paging;
 
 namespace SFC.Identity.Application.Common.Mappings;
-public class MappingProfile : Profile
+public class MappingProfile : BaseMappingProfile
 {
-    public MappingProfile()
-    {
-        Configure();
+    protected override Assembly Assembly => Assembly.GetExecutingAssembly();
 
-        ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+    public MappingProfile() : base()
+    {
+        ApplyCustomMappings();
     }
 
-    private void Configure()
+    private void ApplyCustomMappings()
     {
-        AllowNullCollections = true;
-    }
+        #region Generic types
 
-    private void ApplyMappingsFromAssembly(Assembly assembly)
-    {
-        string mappingMethodName = nameof(IMapFrom<object>.Mapping);
+        CreateMap(typeof(PagedList<>), typeof(PageDto<>))
+            .ForMember(nameof(PageDto<object>.Items), d => d.Ignore())
+            .ForMember(nameof(PageDto<object>.Metadata), d => d.Ignore());
 
-        static bool HasInterface(Type t) => t.IsGenericType &&
-            (t.GetGenericTypeDefinition() == typeof(IMapFrom<>) || t.GetGenericTypeDefinition() == typeof(IMapFromReverse<>));
+        CreateMap(typeof(PagedList<>), typeof(PageMetadataDto));
 
-        List<Type> types = assembly.GetExportedTypes()
-                                   .Where(t => t.GetInterfaces().Any(HasInterface) && !t.IsInterface)
-                                   .ToList();
-
-        Type[] argumentTypes = [typeof(Profile)];
-
-        foreach (Type type in types)
-        {
-            object? instance = Activator.CreateInstance(type);
-
-            MethodInfo? methodInfo = type.GetMethod(mappingMethodName);
-
-            if (methodInfo != null)
-            {
-                methodInfo.Invoke(instance, [this]);
-            }
-            else
-            {
-                List<Type> interfaces = type.GetInterfaces().Where(HasInterface).ToList();
-
-                if (interfaces.Count > 0)
-                {
-                    foreach (Type @interface in interfaces)
-                    {
-                        MethodInfo? interfaceMethodInfo = @interface.GetMethod(mappingMethodName, argumentTypes);
-
-                        interfaceMethodInfo?.Invoke(instance, [this]);
-                    }
-                }
-            }
-        }
+        #endregion Generic types        
     }
 }

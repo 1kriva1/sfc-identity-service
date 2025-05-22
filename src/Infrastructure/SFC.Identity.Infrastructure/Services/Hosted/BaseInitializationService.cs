@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using SFC.Data.Infrastructure.Services.Hosted;
-
 namespace SFC.Identity.Infrastructure.Services.Hosted;
 public abstract class BaseInitializationService(ILogger logger) : IHostedService
 {
-    protected readonly ILogger _logger = logger;
+    protected ILogger Logger { get; } = logger;
 
     public virtual Task StartAsync(CancellationToken cancellationToken)
     {

@@ -1,8 +1,7 @@
 ﻿using System.Security.Claims;
 
+using Duende.IdentityModel;
 using Duende.IdentityServer.Models;
-
-using IdentityModel;
 
 using SFC.Identity.Infrastructure.Services;
 
@@ -32,9 +31,9 @@ public class ProfileServiceTests
     {
         // Arrange
         ProfileDataRequestContext context = new()
-        { 
-            Subject = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { 
-                new(JwtClaimTypes.AuthenticationMethod, OidcConstants.GrantTypes.AuthorizationCode) 
+        {
+            Subject = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> {
+                new(JwtClaimTypes.AuthenticationMethod, OidcConstants.GrantTypes.AuthorizationCode)
             }))
         };
         ProfileService service = new();
@@ -43,7 +42,7 @@ public class ProfileServiceTests
         await service.GetProfileDataAsync(context);
 
         // Assert
-        Assert.DoesNotContain(context.IssuedClaims, claim =>claim.Type == JwtClaimTypes.Actor);
+        Assert.DoesNotContain(context.IssuedClaims, claim => claim.Type == JwtClaimTypes.Actor);
     }
 
     [Fact]
@@ -86,6 +85,6 @@ public class ProfileServiceTests
 
         // Assert
         Assert.Contains(context.IssuedClaims, claim => claim.Type == JwtClaimTypes.Actor);
-        Assert.Equal(assertActValue,context.IssuedClaims.First(c=>c.Type == JwtClaimTypes.Actor).Value);
+        Assert.Equal(assertActValue, context.IssuedClaims.First(c => c.Type == JwtClaimTypes.Actor).Value);
     }
 }

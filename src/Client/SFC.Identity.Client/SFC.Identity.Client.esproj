@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.271090-alpha">
+
   <PropertyGroup>
     <StartupCommand>npm start</StartupCommand>
     <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>
@@ -7,6 +8,7 @@
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\sfc-identity\</BuildOutputFolder>
   </PropertyGroup>
+  
   <ItemGroup>
     <Folder Include="src\app\core\assets\i18n\" />
     <Folder Include="src\app\core\enums\" />

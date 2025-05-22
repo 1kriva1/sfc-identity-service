@@ -1,15 +1,26 @@
 ﻿namespace SFC.Identity.Infrastructure.Settings;
 public class IdentitySettings
 {
-    public const string SECTION_KEY = "Identity";
+    public const string SectionKey = "Identity";
 
     public LoginSettings Login { get; set; } = default!;
 
     public LogoutSettings Logout { get; set; } = default!;
 
-    public ICollection<ClientSetting> Clients { get; set; } = [];
+    public ICollection<ClientSetting> Clients { get; init; } = [];
 
     public ApiSettings Api { get; set; } = new ApiSettings();
+
+    public Authentication Authentication { get; set; } = default!;
+}
+
+public class Authentication
+{
+    public string Authority { get; set; } = default!;
+
+    public string Audience { get; set; } = default!;
+
+    public IDictionary<string, IEnumerable<string>> RequireClaims { get; } = new Dictionary<string, IEnumerable<string>>();
 }
 
 public class LoginSettings
@@ -44,17 +55,17 @@ public class ClientSetting
 
     public bool IsTokenExchange { get; set; }
 
-    public ICollection<string> Secrets { get; set; } = [];
+    public ICollection<string> Secrets { get; init; } = [];
 
     public bool AllowOfflineAccess { get; set; }
 
     public bool UpdateAccessTokenClaimsOnRefresh { get; set; }
 
-    public ICollection<string> RedirectUris { get; set; } = [];
+    public ICollection<string> RedirectUris { get; init; } = [];
 
-    public ICollection<string> PostLogoutRedirectUris { get; set; } = [];
+    public ICollection<string> PostLogoutRedirectUris { get; init; } = [];
 
-    public ICollection<string> Scopes { get; set; } = [];
+    public ICollection<string> Scopes { get; init; } = [];
 
     public int? AccessTokenLifetime { get; set; }
 
@@ -67,9 +78,9 @@ public class ClientSetting
 
 public class ApiSettings
 {
-    public ICollection<ApiResourceSetting> Resources { get; set; } = [];
+    public ICollection<ApiResourceSetting> Resources { get; init; } = [];
 
-    public ICollection<ApiScopeSetting> Scopes { get; set; } = [];
+    public ICollection<ApiScopeSetting> Scopes { get; init; } = [];
 }
 
 public class ApiResourceSetting
@@ -78,9 +89,9 @@ public class ApiResourceSetting
 
     public string DisplayName { get; set; } = default!;
 
-    public ICollection<string> Scopes { get; set; } = [];
+    public ICollection<string> Scopes { get; init; } = [];
 
-    public ICollection<string> UserClaims { get; set; } = [];
+    public ICollection<string> UserClaims { get; init; } = [];
 }
 
 public class ApiScopeSetting

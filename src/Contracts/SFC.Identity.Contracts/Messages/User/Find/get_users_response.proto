@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+package sfc_identity;
+
+import "Models/User/user.proto";
+
+option csharp_namespace = "SFC.Identity.Contracts.Messages.User.Find";
+
+message GetUsersResponse
+{
+    repeated User items = 1;
+}
