@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 		global.json = global.json
 		nuget.config = nuget.config
 	EndProjectSection
@@ -43,11 +45,37 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Domain", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{93D51FF1-6C71-401E-B822-51FE3925313C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Contracts", "src\Contracts\SFC.Identity.Infrastructure.Contracts\SFC.Identity.Contracts.csproj", "{C82C4B1C-7774-4E48-8B92-AB5494FF0501}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{A8C736BE-002F-49BA-8BFE-2DBD308569D6}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SFC.Identity.Client", "src\Client\SFC.Identity.Client\SFC.Identity.Client.esproj", "{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Messages", "src\Contracts\SFC.Identity.Messages\SFC.Identity.Messages.csproj", "{7085263F-07F6-42B6-AD58-F9459A783F95}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFC.Identity.Contracts", "src\Contracts\SFC.Identity.Contracts\SFC.Identity.Contracts.csproj", "{95F95312-32B6-42A8-A0CA-81FA1097076D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{99833578-A91B-4A24-9832-5212C29B1E16}"
+	ProjectSection(SolutionItems) = preProject
+		tools\update-contracts.ps1 = tools\update-contracts.ps1
+		tools\update-messages.ps1 = tools\update-messages.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{685A28AC-CBAE-4A7B-9E93-A07CB80EF1F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{3E8B00D2-DD6F-4960-9A0E-9C8E41ED7ABB}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\configuration.yml = .github\workflows\configuration.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".husky", ".husky", "{DC976DC8-F1A3-4C7E-B806-865282970BEE}"
+	ProjectSection(SolutionItems) = preProject
+		.husky\task-runner.json = .husky\task-runner.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hooks", "hooks", "{75C34A3A-14CB-4046-AD59-0617D13C56BC}"
+	ProjectSection(SolutionItems) = preProject
+		.husky\pre-commit = .husky\pre-commit
+		.husky\pre-push = .husky\pre-push
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,16 +123,20 @@ Global
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C82C4B1C-7774-4E48-8B92-AB5494FF0501}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{7085263F-07F6-42B6-AD58-F9459A783F95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7085263F-07F6-42B6-AD58-F9459A783F95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7085263F-07F6-42B6-AD58-F9459A783F95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7085263F-07F6-42B6-AD58-F9459A783F95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95F95312-32B6-42A8-A0CA-81FA1097076D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95F95312-32B6-42A8-A0CA-81FA1097076D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95F95312-32B6-42A8-A0CA-81FA1097076D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95F95312-32B6-42A8-A0CA-81FA1097076D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,9 +156,15 @@ Global
 		{95B9929D-147E-4096-8A32-95EB88CF9268} = {91C4081C-7EC1-4082-B918-A87499FC4CBC}
 		{9ACD69C8-0BCD-418D-9FD7-A6B555F47633} = {5665E84D-2C02-4F99-82B7-FF2B54A9EC19}
 		{93D51FF1-6C71-401E-B822-51FE3925313C} = {2C704F95-810B-42CA-987B-C711BF6C3456}
-		{C82C4B1C-7774-4E48-8B92-AB5494FF0501} = {93D51FF1-6C71-401E-B822-51FE3925313C}
 		{A8C736BE-002F-49BA-8BFE-2DBD308569D6} = {2C704F95-810B-42CA-987B-C711BF6C3456}
 		{AB0F54EB-E073-4491-B3B3-9993F2EAE7C1} = {A8C736BE-002F-49BA-8BFE-2DBD308569D6}
+		{7085263F-07F6-42B6-AD58-F9459A783F95} = {93D51FF1-6C71-401E-B822-51FE3925313C}
+		{95F95312-32B6-42A8-A0CA-81FA1097076D} = {93D51FF1-6C71-401E-B822-51FE3925313C}
+		{99833578-A91B-4A24-9832-5212C29B1E16} = {4328AA1E-3BA9-493A-A2E4-D0A883767F4E}
+		{685A28AC-CBAE-4A7B-9E93-A07CB80EF1F0} = {4328AA1E-3BA9-493A-A2E4-D0A883767F4E}
+		{3E8B00D2-DD6F-4960-9A0E-9C8E41ED7ABB} = {685A28AC-CBAE-4A7B-9E93-A07CB80EF1F0}
+		{DC976DC8-F1A3-4C7E-B806-865282970BEE} = {4328AA1E-3BA9-493A-A2E4-D0A883767F4E}
+		{75C34A3A-14CB-4046-AD59-0617D13C56BC} = {DC976DC8-F1A3-4C7E-B806-865282970BEE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DADF67B-0150-48FA-B103-9460262A7AA4}

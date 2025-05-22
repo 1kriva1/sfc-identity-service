@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+package sfc_identity;
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "SFC.Identity.Contracts.Headers";
+
+message AuditableHeader
+{
+    string created_by = 1;
+    google.protobuf.Timestamp created_date = 2;
+    string last_modified_by = 3;
+    google.protobuf.Timestamp last_modified_date = 4;
+}

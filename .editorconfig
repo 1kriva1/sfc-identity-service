@@ -369,4 +369,7 @@ tab_width = 4
 indent_size = 4
 end_of_line = crlf
 dotnet_style_namespace_match_folder = true:suggestion
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1724.severity = none
+dotnet_diagnostic.CA1861.severity = none
 

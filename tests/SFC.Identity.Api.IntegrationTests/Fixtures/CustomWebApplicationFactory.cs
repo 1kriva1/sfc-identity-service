@@ -1,72 +1,75 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using SFC.Identity.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Data.Sqlite;
-using System.Data.Common;
-using Duende.IdentityServer.EntityFramework.DbContexts;
+﻿//using System.Data.Common;
 
-using Environments = SFC.Identity.Application.Common.Constants.Environments;
+//using Duende.IdentityServer.EntityFramework.DbContexts;
 
-namespace SFC.Identity.Api.IntegrationTests.Fixtures;
+//using Microsoft.AspNetCore.Hosting;
+//using Microsoft.AspNetCore.Mvc.Testing;
+//using Microsoft.Data.Sqlite;
+//using Microsoft.EntityFrameworkCore;
+//using Microsoft.Extensions.DependencyInjection;
+//using Microsoft.Extensions.Hosting;
 
-public class CustomWebApplicationFactory<TStartup>
-       : WebApplicationFactory<TStartup> where TStartup : class
-{
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.ConfigureServices(services =>
-        {
-            // remove db contexts
-            RemoveServiceDescriptor<DbContextOptions<IdentityDbContext>>(services);
-            RemoveServiceDescriptor<DbContextOptions<ConfigurationDbContext>>(services);
-            RemoveServiceDescriptor<DbContextOptions<PersistedGrantDbContext>>(services);
+//using SFC.Identity.Infrastructure.Persistence.Contexts;
 
-            // remove db connection
-            RemoveServiceDescriptor<DbConnection>(services);
+//using Environments = SFC.Identity.Infrastructure.Constants.Environments;
 
-            // create open SqliteConnection so EF won't automatically close it
-            services.AddSingleton<DbConnection>(container =>
-            {
-                SqliteConnection connection = new("DataSource=:memory:");
-                connection.Open();
+//namespace SFC.Identity.Api.IntegrationTests.Fixtures;
 
-                return connection;
-            });
+//public class CustomWebApplicationFactory<TStartup>
+//       : WebApplicationFactory<TStartup> where TStartup : class
+//{
+//    protected override void ConfigureWebHost(IWebHostBuilder builder)
+//    {
+//        builder.ConfigureServices(services =>
+//        {
+//            // remove db contexts
+//            RemoveServiceDescriptor<DbContextOptions<IdentityDbContext>>(services);
+//            RemoveServiceDescriptor<DbContextOptions<ConfigurationDbContext>>(services);
+//            RemoveServiceDescriptor<DbContextOptions<PersistedGrantDbContext>>(services);
 
-            // switch db context connection to sqllite db
-            services.AddDbContext<IdentityDbContext>(SwitchToSqliteConnection);
-            services.AddDbContext<ConfigurationDbContext>(SwitchToSqliteConnection);
-            services.AddDbContext<PersistedGrantDbContext>(SwitchToSqliteConnection);
-        });
+//            // remove db connection
+//            RemoveServiceDescriptor<DbConnection>(services);
 
-        builder.UseEnvironment(Environments.Testing);
-    }
+//            // create open SqliteConnection so EF won't automatically close it
+//            services.AddSingleton<DbConnection>(container =>
+//            {
+//                SqliteConnection connection = new("DataSource=:memory:");
+//                connection.Open();
 
-    public void InitializeDbForTests()
-    {
-        using IServiceScope scope = Services.CreateScope();
+//                return connection;
+//            });
 
-        IServiceProvider scopedServices = scope.ServiceProvider;
+//            // switch db context connection to sqllite db
+//            services.AddDbContext<IdentityDbContext>(SwitchToSqliteConnection);
+//            services.AddDbContext<ConfigurationDbContext>(SwitchToSqliteConnection);
+//            services.AddDbContext<PersistedGrantDbContext>(SwitchToSqliteConnection);
+//        });
 
-        IdentityDbContext context = scopedServices.GetRequiredService<IdentityDbContext>();
+//        builder.UseEnvironment(Environments.Testing);
+//    }
 
-        context.Database.EnsureCreated();
+//    public void InitializeDbForTests()
+//    {
+//        using IServiceScope scope = Services.CreateScope();
 
-        Utilities.InitializeDbForTests(context);
-    }
+//        IServiceProvider scopedServices = scope.ServiceProvider;
 
-    private static void RemoveServiceDescriptor<T>(IServiceCollection services)
-    {
-        ServiceDescriptor? serviceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(T));
-        services.Remove(serviceDescriptor!);
-    }
+//        IdentityDbContext context = scopedServices.GetRequiredService<IdentityDbContext>();
 
-    private static void SwitchToSqliteConnection(IServiceProvider container, DbContextOptionsBuilder options)
-    {
-        DbConnection connection = container.GetRequiredService<DbConnection>();
-        options.UseSqlite(connection);
-    }
-}
+//        context.Database.EnsureCreated();
+
+//        Utilities.InitializeDbForTests(context);
+//    }
+
+//    private static void RemoveServiceDescriptor<T>(IServiceCollection services)
+//    {
+//        ServiceDescriptor? serviceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(T));
+//        services.Remove(serviceDescriptor!);
+//    }
+
+//    private static void SwitchToSqliteConnection(IServiceProvider container, DbContextOptionsBuilder options)
+//    {
+//        DbConnection connection = container.GetRequiredService<DbConnection>();
+//        options.UseSqlite(connection);
+//    }
+//}

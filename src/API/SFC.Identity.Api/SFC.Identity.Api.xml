@@ -20,7 +20,7 @@
             <returns>An ActionResult of type ExistenceResponse</returns>
             <response code="200">Returns user existence check result by **email**.</response>
         </member>
-        <member name="M:SFC.Identity.Api.Controllers.IdentityController.RegisterAsync(SFC.Identity.Application.Models.Registration.RegistrationRequest)">
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.RegisterAsync(SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest)">
             <summary>
             Register new user.
             </summary>
@@ -30,7 +30,7 @@
             <response code="400">Returns **validation** errors.</response>
             <response code="409">Returns if user **already exist** by name or email.</response>
         </member>
-        <member name="M:SFC.Identity.Api.Controllers.IdentityController.LoginAsync(SFC.Identity.Application.Models.Login.LoginRequest)">
+        <member name="M:SFC.Identity.Api.Controllers.IdentityController.LoginAsync(SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest)">
             <summary>
             Login user.
             </summary>
@@ -56,6 +56,240 @@
             <param name="logoutId">Logout identificator</param>
             <returns>An ActionResult of type LogoutResponse</returns>
             <response code="200">Returns **successfully** logout user result.</response>
+        </member>
+        <member name="M:SFC.Identity.Api.Infrastructure.Extensions.GrpcExtensions.MapInternalService(Microsoft.AspNetCore.Builder.GrpcServiceEndpointConventionBuilder,System.String)">
+            <summary>
+            Without RequireHost WebApi and Grpc not working together
+            RequireHost distinguish webapi and grpc by port value
+            Also required Kestrel endpoint configuration in appSettings
+            </summary>
+            <param name="builder"></param>
+            <param name="url"></param>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Base.BaseErrorResponse">
+            <summary>
+            **Base** response model with **errors**.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Base.BaseErrorResponse.Errors">
+            <summary>
+            Response result errors in key/value representation.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Base.BaseResponse">
+            <summary>
+            **Base** response model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Base.BaseResponse.Success">
+            <summary>
+            Determined if response has **success** result.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Base.BaseResponse.Message">
+            <summary>
+            Describe response **result**.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Existence.ExistenceResponse">
+            <summary>
+            Described the result of check user on **existence**.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Existence.ExistenceResponse.Exist">
+            <summary>
+            Determined if User exist or not.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest">
+            <summary>
+            **Login** model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest.Email">
+            <summary>
+            User email.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest.UserName">
+            <summary>
+            User name.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest.Password">
+            <summary>
+            Password.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest.RememberMe">
+            <summary>
+            Define if login persistent.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginRequest.ReturnUrl">
+            <summary>
+            Return URL.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginResponse">
+            <summary>
+            **Login** response model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Login.LoginResponse.ReturnUrl">
+            <summary>
+            Return URL to application.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Identity.Logout.LogoutResponse">
+            <summary>
+            **Logout** response model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Logout.LogoutResponse.PostLogoutRedirectUrl">
+            <summary>
+            URL where user will be redirected after success log out.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Logout.LogoutResponse.ClientName">
+            <summary>
+            Client name.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Logout.LogoutResponse.SignOutIFrameUrl">
+            <summary>
+            URL of sign out iframe.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Logout.LogoutResponse.AutomaticRedirectAfterSignOut">
+            <summary>
+            Determine if user will be automatically redirected to application after success log out.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Logout.LogoutResponse.ShowLogoutPrompt">
+            <summary>
+            Determine if user must confirm logout flow.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest">
+            <summary>
+            **Registration** model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest.Email">
+            <summary>
+            Email address (required if UserName is missed).
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest.UserName">
+            <summary>
+            User name (required if Email is missed).
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest.Password">
+            <summary>
+            Password value.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest.ConfirmPassword">
+            <summary>
+            Confirm password value (must be equal to Password value).
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationRequest.ReturnUrl">
+            <summary>
+            Return URI.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationResponse">
+            <summary>
+            **Registration** response model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Identity.Registration.RegistrationResponse.ReturnUrl">
+            <summary>
+            Return URL to application.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Pagination.PageLinksModel">
+            <summary>
+            **Pagination** links model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageLinksModel.FirstPage">
+            <summary>
+            Link to first page.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageLinksModel.LastPage">
+            <summary>
+            Link to last page.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageLinksModel.NextPage">
+            <summary>
+            Link to next page.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageLinksModel.PreviousPage">
+            <summary>
+            Link to previous page.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel">
+            <summary>
+            **Pagination** metadata model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.CurrentPage">
+            <summary>
+            **Current** page.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.TotalPages">
+            <summary>
+            Total **pages** count.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.PageSize">
+            <summary>
+            Page **size**.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.TotalCount">
+            <summary>
+            Total **items** count.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.HasPreviousPage">
+            <summary>
+            Describe if **previous** page **exist** for defined filters and page size.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.HasNextPage">
+            <summary>
+            Describe if **next** page **exist** for defined filters and page size.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PageMetadataModel.Links">
+            <summary>
+            Links model.
+            </summary>
+        </member>
+        <member name="T:SFC.Identity.Api.Infrastructure.Models.Pagination.PaginationModel">
+            <summary>
+            **Pagination** model.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PaginationModel.Page">
+            <summary>
+            Requested **page**.
+            </summary>
+        </member>
+        <member name="P:SFC.Identity.Api.Infrastructure.Models.Pagination.PaginationModel.Size">
+            <summary>
+            Requested page **size**.
+            </summary>
         </member>
     </members>
 </doc>

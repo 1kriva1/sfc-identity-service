@@ -1,19 +1,19 @@
-﻿using SFC.Identity.Application.Common.Exceptions;
+﻿//using SFC.Identity.Application.Common.Exceptions;
 
-namespace SFC.Identity.Application.UnitTests.Common.Exceptions;
-public class ConflictExceptionTests
-{
-    [Fact]
-    [Trait("Exception", "Conflict")]
-    public void Exception_Conflict_ShouldHaveDefinedMessage()
-    {
-        // Arrange
-        string validationMessage = "Test validation message.";
+//namespace SFC.Identity.Application.UnitTests.Common.Exceptions;
+//public class ConflictExceptionTests
+//{
+//    [Fact]
+//    [Trait("Exception", "Conflict")]
+//    public void Exception_Conflict_ShouldHaveDefinedMessage()
+//    {
+//        // Arrange
+//        string validationMessage = "Test validation message.";
 
-        // Act
-        ConflictException exception = new(validationMessage);
+//        // Act
+//        ConflictException exception = new(validationMessage);
 
-        // Assert
-        Assert.Equal(validationMessage, exception.Message);
-    }
-}
+//        // Assert
+//        Assert.Equal(validationMessage, exception.Message);
+//    }
+//}

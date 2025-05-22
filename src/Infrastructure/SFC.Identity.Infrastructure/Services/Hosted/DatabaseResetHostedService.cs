@@ -8,12 +8,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using SFC.Identity.Application.Common.Enums;
 using SFC.Identity.Infrastructure.Extensions;
-using SFC.Identity.Infrastructure.Persistence;
-using SFC.Identity.Infrastructure.Services.Hosted;
+using SFC.Identity.Infrastructure.Persistence.Contexts;
 using SFC.Identity.Infrastructure.Settings;
 
-namespace SFC.Data.Infrastructure.Services.Hosted;
+namespace SFC.Identity.Infrastructure.Services.Hosted;
 public class DatabaseResetHostedService(
     ILogger<DatabaseResetHostedService> logger,
     IServiceProvider services,
@@ -26,7 +26,10 @@ public class DatabaseResetHostedService(
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Identity Initialization Hosted Service running.");
+        EventId eventId = new((int)RequestId.DatabaseReset, Enum.GetName(RequestId.DatabaseReset));
+        Action<ILogger, Exception?> logStartExecution = LoggerMessage.Define(LogLevel.Information, eventId,
+            "Data Initialization Hosted Service running.");
+        logStartExecution(Logger, null);
 
         using IServiceScope scope = _services.CreateScope();
 
@@ -38,30 +41,25 @@ public class DatabaseResetHostedService(
 
         if (_hostEnvironment.IsDevelopment())
         {
-            await identityContext.Database.EnsureDeletedAsync(cancellationToken);
-            await persistedGrantContext.Database.EnsureDeletedAsync(cancellationToken);
-            await configurationContext.Database.EnsureDeletedAsync(cancellationToken);
+            await identityContext.Database.EnsureDeletedAsync(cancellationToken).ConfigureAwait(true);
+            await persistedGrantContext.Database.EnsureDeletedAsync(cancellationToken).ConfigureAwait(true);
+            await configurationContext.Database.EnsureDeletedAsync(cancellationToken).ConfigureAwait(true);
         }
 
         if (_hostEnvironment.IsTesting())
         {
-            await EnsureCreatedAsync(identityContext, cancellationToken);
-            await EnsureCreatedAsync(persistedGrantContext, cancellationToken);
-            await EnsureCreatedAsync(configurationContext, cancellationToken);
+            await EnsureCreatedAsync(identityContext, cancellationToken).ConfigureAwait(true);
+            await EnsureCreatedAsync(persistedGrantContext, cancellationToken).ConfigureAwait(true);
+            await EnsureCreatedAsync(configurationContext, cancellationToken).ConfigureAwait(true);
         }
         else
         {
-            await identityContext.Database.MigrateAsync(cancellationToken);
-            await persistedGrantContext.Database.MigrateAsync(cancellationToken);
-            await configurationContext.Database.MigrateAsync(cancellationToken);
+            await identityContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(true);
+            await persistedGrantContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(true);
+            await configurationContext.Database.MigrateAsync(cancellationToken).ConfigureAwait(true);
         }
 
-        if (_hostEnvironment.IsDevelopment())
-        {
-            await identityContext.SeedUsersAsync(cancellationToken);
-        }
-
-        await configurationContext.EnsureIdentityConfigurationExistAsync(_identitySettings.Value, cancellationToken);
+        await configurationContext.EnsureIdentityConfigurationExistAsync(_identitySettings.Value, cancellationToken).ConfigureAwait(true);
     }
 
     private static Task EnsureCreatedAsync<C>(C context, CancellationToken cancellationToken) where C : DbContext

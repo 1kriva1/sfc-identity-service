@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+package sfc_identity;
+
+import "Messages/User/Get/get_user_request.proto";
+import "Messages/User/Get/get_user_response.proto";
+import "Messages/User/Find/get_users_request.proto";
+import "Messages/User/Find/get_users_response.proto";
+
+option csharp_namespace = "SFC.Identity.Contracts.Services";
+
+service IdentityService{
+    rpc GetUser(GetUserRequest) returns (GetUserResponse);
+    rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+}

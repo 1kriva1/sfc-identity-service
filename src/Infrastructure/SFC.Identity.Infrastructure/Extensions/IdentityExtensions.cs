@@ -1,26 +1,25 @@
-﻿using Duende.IdentityServer.EntityFramework.DbContexts;
+﻿using Duende.IdentityModel;
+using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
-
-using IdentityModel;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using SFC.Identity.Application.Common.Constants;
 using SFC.Identity.Infrastructure.Configuration;
-using SFC.Identity.Infrastructure.Persistence;
-using SFC.Identity.Infrastructure.Persistence.Models;
+using SFC.Identity.Infrastructure.Persistence.Constants;
+using SFC.Identity.Infrastructure.Persistence.Contexts;
+using SFC.Identity.Infrastructure.Persistence.Entities;
+using SFC.Identity.Infrastructure.Services.Identity;
 using SFC.Identity.Infrastructure.Settings;
-using SFC.Identity.Infrastructure.Services;
 using SFC.Identity.Infrastructure.Validators;
 
-using ClientEntity = Duende.IdentityServer.EntityFramework.Entities.Client;
 using ApiResourceEntity = Duende.IdentityServer.EntityFramework.Entities.ApiResource;
 using ApiScopeEntity = Duende.IdentityServer.EntityFramework.Entities.ApiScope;
-using IdentityConstants = SFC.Identity.Application.Common.Constants.IdentityConstants;
+using ClientEntity = Duende.IdentityServer.EntityFramework.Entities.Client;
+using IdentityConstants = SFC.Identity.Infrastructure.Constants.IdentityConstants;
 
 namespace SFC.Identity.Infrastructure.Extensions;
 public static class IdentityExtensions
@@ -80,7 +79,7 @@ public static class IdentityExtensions
             options.ConfigureDbContext = builder =>
                 builder.UseSqlServer(connectionString,
                     sql => sql.MigrationsAssembly(migrationsAssemblyName));
-            options.DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME;
+            options.DefaultSchema = DatabaseConstants.DefaultSchemaName;
         })
         // this adds the operational data from DB (codes, tokens, consents)
         .AddOperationalStore(options =>
@@ -88,7 +87,7 @@ public static class IdentityExtensions
             options.ConfigureDbContext = builder =>
                 builder.UseSqlServer(connectionString,
                     sql => sql.MigrationsAssembly(migrationsAssemblyName));
-            options.DefaultSchema = DatabaseConstants.DEFAULT_SCHEMA_NAME;
+            options.DefaultSchema = DatabaseConstants.DefaultSchemaName;
 
             // this enables automatic token cleanup. this is optional.
             options.EnableTokenCleanup = true;
@@ -105,11 +104,13 @@ public static class IdentityExtensions
     {
         List<Task> tasks = [];
 
+        // what was returned as a claims in token
         if (!context.IdentityResources.Any())
         {
             tasks.Add(context.IdentityResources.AddRangeAsync(IdentityConfiguration.IdentityResources.Select(resource => resource.ToEntity()), cancellationToken));
         }
 
+        // the list of APIs (like resource)
         if (settings.Api.Resources.Count != 0 && !context.ApiResources.Any())
         {
             IEnumerable<ApiResourceEntity> resources = settings.Api.Resources.Select(resource => new ApiResource
@@ -123,6 +124,7 @@ public static class IdentityExtensions
             tasks.Add(context.ApiResources.AddRangeAsync(resources, cancellationToken));
         }
 
+        // more granually autherization (read or write scope or full scope(read and write) or other permissions)
         if (settings.Api.Scopes.Count != 0 && !context.ApiScopes.Any())
         {
             IEnumerable<ApiScopeEntity> scopes = settings.Api.Scopes.Select(scope => new ApiScope
@@ -144,7 +146,8 @@ public static class IdentityExtensions
                                               .ToArray(),
                 // authorization code flow
                 AllowedGrantTypes = client.IsTokenExchange
-                    ? [OidcConstants.GrantTypes.TokenExchange] : GrantTypes.Code,
+                    ? [OidcConstants.GrantTypes.TokenExchange]
+                    : GrantTypes.Code,
                 AllowOfflineAccess = client.AllowOfflineAccess,
                 RedirectUris = client.RedirectUris,
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris,
@@ -152,10 +155,10 @@ public static class IdentityExtensions
                 // skip consent screen
                 RequireConsent = false,
                 UpdateAccessTokenClaimsOnRefresh = client.UpdateAccessTokenClaimsOnRefresh,
-                IdentityTokenLifetime = client.IdentityTokenLifetime ?? IdentityConstants.DEFAULT_IDENTITY_TOKEN_LIFETIME,
-                AccessTokenLifetime = client.AccessTokenLifetime ?? IdentityConstants.DEFAULT_ACCESS_TOKEN_LIFETIME,
-                AbsoluteRefreshTokenLifetime = client.AbsoluteRefreshTokenLifetime ?? IdentityConstants.DEFAULT_ABSOLUTE_REFRESH_TOKEN_LIFETIME,
-                SlidingRefreshTokenLifetime = client.SlidingRefreshTokenLifetime ?? IdentityConstants.DEFAULT_SLIDING_REFRESH_TOKEN_LIFETIME,
+                IdentityTokenLifetime = client.IdentityTokenLifetime ?? IdentityConstants.DefaultIdentityTokenLifetime,
+                AccessTokenLifetime = client.AccessTokenLifetime ?? IdentityConstants.DefaultAccessTokenLifetime,
+                AbsoluteRefreshTokenLifetime = client.AbsoluteRefreshTokenLifetime ?? IdentityConstants.DefaultAbsoluteRefreshTokenLifetime,
+                SlidingRefreshTokenLifetime = client.SlidingRefreshTokenLifetime ?? IdentityConstants.DefaultSlidingRefreshTokenLifetime,
             }.ToEntity());
 
             tasks.Add(context.Clients.AddRangeAsync(clients, cancellationToken));
@@ -163,8 +166,9 @@ public static class IdentityExtensions
 
         if (tasks.Count != 0)
         {
-            await Task.WhenAll(tasks);
-            await context.SaveChangesAsync(cancellationToken);
+            await Task.WhenAll(tasks).ConfigureAwait(true);
+
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(true);
         }
     }
 }

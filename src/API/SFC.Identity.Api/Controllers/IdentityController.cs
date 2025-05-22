@@ -8,12 +8,16 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SFC.Identity.Api.Extensions;
-using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Base;
-using SFC.Identity.Application.Models.Login;
-using SFC.Identity.Application.Models.Logout;
-using SFC.Identity.Application.Models.Registration;
+using SFC.Identity.Api.Infrastructure.Models.Base;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Login;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Logout;
+using SFC.Identity.Api.Infrastructure.Models.Identity.Registration;
+using SFC.Identity.Application.Interfaces.Identity;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Base;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Login;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Logout;
+using SFC.Identity.Application.Interfaces.Identity.Dto.Registration;
+using SFC.Identity.Infrastructure.Extensions;
 
 namespace SFC.Identity.Api.Controllers;
 
@@ -37,11 +41,11 @@ public class IdentityController(IIdentityService identityService) : ApiControlle
     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<RegistrationResponse>> RegisterAsync([FromBody] RegistrationRequest request)
     {
-        RegistrationModel model = Mapper.Map<RegistrationModel>(request);
+        RegistrationModelDto model = Mapper.Map<RegistrationModelDto>(request);
 
-        RegistrationResult result = await identityService.RegisterAsync(model);
+        RegistrationResultDto result = await identityService.RegisterAsync(model).ConfigureAwait(true);
 
-        return await BuildResponse<RegistrationResponse>(result);
+        return await BuildResponseAsync<RegistrationResponse>(result).ConfigureAwait(true);
     }
 
     /// <summary>
@@ -60,11 +64,11 @@ public class IdentityController(IIdentityService identityService) : ApiControlle
     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<LoginResponse>> LoginAsync([FromBody] LoginRequest request)
     {
-        LoginModel model = Mapper.Map<LoginModel>(request);
+        LoginModelDto model = Mapper.Map<LoginModelDto>(request);
 
-        LoginResult result = await identityService.LoginAsync(model);
+        LoginResultDto result = await identityService.LoginAsync(model).ConfigureAwait(true);
 
-        return await BuildResponse<LoginResponse>(result);
+        return await BuildResponseAsync<LoginResponse>(result).ConfigureAwait(true);
     }
 
     /// <summary>
@@ -78,13 +82,13 @@ public class IdentityController(IIdentityService identityService) : ApiControlle
     public async Task<ActionResult<LogoutResponse>> LogoutAsync(
         [FromQuery][Required(ErrorMessage = "LogoutIdRequired")] string logoutId)
     {
-        LogoutModel model = User.BuildLogoutModel(logoutId);
+        LogoutModelDto model = User.BuildLogoutModel(logoutId);
 
-        LogoutResult result = await identityService.LogoutAsync(model);
+        LogoutResultDto result = await identityService.LogoutAsync(model).ConfigureAwait(true);
 
         if (!result.ShowLogoutPrompt)
         {
-            await SignOutAsync();
+            await SignOutAsync().ConfigureAwait(true);
         }
 
         return Ok(Mapper.Map<LogoutResponse>(result));
@@ -100,13 +104,13 @@ public class IdentityController(IIdentityService identityService) : ApiControlle
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<LogoutResponse>> PostLogoutAsync(
-        [FromQuery] [Required(ErrorMessage = "LogoutIdRequired")] string logoutId)
+        [FromQuery][Required(ErrorMessage = "LogoutIdRequired")] string logoutId)
     {
-        LogoutModel model = User.BuildLogoutModel(logoutId);
+        LogoutModelDto model = User.BuildLogoutModel(logoutId);
 
-        LogoutResult result = await identityService.PostLogoutAsync(model);
+        LogoutResultDto result = await identityService.PostLogoutAsync(model).ConfigureAwait(true);
 
-        await SignOutAsync();
+        await SignOutAsync().ConfigureAwait(true);
 
         return Ok(Mapper.Map<LogoutResponse>(result));
     }
@@ -115,11 +119,11 @@ public class IdentityController(IIdentityService identityService) : ApiControlle
 
     #region Private
 
-    private async Task<ActionResult<T>> BuildResponse<T>(BaseResult result)
+    private async Task<ActionResult<T>> BuildResponseAsync<T>(BaseResultDto result)
     {
         IdentityServerUser user = new(result.UserId.ToString()) { DisplayName = result.UserName };
 
-        await HttpContext.SignInAsync(user.CreatePrincipal(), (AuthenticationProperties)result.Properties);
+        await HttpContext.SignInAsync(user.CreatePrincipal(), (AuthenticationProperties)result.Properties).ConfigureAwait(true);
 
         return Ok(Mapper.Map<T>(result));
     }

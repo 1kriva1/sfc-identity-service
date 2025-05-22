@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using SFC.Identity.Application.Interfaces;
-using SFC.Identity.Application.Models.Existence;
+using SFC.Identity.Api.Infrastructure.Models.Existence;
+using SFC.Identity.Application.Interfaces.Existence;
 
 namespace SFC.Identity.Api.Controllers;
 
@@ -20,9 +20,8 @@ public class ExistenceController(IExistenceService existenceService) : ApiContro
 
     public async Task<ActionResult<ExistenceResponse>> CheckExistenceByUserNameAsync([FromRoute] string userName)
     {
-        ExistenceResponse response = await existenceService.CheckByUserNameAsync(userName);
-
-        return Ok(response);
+        bool exist = await existenceService.CheckByUserNameAsync(userName).ConfigureAwait(true);
+        return Ok(new ExistenceResponse { Exist = exist });
     }
 
     /// <summary>
@@ -34,8 +33,7 @@ public class ExistenceController(IExistenceService existenceService) : ApiContro
     [HttpGet("email/{email}")]
     public async Task<ActionResult<ExistenceResponse>> CheckExistenceByEmailAsync([FromRoute] string email)
     {
-        ExistenceResponse response = await existenceService.CheckByEmailAsync(email);
-
-        return Ok(response);
+        bool exist = await existenceService.CheckByEmailAsync(email).ConfigureAwait(true);
+        return Ok(new ExistenceResponse { Exist = exist });
     }
 }

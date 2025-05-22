@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>SFC.Identity.Contracts</PackageId>
+    <Version>0.0.3</Version>
+    <Authors>Andrii Kryvoruk</Authors>
+    <Company>SFC</Company>
+    <Product>SFC</Product>
+    <PackageTags>Street Football Club;SFC;contracts</PackageTags>
+    <Description>
+      Contracts from Identity service for SFC project
+    </Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.29.3" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.67.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.69.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <Protobuf Include="Protos/Messages/**/*.proto" ProtoRoot="Protos/Messages/" />
+    <None Remove="Enums\sorting_direction.proto" />
+    <None Remove="Headers\auditable_header.proto" />
+    <None Remove="Headers\pagination_header.proto" />
+    <None Remove="Messages\User\Find\Filters\get_users_filter.proto" />
+    <None Remove="Messages\User\Find\get_users_request.proto" />
+    <None Remove="Messages\User\Find\get_users_response.proto" />
+    <None Remove="Models\Common\pagination.proto" />
+    <None Remove="Models\Common\range_limit.proto" />
+    <None Remove="Models\Common\sorting.proto" />
+    <Protobuf Include="Enums\sorting_direction.proto" />
+    <Protobuf Include="Headers\auditable_header.proto" />
+    <Protobuf Include="Headers\pagination_header.proto" />
+    <Protobuf Include="Messages\User\Find\Filters\get_users_filter.proto" />
+    <Protobuf Include="Messages\User\Find\get_users_request.proto" />
+    <Protobuf Include="Messages\User\Find\get_users_response.proto" />
+    <Protobuf Include="Messages\User\Get\get_user_request.proto" />
+    <Protobuf Include="Messages\User\Get\get_user_response.proto" />
+    <Protobuf Include="Models\Common\pagination.proto" />
+    <Protobuf Include="Models\Common\range_limit.proto" />
+    <Protobuf Include="Models\Common\sorting.proto" />
+    <Protobuf Include="Models\User\user.proto" />
+    <Protobuf Include="Services\identity_service.proto" />
+  </ItemGroup>
+
+</Project>

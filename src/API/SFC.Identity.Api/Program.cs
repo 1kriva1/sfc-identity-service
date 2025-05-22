@@ -1,4 +1,4 @@
-using SFC.Identity.Api.Extensions;
+using SFC.Identity.Api.Infrastructure.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

@@ -1,11 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
 
+using Duende.IdentityModel;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
-
-using IdentityModel;
 
 namespace SFC.Identity.Infrastructure.Validators;
 public class TokenExchangeGrantValidator(ITokenValidator validator) : IExtensionGrantValidator
@@ -39,13 +38,13 @@ public class TokenExchangeGrantValidator(ITokenValidator validator) : IExtension
         }
 
         // for delegation scenario we require an access token
-        if (!string.Equals(subjectTokenType, OidcConstants.TokenTypeIdentifiers.AccessToken))
+        if (!string.Equals(subjectTokenType, OidcConstants.TokenTypeIdentifiers.AccessToken, StringComparison.Ordinal))
         {
             return;
         }
 
         // validate the incoming access token with the built-in token validator
-        TokenValidationResult validationResult = await _validator.ValidateAccessTokenAsync(subjectToken);
+        TokenValidationResult validationResult = await _validator.ValidateAccessTokenAsync(subjectToken).ConfigureAwait(true);
 
         if (validationResult.IsError || validationResult.Claims is null)
         {

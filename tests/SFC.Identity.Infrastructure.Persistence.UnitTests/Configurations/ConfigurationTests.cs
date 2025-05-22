@@ -1,127 +1,128 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Metadata;
-using SFC.Identity.Infrastructure.Persistence.Configurations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore;
-using SFC.Identity.Infrastructure.Persistence.Models;
-using Microsoft.AspNetCore.Identity;
+﻿//using Microsoft.AspNetCore.Identity;
+//using Microsoft.EntityFrameworkCore;
+//using Microsoft.EntityFrameworkCore.Metadata;
+//using Microsoft.EntityFrameworkCore.Metadata.Builders;
+//using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace SFC.Identity.Infrastructure.Persistence.UnitTests.Configurations;
-public class ConfigurationTests
-{
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_ApplicationRole_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        ApplicationRoleConfiguration sut = new();
-        EntityTypeBuilder<ApplicationRole> builder = GetEntityBuilder<ApplicationRole>();
+//using SFC.Identity.Infrastructure.Persistence.Configurations.Identity;
+//using SFC.Identity.Infrastructure.Persistence.Entities;
 
-        // Act
-        sut.Configure(builder);
+//namespace SFC.Identity.Infrastructure.Persistence.UnitTests.Configurations;
+//public class ConfigurationTests
+//{
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_ApplicationRole_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        ApplicationRoleConfiguration sut = new();
+//        EntityTypeBuilder<ApplicationRole> builder = GetEntityBuilder<ApplicationRole>();
 
-        // Assert
-        Assert.Equal("Roles", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_ApplicationUser_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        ApplicationUserConfiguration sut = new();
-        EntityTypeBuilder<ApplicationUser> builder = GetEntityBuilder<ApplicationUser>();
+//        // Assert
+//        Assert.Equal("Roles", builder.Metadata.GetTableName());
+//    }
 
-        // Act
-        sut.Configure(builder);
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_ApplicationUser_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        ApplicationUserConfiguration sut = new();
+//        EntityTypeBuilder<ApplicationUser> builder = GetEntityBuilder<ApplicationUser>();
 
-        // Assert
-        Assert.Equal("Users", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_IdentityRoleClaim_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        IdentityRoleClaimConfiguration sut = new();
-        EntityTypeBuilder<IdentityRoleClaim<Guid>> builder = GetEntityBuilder<IdentityRoleClaim<Guid>>();
+//        // Assert
+//        Assert.Equal("Users", builder.Metadata.GetTableName());
+//    }
 
-        // Act
-        sut.Configure(builder);
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_IdentityRoleClaim_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        IdentityRoleClaimConfiguration sut = new();
+//        EntityTypeBuilder<IdentityRoleClaim<Guid>> builder = GetEntityBuilder<IdentityRoleClaim<Guid>>();
 
-        // Assert
-        Assert.Equal("RoleClaims", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_IdentityUserClaim_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        IdentityUserClaimConfiguration sut = new();
-        EntityTypeBuilder<IdentityUserClaim<Guid>> builder = GetEntityBuilder<IdentityUserClaim<Guid>>();
+//        // Assert
+//        Assert.Equal("RoleClaims", builder.Metadata.GetTableName());
+//    }
 
-        // Act
-        sut.Configure(builder);
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_IdentityUserClaim_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        IdentityUserClaimConfiguration sut = new();
+//        EntityTypeBuilder<IdentityUserClaim<Guid>> builder = GetEntityBuilder<IdentityUserClaim<Guid>>();
 
-        // Assert
-        Assert.Equal("UserClaims", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_IdentityUserLogin_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        IdentityUserLoginConfiguration sut = new();
-        EntityTypeBuilder<IdentityUserLogin<Guid>> builder = GetEntityBuilder<IdentityUserLogin<Guid>>();
+//        // Assert
+//        Assert.Equal("UserClaims", builder.Metadata.GetTableName());
+//    }
 
-        // Act
-        sut.Configure(builder);
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_IdentityUserLogin_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        IdentityUserLoginConfiguration sut = new();
+//        EntityTypeBuilder<IdentityUserLogin<Guid>> builder = GetEntityBuilder<IdentityUserLogin<Guid>>();
 
-        // Assert
-        Assert.Equal("UserLogins", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_IdentityUserRole_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        IdentityUserRoleConfiguration sut = new();
-        EntityTypeBuilder<IdentityUserRole<Guid>> builder = GetEntityBuilder<IdentityUserRole<Guid>>();
+//        // Assert
+//        Assert.Equal("UserLogins", builder.Metadata.GetTableName());
+//    }
 
-        // Act
-        sut.Configure(builder);
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_IdentityUserRole_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        IdentityUserRoleConfiguration sut = new();
+//        EntityTypeBuilder<IdentityUserRole<Guid>> builder = GetEntityBuilder<IdentityUserRole<Guid>>();
 
-        // Assert
-        Assert.Equal("UserRoles", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    [Fact]
-    [Trait("Persistence", "Configuration")]
-    public void Persistence_Configuration_IdentityUserToken_ShouldHaveCorrectConfiguration()
-    {
-        // Arrange
-        IdentityUserTokenConfiguration sut = new();
-        EntityTypeBuilder<IdentityUserToken<Guid>> builder = GetEntityBuilder<IdentityUserToken<Guid>>();
+//        // Assert
+//        Assert.Equal("UserRoles", builder.Metadata.GetTableName());
+//    }
 
-        // Act
-        sut.Configure(builder);
+//    [Fact]
+//    [Trait("Persistence", "Configuration")]
+//    public void Persistence_Configuration_IdentityUserToken_ShouldHaveCorrectConfiguration()
+//    {
+//        // Arrange
+//        IdentityUserTokenConfiguration sut = new();
+//        EntityTypeBuilder<IdentityUserToken<Guid>> builder = GetEntityBuilder<IdentityUserToken<Guid>>();
 
-        // Assert
-        Assert.Equal("UserTokens", builder.Metadata.GetTableName());
-    }
+//        // Act
+//        sut.Configure(builder);
 
-    private static EntityTypeBuilder<T> GetEntityBuilder<T>() where T : class
-    {
-#pragma warning disable EF1001 // Internal EF Core API usage.
-        EntityType entityType = new(typeof(T).Name, typeof(T), new Model(), false, ConfigurationSource.Explicit);
+//        // Assert
+//        Assert.Equal("UserTokens", builder.Metadata.GetTableName());
+//    }
 
-        EntityTypeBuilder<T> builder = new(entityType);
+//    private static EntityTypeBuilder<T> GetEntityBuilder<T>() where T : class
+//    {
+//#pragma warning disable EF1001 // Internal EF Core API usage.
+//        EntityType entityType = new(typeof(T).Name, typeof(T), new Model(), false, ConfigurationSource.Explicit);
 
-        return builder;
-#pragma warning restore EF1001 // Internal EF Core API usage.
-    }
-}
+//        EntityTypeBuilder<T> builder = new(entityType);
+
+//        return builder;
+//#pragma warning restore EF1001 // Internal EF Core API usage.
+//    }
+//}

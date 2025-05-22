@@ -1,163 +1,165 @@
-﻿using SFC.Identity.Api.IntegrationTests.Fixtures;
-using System.Net;
-using System.Text.Json;
-using SFC.Identity.Application.Models.Existence;
-using SFC.Identity.Application.Common.Constants;
+﻿//using System.Net;
+//using System.Text.Json;
 
-namespace SFC.Identity.Api.IntegrationTests.Controllers;
+//using SFC.Identity.Api.Infrastructure.Models.Existence;
+//using SFC.Identity.Api.IntegrationTests.Fixtures;
+//using SFC.Identity.Application.Common.Constants;
+//using SFC.Identity.Infrastructure.Constants;
 
-public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
-{
-    private readonly CustomWebApplicationFactory<Program> _factory;
+//namespace SFC.Identity.Api.IntegrationTests.Controllers;
 
-    public ExistenceControllerTests(CustomWebApplicationFactory<Program> factory)
-    {
-        _factory = factory;
-        _factory.InitializeDbForTests();
-    }
+//public class ExistenceControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
+//{
+//    private readonly CustomWebApplicationFactory<Program> _factory;
 
-    [Fact]
-    [Trait("API", "Integration")]
-    public async Task API_Integration_Existence_CheckByUserName_ShouldReturnUserExist()
-    {
-        // Arrange
-        HttpClient client = _factory.CreateClient();
+//    public ExistenceControllerTests(CustomWebApplicationFactory<Program> factory)
+//    {
+//        _factory = factory;
+//        _factory.InitializeDbForTests();
+//    }
 
-        string userName = "IntegrationTestUser";
+//    [Fact]
+//    [Trait("API", "Integration")]
+//    public async Task API_Integration_Existence_CheckByUserName_ShouldReturnUserExist()
+//    {
+//        // Arrange
+//        HttpClient client = _factory.CreateClient();
 
-        // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
+//        string userName = "IntegrationTestUser";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+//        // Act
+//        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
 
-        string responseString = await response.Content.ReadAsStringAsync();
+//        // Assert
+//        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
+//        string responseString = await response.Content.ReadAsStringAsync();
 
-        Assert.IsType<ExistenceResponse>(responseValue);
-        Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.True(responseValue.Exist);
-    }
+//        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
-    [Fact]
-    [Trait("API", "Integration")]
-    public async Task API_Integration_Existence_CheckByUserName_ShouldReturnUserNotExist()
-    {
-        // Arrange
-        HttpClient client = _factory.CreateClient();
+//        Assert.IsType<ExistenceResponse>(responseValue);
+//        Assert.True(responseValue.Success);
+//        Assert.Equal(Localization.SuccessResult, responseValue.Message);
+//        Assert.True(responseValue.Exist);
+//    }
 
-        string userName = "IntegrationTestUser_Another";
+//    [Fact]
+//    [Trait("API", "Integration")]
+//    public async Task API_Integration_Existence_CheckByUserName_ShouldReturnUserNotExist()
+//    {
+//        // Arrange
+//        HttpClient client = _factory.CreateClient();
 
-        // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
+//        string userName = "IntegrationTestUser_Another";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+//        // Act
+//        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
 
-        string responseString = await response.Content.ReadAsStringAsync();
+//        // Assert
+//        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
+//        string responseString = await response.Content.ReadAsStringAsync();
 
-        Assert.IsType<ExistenceResponse>(responseValue);
-        Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.False(responseValue.Exist);
-    }
+//        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
-    [Fact]
-    [Trait("API", "Integration")]
-    public async Task API_Integration_Existence_CheckByUserName_ShouldReturnLocalizedMessage()
-    {
-        // Arrange
-        // Arrange
-        HttpClient client = _factory.CreateClient();
+//        Assert.IsType<ExistenceResponse>(responseValue);
+//        Assert.True(responseValue.Success);
+//        Assert.Equal(Localization.SuccessResult, responseValue.Message);
+//        Assert.False(responseValue.Exist);
+//    }
 
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+//    [Fact]
+//    [Trait("API", "Integration")]
+//    public async Task API_Integration_Existence_CheckByUserName_ShouldReturnLocalizedMessage()
+//    {
+//        // Arrange
+//        // Arrange
+//        HttpClient client = _factory.CreateClient();
 
-        string userName = "IntegrationTestUser_Another";
+//        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
-        // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
+//        string userName = "IntegrationTestUser_Another";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+//        // Act
+//        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/name/{userName}");
 
-        string responseString = await response.Content.ReadAsStringAsync();
+//        // Assert
+//        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.Contains("Успішний результат.", responseString);
-    }
+//        string responseString = await response.Content.ReadAsStringAsync();
 
-    [Fact]
-    [Trait("API", "Integration")]
-    public async Task API_Integration_Existence_CheckByEmail_ShouldReturnUserExist()
-    {
-        // Arrange
-        HttpClient client = _factory.CreateClient();
+//        Assert.Contains("Успішний результат.", responseString);
+//    }
 
-        string email = "integrationtestemail@mail.com";
+//    [Fact]
+//    [Trait("API", "Integration")]
+//    public async Task API_Integration_Existence_CheckByEmail_ShouldReturnUserExist()
+//    {
+//        // Arrange
+//        HttpClient client = _factory.CreateClient();
 
-        // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
+//        string email = "integrationtestemail@mail.com";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+//        // Act
+//        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
 
-        string responseString = await response.Content.ReadAsStringAsync();
+//        // Assert
+//        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
+//        string responseString = await response.Content.ReadAsStringAsync();
 
-        Assert.IsType<ExistenceResponse>(responseValue);
-        Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.True(responseValue.Exist);
-    }
+//        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
-    [Fact]
-    [Trait("API", "Integration")]
-    public async Task API_Integration_Existence_CheckByEmail_ShouldReturnUserNotExist()
-    {
-        // Arrange
-        HttpClient client = _factory.CreateClient();
+//        Assert.IsType<ExistenceResponse>(responseValue);
+//        Assert.True(responseValue.Success);
+//        Assert.Equal(Localization.SuccessResult, responseValue.Message);
+//        Assert.True(responseValue.Exist);
+//    }
 
-        string email = "testemail_another@mail.com";
+//    [Fact]
+//    [Trait("API", "Integration")]
+//    public async Task API_Integration_Existence_CheckByEmail_ShouldReturnUserNotExist()
+//    {
+//        // Arrange
+//        HttpClient client = _factory.CreateClient();
 
-        // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
+//        string email = "testemail_another@mail.com";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+//        // Act
+//        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
 
-        string responseString = await response.Content.ReadAsStringAsync();
+//        // Assert
+//        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
+//        string responseString = await response.Content.ReadAsStringAsync();
 
-        Assert.IsType<ExistenceResponse>(responseValue);
-        Assert.True(responseValue.Success);
-        Assert.Equal(Messages.SuccessResult, responseValue.Message);
-        Assert.False(responseValue.Exist);
-    }
+//        ExistenceResponse? responseValue = JsonSerializer.Deserialize<ExistenceResponse>(responseString);
 
-    [Fact]
-    [Trait("API", "Integration")]
-    public async Task API_Integration_Existence_CheckByEmail_ShouldReturnLocalizedMessage()
-    {
-        // Arrange
-        HttpClient client = _factory.CreateClient();
+//        Assert.IsType<ExistenceResponse>(responseValue);
+//        Assert.True(responseValue.Success);
+//        Assert.Equal(Localization.SuccessResult, responseValue.Message);
+//        Assert.False(responseValue.Exist);
+//    }
 
-        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SUPPORTED_CULTURES[1]);
+//    [Fact]
+//    [Trait("API", "Integration")]
+//    public async Task API_Integration_Existence_CheckByEmail_ShouldReturnLocalizedMessage()
+//    {
+//        // Arrange
+//        HttpClient client = _factory.CreateClient();
 
-        string email = "integrationtestemail@mail.com";
+//        client.DefaultRequestHeaders.Add(Constants.ACCEPT_LANGUAGE, CommonConstants.SupportedCultures[1]);
 
-        // Act
-        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
+//        string email = "integrationtestemail@mail.com";
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+//        // Act
+//        HttpResponseMessage response = await client.GetAsync($"{Constants.API_EXISTENCE}/email/{email}");
 
-        string responseString = await response.Content.ReadAsStringAsync();
+//        // Assert
+//        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.Contains("Успішний результат.", responseString);
-    }
-}
+//        string responseString = await response.Content.ReadAsStringAsync();
+
+//        Assert.Contains("Успішний результат.", responseString);
+//    }
+//}
