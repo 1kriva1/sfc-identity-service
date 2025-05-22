@@ -1,24 +1,25 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SFC.Identity.Application.Common.Exceptions;
-using SFC.Identity.Application.Common.Constants;
+﻿using AutoMapper;
+
+using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
-using Microsoft.AspNetCore.Authentication;
-using Duende.IdentityServer.Events;
-using Microsoft.Extensions.Options;
 
 using MassTransit;
 
-using SFC.Identity.Infrastructure.Settings;
-using SFC.Identity.Infrastructure.Persistence.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+
+using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Application.Interfaces.Identity;
 using SFC.Identity.Application.Interfaces.Identity.Dto.Base;
 using SFC.Identity.Application.Interfaces.Identity.Dto.Login;
 using SFC.Identity.Application.Interfaces.Identity.Dto.Logout;
 using SFC.Identity.Application.Interfaces.Identity.Dto.Registration;
+using SFC.Identity.Infrastructure.Persistence.Entities;
+using SFC.Identity.Infrastructure.Settings;
 using SFC.Identity.Messages.Events.User;
-
-using AutoMapper;
 
 using LogoutRequest = Duende.IdentityServer.Models.LogoutRequest;
 

@@ -1,6 +1,6 @@
-﻿using SFC.Identity.Application.Common.Constants;
+﻿using System.Text.Json.Serialization;
 
-using System.Text.Json.Serialization;
+using SFC.Identity.Application.Common.Constants;
 
 namespace SFC.Identity.Api.Infrastructure.Models.Base;
 

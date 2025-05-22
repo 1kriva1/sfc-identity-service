@@ -15,9 +15,9 @@ using SFC.Identity.Messages.Events.User;
 
 namespace SFC.Identity.Infrastructure.Services.Identity;
 public class UserSeedService(
-    IMapper mapper, 
-    IPublishEndpoint publisher, 
-    IUserRepository userRepository, 
+    IMapper mapper,
+    IPublishEndpoint publisher,
+    IUserRepository userRepository,
     IMetadataService metadataService) : IUserSeedService
 {
     private readonly IMapper _mapper = mapper;
@@ -133,7 +133,7 @@ public class UserSeedService(
         await PublishUsersSeededEvent(seedUsers, cancellationToken).ConfigureAwait(true);
 
         await _metadataService.CompleteAsync(MetadataServiceEnum.Identity, MetadataDomainEnum.User, MetadataTypeEnum.Seed).ConfigureAwait(true);
-    }    
+    }
 
     #endregion Public
 

@@ -1,10 +1,12 @@
-﻿using SFC.Identity.Application.Common.Exceptions;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using SFC.Identity.Application.Common.Constants;
-using ExceptionType = System.Exception;
+
 using SFC.Identity.Api.Infrastructure.Models.Base;
+using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Application.Common.Exceptions;
 using SFC.Identity.Infrastructure.Constants;
+
+using ExceptionType = System.Exception;
 
 namespace SFC.Identity.Api.Infrastructure.Middlewares;
 

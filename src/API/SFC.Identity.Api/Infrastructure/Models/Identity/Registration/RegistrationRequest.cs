@@ -1,8 +1,8 @@
-﻿using SFC.Identity.Api.Infrastructure.Validators;
+﻿using System.ComponentModel.DataAnnotations;
+
+using SFC.Identity.Api.Infrastructure.Validators;
 using SFC.Identity.Application.Common.Mappings.Interfaces;
 using SFC.Identity.Application.Interfaces.Identity.Dto.Registration;
-
-using System.ComponentModel.DataAnnotations;
 
 namespace SFC.Identity.Api.Infrastructure.Models.Identity.Registration;
 

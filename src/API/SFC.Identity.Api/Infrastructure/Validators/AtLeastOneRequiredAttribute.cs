@@ -1,8 +1,8 @@
-﻿using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Common.Extensions;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+
+using SFC.Identity.Application.Common.Constants;
+using SFC.Identity.Application.Common.Extensions;
 
 namespace SFC.Identity.Api.Infrastructure.Validators;
 
@@ -42,5 +42,5 @@ public sealed class AtLeastOneRequiredAttribute(string field1, string field2) : 
     private static bool TryGetProperty(string fieldName, ValidationContext validateionContext, out PropertyInfo? propertyInfo)
         => (propertyInfo = validateionContext.ObjectType.GetProperty(fieldName)) != null;
 
-    
+
 }

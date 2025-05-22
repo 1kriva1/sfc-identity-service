@@ -1,8 +1,8 @@
-﻿using Duende.IdentityServer.Extensions;
+﻿using System.Security.Claims;
+
+using Duende.IdentityServer.Extensions;
 
 using SFC.Identity.Application.Interfaces.Identity.Dto.Logout;
-
-using System.Security.Claims;
 
 namespace SFC.Identity.Infrastructure.Extensions;
 

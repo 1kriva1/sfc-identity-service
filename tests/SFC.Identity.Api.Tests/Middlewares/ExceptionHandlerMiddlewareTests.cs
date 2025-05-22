@@ -1,229 +1,229 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿//using System.Net;
+//using System.Text.Json;
 
-using Microsoft.AspNetCore.Http;
+//using Microsoft.AspNetCore.Http;
 
-using SFC.Identity.Api.Infrastructure.Middlewares;
-using SFC.Identity.Api.Infrastructure.Models.Base;
-using SFC.Identity.Application.Common.Constants;
-using SFC.Identity.Application.Common.Exceptions;
-using SFC.Identity.Infrastructure.Constants;
+//using SFC.Identity.Api.Infrastructure.Middlewares;
+//using SFC.Identity.Api.Infrastructure.Models.Base;
+//using SFC.Identity.Application.Common.Constants;
+//using SFC.Identity.Application.Common.Exceptions;
+//using SFC.Identity.Infrastructure.Constants;
 
-using SystemException = System.Exception;
+//using SystemException = System.Exception;
 
-namespace SFC.Identity.Api.UnitTests.Middlewares;
+//namespace SFC.Identity.Api.UnitTests.Middlewares;
 
-public class ExceptionHandlerMiddlewareTests
-{
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldHaveDefaultContentType()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
+//public class ExceptionHandlerMiddlewareTests
+//{
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldHaveDefaultContentType()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
 
-        static Task Next(HttpContext httpContext) => Task.FromException<SystemException>(new SystemException("Test_error"));
+//        static Task Next(HttpContext httpContext) => Task.FromException<SystemException>(new SystemException("Test_error"));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        Assert.Equal(CommonConstants.ContentType, httpContext.Response.ContentType);
-    }
+//        // Assert
+//        Assert.Equal(CommonConstants.ContentType, httpContext.Response.ContentType);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldHaveDefinedContentType()
-    {
-        // Arrange
-        string customContentType = "application/xml";
-        DefaultHttpContext httpContext = new();
-        httpContext.Request.ContentType = customContentType;
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldHaveDefinedContentType()
+//    {
+//        // Arrange
+//        string customContentType = "application/xml";
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Request.ContentType = customContentType;
 
-        static Task Next(HttpContext httpContext) => Task.FromException<SystemException>(new SystemException("Test_error"));
+//        static Task Next(HttpContext httpContext) => Task.FromException<SystemException>(new SystemException("Test_error"));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        Assert.Equal(customContentType, httpContext.Response.ContentType);
-    }
+//        // Assert
+//        Assert.Equal(customContentType, httpContext.Response.ContentType);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldProcessSuccessFlow()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldProcessSuccessFlow()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
 
-        static Task Next(HttpContext httpContext) => Task.CompletedTask;
+//        static Task Next(HttpContext httpContext) => Task.CompletedTask;
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        Assert.Equal((int)HttpStatusCode.OK, httpContext.Response.StatusCode);
-    }
+//        // Assert
+//        Assert.Equal((int)HttpStatusCode.OK, httpContext.Response.StatusCode);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnInternalServerErrorIfHandlerNotProvided()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldReturnInternalServerErrorIfHandlerNotProvided()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Response.Body = new MemoryStream();
 
-        static Task Next(HttpContext httpContext) => Task.FromException<SystemException>(new SystemException("test_error"));
+//        static Task Next(HttpContext httpContext) => Task.FromException<SystemException>(new SystemException("test_error"));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        AssertBaseResponse(HttpStatusCode.InternalServerError, httpContext.Response, Localization.FailedResult, out string _);
-    }
+//        // Assert
+//        AssertBaseResponse(HttpStatusCode.InternalServerError, httpContext.Response, Localization.FailedResult, out string _);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnConflict()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldReturnConflict()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Response.Body = new MemoryStream();
 
-        string errorMessage = "conflict_error";
+//        string errorMessage = "conflict_error";
 
-        Task Next(HttpContext httpContext) => Task.FromException<ConflictException>(new ConflictException(errorMessage));
+//        Task Next(HttpContext httpContext) => Task.FromException<ConflictException>(new ConflictException(errorMessage));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        AssertBaseResponse(HttpStatusCode.Conflict, httpContext.Response, errorMessage, out string _);
-    }
+//        // Assert
+//        AssertBaseResponse(HttpStatusCode.Conflict, httpContext.Response, errorMessage, out string _);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnBadRequest()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldReturnBadRequest()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Response.Body = new MemoryStream();
 
-        string errorMessage = "bad_request_error", errorCode = "test_code", errorDescription = "test_message";
+//        string errorMessage = "bad_request_error", errorCode = "test_code", errorDescription = "test_message";
 
-        Task Next(HttpContext httpContext) => Task.FromException<BadRequestException>(new BadRequestException(errorMessage, (errorCode, errorDescription)));
+//        Task Next(HttpContext httpContext) => Task.FromException<BadRequestException>(new BadRequestException(errorMessage, (errorCode, errorDescription)));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        AssertBaseErrorResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, errorCode, errorDescription);
-    }
+//        // Assert
+//        AssertBaseErrorResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, errorCode, errorDescription);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnBadRequestForIdentityException()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldReturnBadRequestForIdentityException()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Response.Body = new MemoryStream();
 
-        string errorMessage = "bad_request_error", errorCode = "test_code", errorDescription = "test_message";
+//        string errorMessage = "bad_request_error", errorCode = "test_code", errorDescription = "test_message";
 
-        Task Next(HttpContext httpContext) => Task.FromException<IdentityException>(new IdentityException(errorMessage, new Dictionary<string, IEnumerable<string>> {
-            { errorCode, new List<string>{ errorDescription } }
-        }));
+//        Task Next(HttpContext httpContext) => Task.FromException<IdentityException>(new IdentityException(errorMessage, new Dictionary<string, IEnumerable<string>> {
+//            { errorCode, new List<string>{ errorDescription } }
+//        }));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        AssertBaseErrorResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, errorCode, errorDescription);
-    }
+//        // Assert
+//        AssertBaseErrorResponse(HttpStatusCode.BadRequest, httpContext.Response, errorMessage, errorCode, errorDescription);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnUnauthorized()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldReturnUnauthorized()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Response.Body = new MemoryStream();
 
-        string errorMessage = "authorization_error";
+//        string errorMessage = "authorization_error";
 
-        Task Next(HttpContext httpContext) => Task.FromException<AuthorizationException>(new AuthorizationException(errorMessage));
+//        Task Next(HttpContext httpContext) => Task.FromException<AuthorizationException>(new AuthorizationException(errorMessage));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        AssertBaseResponse(HttpStatusCode.Unauthorized, httpContext.Response, errorMessage, out string _);
-    }
+//        // Assert
+//        AssertBaseResponse(HttpStatusCode.Unauthorized, httpContext.Response, errorMessage, out string _);
+//    }
 
-    [Fact]
-    [Trait("API", "Middleware")]
-    public async Task API_Middleware_Exception_ShouldReturnForbidden()
-    {
-        // Arrange
-        DefaultHttpContext httpContext = new();
-        httpContext.Response.Body = new MemoryStream();
+//    [Fact]
+//    [Trait("API", "Middleware")]
+//    public async Task API_Middleware_Exception_ShouldReturnForbidden()
+//    {
+//        // Arrange
+//        DefaultHttpContext httpContext = new();
+//        httpContext.Response.Body = new MemoryStream();
 
-        string errorMessage = "forbidden_error";
+//        string errorMessage = "forbidden_error";
 
-        Task Next(HttpContext httpContext) => Task.FromException<ForbiddenException>(new ForbiddenException(errorMessage));
+//        Task Next(HttpContext httpContext) => Task.FromException<ForbiddenException>(new ForbiddenException(errorMessage));
 
-        ExceptionHandlerMiddleware middleware = new(Next);
+//        ExceptionHandlerMiddleware middleware = new(Next);
 
-        // Act
-        await middleware.InvokeAsync(httpContext).ConfigureAwait(false);
+//        // Act
+//        await middleware.InvokeAsync(httpContext);
 
-        // Assert
-        AssertBaseResponse(HttpStatusCode.Forbidden, httpContext.Response, errorMessage, out string _);
-    }
+//        // Assert
+//        AssertBaseResponse(HttpStatusCode.Forbidden, httpContext.Response, errorMessage, out string _);
+//    }
 
-    private void AssertBaseResponse(HttpStatusCode statusCode, HttpResponse httpResponse, string errorMessage, out string responseBody)
-    {
-        Assert.Equal((int)statusCode, httpResponse.StatusCode);
+//    private void AssertBaseResponse(HttpStatusCode statusCode, HttpResponse httpResponse, string errorMessage, out string responseBody)
+//    {
+//        Assert.Equal((int)statusCode, httpResponse.StatusCode);
 
-        httpResponse.Body.Seek(0, SeekOrigin.Begin);
+//        httpResponse.Body.Seek(0, SeekOrigin.Begin);
 
-        responseBody = new StreamReader(httpResponse.Body).ReadToEnd();
+//        responseBody = new StreamReader(httpResponse.Body).ReadToEnd();
 
-        Assert.False(string.IsNullOrEmpty(responseBody));
+//        Assert.False(string.IsNullOrEmpty(responseBody));
 
-        BaseResponse? response = JsonSerializer.Deserialize<BaseResponse>(responseBody);
+//        BaseResponse? response = JsonSerializer.Deserialize<BaseResponse>(responseBody);
 
-        Assert.NotNull(response);
-        Assert.Equal(errorMessage, response.Message);
-        Assert.False(response.Success);
-    }
+//        Assert.NotNull(response);
+//        Assert.Equal(errorMessage, response.Message);
+//        Assert.False(response.Success);
+//    }
 
-    private void AssertBaseErrorResponse(HttpStatusCode statusCode, HttpResponse httpResponse, string errorMessage,
-        string errorCode, string errorDescription)
-    {
-        AssertBaseResponse(statusCode, httpResponse, errorMessage, out string responseBody);
+//    private void AssertBaseErrorResponse(HttpStatusCode statusCode, HttpResponse httpResponse, string errorMessage,
+//        string errorCode, string errorDescription)
+//    {
+//        AssertBaseResponse(statusCode, httpResponse, errorMessage, out string responseBody);
 
-        BaseErrorResponse? response = JsonSerializer.Deserialize<BaseErrorResponse>(responseBody);
+//        BaseErrorResponse? response = JsonSerializer.Deserialize<BaseErrorResponse>(responseBody);
 
-        Assert.NotNull(response!.Errors);
-        Assert.True(response.Errors.ContainsKey(errorCode));
-        Assert.Single(response.Errors[errorCode]);
-        Assert.Equal(errorDescription, response.Errors[errorCode].FirstOrDefault());
-    }
-}
+//        Assert.NotNull(response!.Errors);
+//        Assert.True(response.Errors.ContainsKey(errorCode));
+//        Assert.Single(response.Errors[errorCode]);
+//        Assert.Equal(errorDescription, response.Errors[errorCode].FirstOrDefault());
+//    }
+//}

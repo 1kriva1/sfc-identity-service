@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Localization;
-using System.Text;
+﻿using System.Text;
+
+using Microsoft.Extensions.Localization;
 
 namespace SFC.Identity.Application.Common.Constants;
 
