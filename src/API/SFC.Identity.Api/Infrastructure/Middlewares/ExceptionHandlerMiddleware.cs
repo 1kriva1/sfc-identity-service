@@ -35,6 +35,7 @@ public class ExceptionHandlerMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+#pragma warning disable CA1031 // Do not catch general exception types
         try
         {
             await _next(context).ConfigureAwait(false);
@@ -42,8 +43,8 @@ public class ExceptionHandlerMiddleware
         catch (ExceptionType ex)
         {
             await HandleExceptionAsync(context, ex).ConfigureAwait(false);
-            throw;
         }
+#pragma warning restore CA1031 // Do not catch general exception types
     }
 
     private Task HandleExceptionAsync(HttpContext context, ExceptionType exception)
