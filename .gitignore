@@ -65,3 +65,6 @@ testem.log
 # Tests coverage
 tests/coverage
 coverage/
+
+# Angular builds
+**/wwwroot/

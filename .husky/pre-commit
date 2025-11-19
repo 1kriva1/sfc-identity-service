@@ -4,11 +4,15 @@
 echo 'Ready to commit changes!'
 
 echo 'Format'
-
 dotnet husky run --name dotnet-format-staged-files
 
 echo 'Build'
+dotnet husky run --name dotnet-build
 
-dotnet build --no-restore --configuration Release
+echo 'Lint npm'
+dotnet husky run --name npm-lint
+
+echo 'Build npm'
+dotnet husky run --name npm-build
 
 echo 'Completed pre-commit changes'

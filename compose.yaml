@@ -1,0 +1,18 @@
+﻿name: sfc-identity
+include:
+   - compose.Infrastructure.yaml
+x-build-args: &build_args
+  args:
+    BUILD_CONFIGURATION: Release
+services:
+  sfc-identity:
+    extends:
+      file: compose.Common.yaml
+      service: sfc-identity  
+    image: kryvorukandrii/sfc.identity:latest
+    build:
+      dockerfile: src/API/SFC.Identity.Api/Dockerfile
+      <<: *build_args
+    env_file:
+      - environments/api/api.Production.env
+  

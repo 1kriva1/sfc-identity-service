@@ -8,6 +8,13 @@
     <UserSecretsId>b8ea6240-e2c2-4fee-88f8-1276a4c20748</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DockerfileFile>Dockerfile</DockerfileFile>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1591;NU1702;</NoWarn>
   </PropertyGroup>
@@ -17,13 +24,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="wwwroot\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
@@ -31,6 +31,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
@@ -39,6 +40,23 @@
     <ProjectReference Include="..\..\Core\SFC.Identity.Application\SFC.Identity.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure.Persistence\SFC.Identity.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\..\Infrastructure\SFC.Identity.Infrastructure\SFC.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="entrypoint.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="entrypoint.Common.sh">
+      <DependentUpon>entrypoint.sh</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="entrypoint.Development.sh">
+      <DependentUpon>entrypoint.sh</DependentUpon>
+    </None>
+    <None Include="entrypoint.sh" />
   </ItemGroup>
 
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' == True">

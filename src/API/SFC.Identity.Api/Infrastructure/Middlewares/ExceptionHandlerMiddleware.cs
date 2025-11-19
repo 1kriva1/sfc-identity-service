@@ -59,7 +59,7 @@ public class ExceptionHandlerMiddleware
 
         context.Response.StatusCode = (int)response.StatusCode;
 
-        context.Response.ContentType = context.Request.ContentType ?? CommonConstants.ContentType;
+        context.Response.ContentType = context.Request.ContentType ?? CommonConstants.JsonContentType;
 
         return context.Response.WriteAsync(JsonSerializer.Serialize(response.Result));
     }

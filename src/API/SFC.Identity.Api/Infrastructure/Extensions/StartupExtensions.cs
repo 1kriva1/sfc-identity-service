@@ -30,10 +30,9 @@ public static class StartupExtensions
             builder.Services.AddSwagger();
         }
 
-        if (builder.Environment.IsProduction())
-        {
-            builder.Services.AddSpa();
-        }
+        builder.AddSpa();
+
+        builder.Services.AddHealthChecks();
 
         return builder.Build();
     }
@@ -65,8 +64,6 @@ public static class StartupExtensions
 
         app.UseRouting();
 
-        app.UseLocalization();
-
         app.UseAuthentication();
 
         app.UseAuthorization();
@@ -75,6 +72,8 @@ public static class StartupExtensions
 
         // add identity server (Duende) to pipeline
         app.UseIdentityServer();
+
+        app.MapHealthChecks("/health");
 
         app.MapControllers();
 

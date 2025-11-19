@@ -8,7 +8,9 @@ public static class CommonConstants
 
     public const string PaginationHeaderKey = "X-Pagination";
 
-    public const string ContentType = "application/json";
+    public const string JsonContentType = "application/json";
+
+    public const string GrpcContentType = "application/grpc";
 
     public const string AuditableHeaderKey = "X-Auditable";
 }

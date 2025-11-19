@@ -1,0 +1,60 @@
+﻿services:
+  sfc-mssql:
+    container_name: sfc-mssql
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    env_file:
+      - environments/mssql/mssql.${ASPNETCORE_ENVIRONMENT}.env      
+    ports:
+      - "1433:1433"
+    entrypoint: ["/bin/bash", "/usr/src/app/entrypoint.mssql.sh"]
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "127.0.0.1", "-U", "sa", "-P", "Test1234!", "-No", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - type: volume
+        source: sfc-mssql-volume
+        target: /var/opt/mssql
+      - type: bind
+        source: scripts/mssql
+        target: /usr/src/app
+    networks:
+      - sfc-network
+  sfc-rabbitmq:
+    container_name: sfc-rabbitmq
+    image: docker.io/rabbitmq:4-management
+    env_file:
+      - environments/rabbitmq/rabbitmq.${ASPNETCORE_ENVIRONMENT}.env
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "node_health_check"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - type: volume
+        source: sfc-rabbitmq-volume
+        target: /var/lib/rabbitmq
+      - type: bind
+        source: ../../Configurations/redis/rabbitmq.conf
+        target: /etc/rabbitmq/rabbitmq.conf
+    networks:
+      - sfc-network
+volumes:
+  sfc-mssql-volume:
+    name: sfc-mssql-volume
+    external: true
+  sfc-rabbitmq-volume:
+    name: sfc-redis-volume
+    external: true
+networks:
+  sfc-network:
+    name: sfc-network  
+    driver: bridge
+    external: true
+  
