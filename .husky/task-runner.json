@@ -5,20 +5,47 @@
       "name": "dotnet-format-staged-files",
       "group": "pre-commit-operations",
       "command": "dotnet",
-      "args": [ "format", "--verbosity", "diagnostic", "--include", "${staged}" ],
+      "args": [ "format", "SFC.Identity.sln", "--verbosity", "diagnostic", "--include", "${staged}" ],
       "include": [ "**/*.cs" ]
+    },
+    {
+      "name": "dotnet-build",
+      "group": "pre-commit-operations",
+      "command": "dotnet",
+      "args": [ "build", "SFC.Identity.sln", "--no-restore", "--configuration", "Release" ]
     },
     {
       "name": "dotnet-test",
       "group": "pre-push-operations",
       "command": "dotnet",
-      "args": [ "test", "--no-restore", "--no-build", "/p:CollectCoverage=true", "/p:CoverletOutput=../coverage/code_coverage", "/p:CoverletOutputFormat=opencover", "/p:Threshold=0", "/p:ThresholdStat=total" ]
+      "args": [ "test", "SFC.Identity.sln", "--no-restore", "--no-build", "/p:CollectCoverage=true", "/p:CoverletOutput=../coverage/code_coverage", "/p:CoverletOutputFormat=opencover", "/p:Threshold=0", "/p:ThresholdStat=total" ]
     },
     {
-      "name": "reportgenerator-create",
+      "name": "dotnet-reportgenerator-create",
       "group": "pre-push-operations",
       "command": "reportgenerator",
       "args": [ "-reports:tests/coverage/code_coverage.opencover.xml", "-targetdir:tests/coverage/report", "-reporttypes:Html", "-assemblyfilters:+SFC.Identity.Domain;+SFC.Identity.Application;+SFC.Identity.Infrastructure.Persistence;+SFC.Identity.Infrastructure;+SFC.Identity.Api" ]
+    },
+    {
+      "name": "npm-lint",
+      "group": "pre-commit-operations",
+      "command": "npm",
+      "cwd": "src/Client/SFC.Identity.Client",
+      "args": [ "run", "lint:all" ]
+    },
+    {
+      "name": "npm-build",
+      "group": "pre-commit-operations",
+      "command": "npm",
+      "cwd": "src/Client/SFC.Identity.Client",
+      "args": [ "run", "build" ]
+    },
+    {
+      "name": "npm-test",
+      "group": "pre-push-operations",
+      "command": "npm",
+      "cwd": "src/Client/SFC.Identity.Client",
+      "args": [ "run", "test:code-coverage:no-browser" ]
     }
   ]
 }

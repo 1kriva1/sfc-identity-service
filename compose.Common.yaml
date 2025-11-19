@@ -1,0 +1,48 @@
+﻿name: sfc-identity
+include:
+   - compose.Infrastructure.yaml
+x-root-certificate-volume: &root-certificate-volume
+  type: bind
+  source: ../../Configurations/certificates/root/sfcRootCA.crt
+  target: /usr/local/share/ca-certificates/sfcRootCA.crt
+x-common-deploy: &common_deploy
+  deploy:
+    replicas: 1
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3
+      window: 120s
+services:
+  sfc-identity:
+    container_name: sfc-identity
+    build:
+      context: .
+      args:
+        HTTP_PORT: 7265
+        HTTPS_PORT: 7266
+    ports:
+      - "7266:7266"
+      - "7265:7265"
+    healthcheck:
+          test: ["CMD", "curl", "--fail", "http://localhost:7265/health"] 
+          interval: 20s
+          timeout: 10s
+          retries: 3
+          start_period: 90s
+    volumes:
+      - *root-certificate-volume
+      - type: bind
+        source: ../../Configurations/certificates/sfc-identity/sfc-identity.pfx
+        target: /https/sfc-identity.pfx
+    networks:
+      - sfc-network
+    <<: *common_deploy
+    depends_on:
+      sfc-mssql:
+        condition: service_healthy
+        restart: true
+      sfc-rabbitmq:
+        condition: service_healthy
+        restart: true
+  

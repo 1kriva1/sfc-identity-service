@@ -1,0 +1,31 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+LABEL service="SFC.Identity.Api" author="Kryvoruk Andrii" email="krivorukandrey@gmail.com"
+
+USER root
+
+ARG HTTP_PORT=8080
+ARG HTTPS_PORT=8081
+
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install -y nodejs
+
+COPY [".", "."]
+
+WORKDIR /app/src/Client/SFC.Identity.Client
+
+RUN npm install
+
+WORKDIR /app
+
+EXPOSE $HTTP_PORT
+EXPOSE $HTTPS_PORT
+
+ENTRYPOINT ["bash", "/app/src/API/SFC.Identity.Api/entrypoint.Development.sh"]

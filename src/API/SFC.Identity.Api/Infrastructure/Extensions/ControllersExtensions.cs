@@ -18,8 +18,8 @@ public static class ControllersExtensions
             configure.ReturnHttpNotAcceptable = true;
 
             // Accept and Content-Type headers filters
-            configure.Filters.Add(new ProducesAttribute(CommonConstants.ContentType));
-            configure.Filters.Add(new ConsumesAttribute(CommonConstants.ContentType));
+            configure.Filters.Add(new ProducesAttribute(CommonConstants.JsonContentType, CommonConstants.GrpcContentType));
+            configure.Filters.Add(new ConsumesAttribute(CommonConstants.JsonContentType, CommonConstants.GrpcContentType));
 
             // Global responses filters
             configure.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable));

@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.SpaServices.AngularCli;
 
 using SFC.Identity.Api.Infrastructure.Extensions;
+using SFC.Identity.Infrastructure.Extensions;
 
 namespace SFC.Identity.Api.Infrastructure.Extensions;
 
 public static class SpaExtensions
 {
     private const string SOURCE_PATH = "../../Client/SFC.Identity.Client";
-    private const string ROOT_PATH = "/dist/sfc-identity";
+    private const string ROOT_PATH = "wwwroot";
     private const int STARTUP_TIMEOUT = 300;
 
-    public static void AddSpa(this IServiceCollection services)
+    public static void AddSpa(this WebApplicationBuilder builder)
     {
-        services.AddSpaStaticFiles(configuration => configuration.RootPath = $"{SOURCE_PATH}{ROOT_PATH}");
+        if (builder.Environment.IsProduction())
+        {
+            builder.Services.AddSpaStaticFiles(configuration => configuration.RootPath = ROOT_PATH);
+        }
     }
 
     public static void UseSpa(this WebApplication app)
@@ -21,9 +25,12 @@ public static class SpaExtensions
         {
             if (app.Environment.IsDevelopment())
             {
+                string npmScript = EnvironmentExtensions.IsRunningInContainer
+                    ? "start:container:development" : "start:development";
+
                 spa.Options.SourcePath = SOURCE_PATH;
                 spa.Options.StartupTimeout = TimeSpan.FromSeconds(STARTUP_TIMEOUT);
-                spa.UseAngularCliServer(npmScript: "start");
+                spa.UseAngularCliServer(npmScript);
             }
         });
     }

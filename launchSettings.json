@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    // TODO: Client application is not working.
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "sfc-identity": "StartDebugging",
+        "sfc-mssql": "StartWithoutDebugging",
+        "sfc-rabbitmq": "StartWithoutDebugging"
+      }
+    }
+  }
+}

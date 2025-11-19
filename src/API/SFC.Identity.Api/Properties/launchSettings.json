@@ -1,16 +1,41 @@
-﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
+{
   "profiles": {
     "SFC.Identity": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "externalUrlConfiguration": true,
-      "applicationUrl": "https://localhost:7266",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://+:7266;http://+:7265",
+        "ASPNETCORE_HTTPS_PORT": "7266",
+        "ConnectionStrings__Database": "Server=127.0.0.1,1433;Database=Identity;User Id=sfc;Password=Test1234!;TrustServerCertificate=True;",
+        "ConnectionStrings__RabbitMq": "rabbitmq://localhost:5672"
+      },
+      "dotnetRunMessages": true,
+      "externalUrlConfiguration": true,
+      "applicationUrl": "http://localhost:7265;https://localhost:7266;",
+      "httpPort": 7265,
+      "useSSL": true,
+      "sslPort": 7266,
+      "nativeDebugging": true
+    },
+    // TODO: Client application is not working.
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://+:7266;http://+:7265",
+        "ASPNETCORE_HTTPS_PORT": "7266"
+      },
+      "DockerfileRunArguments": "--network sfc-network",
+      "httpPort": 7265,
+      "useSSL": true,
+      "sslPort": 7266,
+      "containerName": "sfc-identity",
+      "mycontainer": "sfc-identity"
     }
-  }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
 }

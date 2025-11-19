@@ -28,7 +28,7 @@ public class DatabaseResetHostedService(
     {
         EventId eventId = new((int)RequestId.DatabaseReset, Enum.GetName(RequestId.DatabaseReset));
         Action<ILogger, Exception?> logStartExecution = LoggerMessage.Define(LogLevel.Information, eventId,
-            "Data Initialization Hosted Service running.");
+            "Data Reset Hosted Service running.");
         logStartExecution(Logger, null);
 
         using IServiceScope scope = _services.CreateScope();

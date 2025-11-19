@@ -7,6 +7,9 @@ echo 'Running unit tests...'
 dotnet husky run --name dotnet-test
 
 echo 'Generate unit tests report...'
-dotnet husky run --name reportgenerator-create
+dotnet husky run --name dotnet-reportgenerator-create
+
+echo 'Running npm unit tests & code coverage...'
+dotnet husky run --name npm-test
 
 echo 'Completed pre-push changes'
