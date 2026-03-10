@@ -21,4 +21,8 @@ public static class SettingsExtensions
     public static IdentitySettings GetIdentitySettings(this IConfiguration configuration)
         => configuration.GetSection(IdentitySettings.SectionKey)
                         .Get<IdentitySettings>()!;
+
+    public static RedisSettings GetRedisSettings(this IConfiguration configuration)
+        => configuration.GetSection(RedisSettings.SectionKey)
+                        .Get<RedisSettings>()!;
 }

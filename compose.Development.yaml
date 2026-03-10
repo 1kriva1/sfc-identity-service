@@ -9,10 +9,6 @@ x-app-secret-volume: &app_secret_volume
   type: bind
   source: ${USERPROFILE}/AppData/Roaming/Microsoft/UserSecrets
   target: /home/app/.microsoft/usersecrets
-x-entrypoint-volume: &entrypoint_volume
-  type: bind
-  source: ${PWD}/entrypoint.sh
-  target: /app/entrypoint.sh
 x-build-args: &build_args
   args:
     BUILD_CONFIGURATION: Debug
@@ -25,14 +21,11 @@ services:
     build:
       dockerfile: src/API/SFC.Identity.Api/Dockerfile.Development
       <<: *build_args
-    entrypoint: ["/bin/sh", "entrypoint.sh"]
-    command: ["src/API/SFC.Identity.Api/SFC.Identity.Api.csproj"]
     env_file:
       - environments/api/api.Development.env
     volumes:
       - *root_secret_volume
       - *app_secret_volume
-      - *entrypoint_volume
       - type: bind
         source: ${PWD}
         target: /app

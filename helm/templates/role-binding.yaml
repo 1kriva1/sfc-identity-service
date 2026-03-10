@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sfc-identity-role-binding
+  namespace: sfc
+  labels:
+    app.kubernetes.io/name: sfc-identity
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: sfc
+    app.kubernetes.io/instance: production
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    owner: "krivorukandrey@gmail.com"
+    purpose: "Role binding for Identity component in SFC application"
+subjects:
+  - kind: ServiceAccount
+    name: sfc-identity-service-account
+    namespace: sfc
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sfc-identity-role

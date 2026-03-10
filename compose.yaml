@@ -4,6 +4,14 @@ include:
 x-build-args: &build_args
   args:
     BUILD_CONFIGURATION: Release
+x-entrypoint-common-volume: &entrypoint_common_volume
+  type: bind
+  source: ${PWD}/entrypoint.Common.sh
+  target: /app/entrypoint.Common.sh
+x-entrypoint-volume: &entrypoint_volume
+  type: bind
+  source: ${PWD}/entrypoint.sh
+  target: /app/entrypoint.sh
 services:
   sfc-identity:
     extends:
@@ -13,6 +21,10 @@ services:
     build:
       dockerfile: src/API/SFC.Identity.Api/Dockerfile
       <<: *build_args
+    entrypoint: ["/bin/sh", "entrypoint.sh"]
+    command: ["SFC.Identity.Api"]
     env_file:
       - environments/api/api.Production.env
-  
+    volumes:
+      - *entrypoint_common_volume
+      - *entrypoint_volume  

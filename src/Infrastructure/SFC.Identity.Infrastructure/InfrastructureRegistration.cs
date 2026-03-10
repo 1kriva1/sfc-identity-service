@@ -24,6 +24,9 @@ public static class InfrastructureRegistration
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+        // redis
+        builder.Services.AddRedis(builder.Configuration);
+
         // identity
         builder.Services.AddIdentity(builder.Configuration);
 

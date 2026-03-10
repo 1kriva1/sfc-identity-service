@@ -22,6 +22,32 @@
         target: /usr/src/app
     networks:
       - sfc-network
+  sfc-redis:
+    container_name: sfc-redis
+    image: docker.io/redis:latest
+    env_file:
+      - environments/redis/redis.${ASPNETCORE_ENVIRONMENT}.env
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - type: volume
+        source: sfc-redis-volume
+        target: /data
+      - type: bind
+        source: ../../Configurations/redis/users.acl
+        target: /usr/local/etc/redis/users.acl
+      - type: bind
+        source: ../../Configurations/redis/redis.conf
+        target: /usr/local/etc/redis/redis.conf
+    networks:
+      - sfc-network
   sfc-rabbitmq:
     container_name: sfc-rabbitmq
     image: docker.io/rabbitmq:4-management
@@ -48,13 +74,11 @@
 volumes:
   sfc-mssql-volume:
     name: sfc-mssql-volume
-    external: true
+  sfc-redis-volume:
+    name: sfc-redis-volume
   sfc-rabbitmq-volume:
     name: sfc-redis-volume
-    external: true
 networks:
   sfc-network:
     name: sfc-network  
-    driver: bridge
-    external: true
-  
+    driver: bridge  

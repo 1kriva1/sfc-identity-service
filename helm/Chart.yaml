@@ -1,0 +1,23 @@
+apiVersion: v2
+name: sfc-identity
+description: "SFC Identity component in SFC application"
+keywords:
+  - Street Football Club
+  - Application
+  - Identity
+type: application
+version: 1.0.0
+appVersion: "0.0.0"
+dependencies:
+  - name: sfc-common
+    version: 1.0.0
+    repository: "file://../../../Bff/sfc-bff/helm/charts/common"
+  - name: sfc-redis
+    version: 1.0.0
+    repository: "file://../../../Bff/sfc-bff/helm/charts/redis"
+  - name: sfc-mssql
+    version: 1.0.0
+    repository: "file://../../../Bff/sfc-bff/helm/charts/mssql"
+  - name: sfc-rabbitmq
+    version: 1.0.0
+    repository: "file://../../../Bff/sfc-bff/helm/charts/rabbitmq"

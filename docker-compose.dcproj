@@ -25,8 +25,14 @@
     <None Include="compose.Development.yaml">
       <DependentUpon>compose.yaml</DependentUpon>
     </None>
-    <None Include="compose.Debug.yaml">
+    <None Include="compose.Watch.yaml">
       <DependentUpon>compose.yaml</DependentUpon>
+    </None>
+    <None Include="entrypoint.Common.sh">
+      <DependentUpon>entrypoint.sh</DependentUpon>
+    </None>
+    <None Include="entrypoint.Watch.sh">
+      <DependentUpon>entrypoint.sh</DependentUpon>
     </None>
     <None Include="compose.yaml" />
     <None Include="entrypoint.sh" />

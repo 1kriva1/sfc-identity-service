@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
-    identity_url: 'https://sfc-identity:7266',
-    client_url: 'https://sfc-bff:7166',
+    identity_url: 'https://sfc-identity',
+    client_url: 'https://sfc-bff:4200',
     cache_age_ms: 30000
 };

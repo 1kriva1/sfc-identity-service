@@ -1,0 +1,106 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sfc-identity-network-policy
+  namespace: sfc
+  labels:
+    app.kubernetes.io/name: sfc-identity
+    app.kubernetes.io/component: policy
+    app.kubernetes.io/part-of: sfc
+    app.kubernetes.io/instance: production
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    owner: "krivorukandrey@gmail.com"
+    purpose: "Network policy for Identity component in SFC application"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sfc-identity
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx          
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 7266
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: sfc        
+        podSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - sfc-data
+                - sfc-identity
+                - sfc-player
+                - sfc-team
+                - sfc-invite
+                - sfc-request
+                - sfc-scheme
+                - sfc-bff
+      ports:
+        - protocol: TCP
+          port: 7266
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: sfc        
+        podSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - sfc-bff
+      ports:
+        - protocol: TCP
+          port: 443
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: sfc
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sfc-redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: sfc
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sfc-mssql
+      ports:
+        - protocol: TCP
+          port: 1433
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: sfc
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sfc-rabbitmq
+      ports:
+        - protocol: TCP
+          port: 5672
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: sfc
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sfc-identity
+      ports:
+        - protocol: TCP
+          port: 7266
