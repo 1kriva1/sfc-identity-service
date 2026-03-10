@@ -1,6 +1,4 @@
-﻿using Duende.IdentityServer;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace SFC.Identity.Api.Infrastructure.Authentication;
 
@@ -13,9 +11,9 @@ public class AuthenticationJwtBearerEvents(ILogger<AuthenticationJwtBearerEvents
         Action<ILogger, Exception?> logRequest = LoggerMessage.Define(
                 LogLevel.Information,
                 new EventId(),
-                "AuthenticationFailed"
+                $"AuthenticationFailed: {context.Exception}"
         );
-        logRequest(_logger, null);
+        logRequest(_logger, context.Exception);
 
         return base.AuthenticationFailed(context);
     }

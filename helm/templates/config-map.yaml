@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sfc-identity-config-map
+  namespace: sfc  
+  labels:
+    app.kubernetes.io/name: sfc-identity
+    app.kubernetes.io/component: configuration
+    app.kubernetes.io/part-of: sfc
+    app.kubernetes.io/instance: production
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    owner: "krivorukandrey@gmail.com"
+    purpose: "Configuration map for Identity component in SFC application"
+immutable: true
+data:  
+  ASPNETCORE_ENVIRONMENT: "Production"

@@ -1,0 +1,41 @@
+﻿apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sfc-identity-ingress
+  namespace: sfc
+  labels:
+    app.kubernetes.io/name: sfc-identity
+    app.kubernetes.io/component: network
+    app.kubernetes.io/part-of: sfc
+    app.kubernetes.io/instance: production
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    owner: "krivorukandrey@gmail.com"
+    purpose: "Ingress for Identity component in SFC application"
+    # Client → Ingress redirect to HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Ingress → backend uses HTTPS
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    # Verify backend's cert using your Root CA
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+    nginx.ingress.kubernetes.io/proxy-ssl-secret: "sfc/sfc-identity-ingress-secret"
+    nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
+    # This must match a SAN on your backend cert (NOT the service DNS unless included)
+    nginx.ingress.kubernetes.io/proxy-ssl-name: "sfc-identity"    
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - sfc-identity
+      secretName: sfc-identity-ingress-tls-secret
+  rules:
+    - host: sfc-identity
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sfc-identity
+                port:
+                  number: 7266

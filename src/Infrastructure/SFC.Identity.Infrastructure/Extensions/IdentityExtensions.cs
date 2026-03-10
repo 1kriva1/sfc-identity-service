@@ -3,6 +3,7 @@ using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,18 +17,27 @@ using SFC.Identity.Infrastructure.Services.Identity;
 using SFC.Identity.Infrastructure.Settings;
 using SFC.Identity.Infrastructure.Validators;
 
+using StackExchange.Redis;
+
 using ApiResourceEntity = Duende.IdentityServer.EntityFramework.Entities.ApiResource;
 using ApiScopeEntity = Duende.IdentityServer.EntityFramework.Entities.ApiScope;
 using ClientEntity = Duende.IdentityServer.EntityFramework.Entities.Client;
 using IdentityConstants = SFC.Identity.Infrastructure.Constants.IdentityConstants;
 
 namespace SFC.Identity.Infrastructure.Extensions;
+
 public static class IdentityExtensions
 {
     public static void AddIdentity(this IServiceCollection services, IConfiguration configuration)
     {
         string connectionString = configuration.GetConnectionString("Database")!;
         string migrationsAssemblyName = typeof(IdentityDbContext).Assembly.FullName!;
+
+        RedisSettings settings = configuration.GetRedisSettings();
+
+        services.AddDataProtection()
+                .SetApplicationName(settings.InstanceName)
+                .PersistKeysToStackExchangeRedis(() => configuration.GetRedisDatabase(settings), IdentityConstants.DataProtectionKey);
 
         services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<IdentityDbContext>()
@@ -142,8 +152,7 @@ public static class IdentityExtensions
             {
                 ClientId = client.Id,
                 ClientName = client.Name,
-                ClientSecrets = client.Secrets.Select(secret => new Secret(secret.Sha256()))
-                                              .ToArray(),
+                ClientSecrets = [.. client.Secrets.Select(secret => new Duende.IdentityServer.Models.Secret(secret.Sha256()))],
                 // authorization code flow
                 AllowedGrantTypes = client.IsTokenExchange
                     ? [OidcConstants.GrantTypes.TokenExchange]

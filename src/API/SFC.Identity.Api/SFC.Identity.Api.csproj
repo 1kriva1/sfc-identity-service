@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DocumentationFile>SFC.Identity.Api.xml</DocumentationFile>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
-    <HUSKY>True</HUSKY>
+    <HUSKY>true</HUSKY>
     <UserSecretsId>b8ea6240-e2c2-4fee-88f8-1276a4c20748</UserSecretsId>
   </PropertyGroup>
 
@@ -49,17 +49,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="entrypoint.Common.sh">
-      <DependentUpon>entrypoint.sh</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="entrypoint.Development.sh">
       <DependentUpon>entrypoint.sh</DependentUpon>
     </None>
-    <None Include="entrypoint.sh" />
+    <None Include="entrypoint.sh" /> 
   </ItemGroup>
 
-  <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' == True">
+  <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' == 'true' AND '$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'">
     <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
     <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="..\..\.." />
   </Target>

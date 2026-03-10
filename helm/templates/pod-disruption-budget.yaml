@@ -1,0 +1,16 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sfc-identity-pod-disruption-budget
+  namespace: sfc
+  labels:
+    app.kubernetes.io/name: sfc-identity
+    app.kubernetes.io/component: policy
+    app.kubernetes.io/part-of: sfc
+    app.kubernetes.io/instance: production
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sfc-identity

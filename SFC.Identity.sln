@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33502.453
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2C704F95-810B-42CA-987B-C711BF6C3456}"
 EndProject
@@ -111,6 +111,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mssql", "mssql", "{BDC304C7
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{DED0B639-5A7D-4966-B6ED-DEC0C51FFE87}"
+	ProjectSection(SolutionItems) = preProject
+		environments\redis\redis.Development.env = environments\redis\redis.Development.env
+		environments\redis\redis.Production.env = environments\redis\redis.Production.env
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "helm", "helm", "{9FFD9126-B91A-4DCE-8344-8826F74D6CDB}"
+	ProjectSection(SolutionItems) = preProject
+		helm\.helmignore = helm\.helmignore
+		helm\Chart.yaml = helm\Chart.yaml
+		helm\values.yaml = helm\values.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{4677590A-0C6B-4912-B6D0-D87A3AAB14F5}"
+	ProjectSection(SolutionItems) = preProject
+		helm\templates\cluster-service.yaml = helm\templates\cluster-service.yaml
+		helm\templates\config-map.yaml = helm\templates\config-map.yaml
+		helm\templates\deployment.yaml = helm\templates\deployment.yaml
+		helm\templates\ingress-secret.yaml = helm\templates\ingress-secret.yaml
+		helm\templates\ingress-tls-secret.yaml = helm\templates\ingress-tls-secret.yaml
+		helm\templates\ingress.yaml = helm\templates\ingress.yaml
+		helm\templates\network-policy.yaml = helm\templates\network-policy.yaml
+		helm\templates\pod-disruption-budget.yaml = helm\templates\pod-disruption-budget.yaml
+		helm\templates\role-binding.yaml = helm\templates\role-binding.yaml
+		helm\templates\role.yaml = helm\templates\role.yaml
+		helm\templates\secret.yaml = helm\templates\secret.yaml
+		helm\templates\service-account.yaml = helm\templates\service-account.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -209,6 +238,9 @@ Global
 		{39700292-923F-4E50-B257-F8DBEDF45550} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{138ADA50-5EA6-4EDE-B940-FCE87639DB46} = {4328AA1E-3BA9-493A-A2E4-D0A883767F4E}
 		{BDC304C7-54BF-43D0-A33B-45EC6F408ED7} = {138ADA50-5EA6-4EDE-B940-FCE87639DB46}
+		{DED0B639-5A7D-4966-B6ED-DEC0C51FFE87} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9FFD9126-B91A-4DCE-8344-8826F74D6CDB} = {4328AA1E-3BA9-493A-A2E4-D0A883767F4E}
+		{4677590A-0C6B-4912-B6D0-D87A3AAB14F5} = {9FFD9126-B91A-4DCE-8344-8826F74D6CDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DADF67B-0150-48FA-B103-9460262A7AA4}

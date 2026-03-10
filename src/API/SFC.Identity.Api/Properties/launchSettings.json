@@ -9,7 +9,8 @@
         "ASPNETCORE_URLS": "https://+:7266;http://+:7265",
         "ASPNETCORE_HTTPS_PORT": "7266",
         "ConnectionStrings__Database": "Server=127.0.0.1,1433;Database=Identity;User Id=sfc;Password=Test1234!;TrustServerCertificate=True;",
-        "ConnectionStrings__RabbitMq": "rabbitmq://localhost:5672"
+        "ConnectionStrings__RabbitMq": "rabbitmq://localhost:5672",
+        "ConnectionStrings__Redis": "localhost:6379"
       },
       "dotnetRunMessages": true,
       "externalUrlConfiguration": true,

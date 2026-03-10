@@ -7,7 +7,7 @@ WORKDIR /app
 #restore & build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-ENV HUSKY=False
+ENV HUSKY=false
 WORKDIR /source
 COPY ["Directory.Build.props", "."]
 COPY ["nuget.config", "."]
