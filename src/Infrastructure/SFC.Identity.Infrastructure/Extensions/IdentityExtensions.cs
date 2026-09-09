@@ -4,10 +4,12 @@ using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using SFC.Identity.Infrastructure.Configuration;
 using SFC.Identity.Infrastructure.Persistence.Constants;
@@ -16,8 +18,6 @@ using SFC.Identity.Infrastructure.Persistence.Entities;
 using SFC.Identity.Infrastructure.Services.Identity;
 using SFC.Identity.Infrastructure.Settings;
 using SFC.Identity.Infrastructure.Validators;
-
-using StackExchange.Redis;
 
 using ApiResourceEntity = Duende.IdentityServer.EntityFramework.Entities.ApiResource;
 using ApiScopeEntity = Duende.IdentityServer.EntityFramework.Entities.ApiScope;
@@ -28,10 +28,11 @@ namespace SFC.Identity.Infrastructure.Extensions;
 
 public static class IdentityExtensions
 {
-    public static void AddIdentity(this IServiceCollection services, IConfiguration configuration)
+    public static void AddIdentity(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
         string connectionString = configuration.GetConnectionString("Database")!;
         string migrationsAssemblyName = typeof(IdentityDbContext).Assembly.FullName!;
+        bool isDevelopment = environment.IsDevelopment();
 
         RedisSettings settings = configuration.GetRedisSettings();
 
@@ -87,16 +88,22 @@ public static class IdentityExtensions
         .AddConfigurationStore(options =>
         {
             options.ConfigureDbContext = builder =>
-                builder.UseSqlServer(connectionString,
-                    sql => sql.MigrationsAssembly(migrationsAssemblyName));
+                builder
+                .UseSqlServer(connectionString,
+                    sql => sql.MigrationsAssembly(migrationsAssemblyName))
+                .EnableDetailedErrors(isDevelopment)
+                .EnableSensitiveDataLogging(isDevelopment);
             options.DefaultSchema = DatabaseConstants.DefaultSchemaName;
         })
         // this adds the operational data from DB (codes, tokens, consents)
         .AddOperationalStore(options =>
         {
             options.ConfigureDbContext = builder =>
-                builder.UseSqlServer(connectionString,
-                    sql => sql.MigrationsAssembly(migrationsAssemblyName));
+                builder
+                .UseSqlServer(connectionString,
+                    sql => sql.MigrationsAssembly(migrationsAssemblyName))
+                .EnableDetailedErrors(isDevelopment)
+                .EnableSensitiveDataLogging(isDevelopment); ;
             options.DefaultSchema = DatabaseConstants.DefaultSchemaName;
 
             // this enables automatic token cleanup. this is optional.
@@ -112,16 +119,14 @@ public static class IdentityExtensions
 
     public static async Task EnsureIdentityConfigurationExistAsync(this ConfigurationDbContext context, IdentitySettings settings, CancellationToken cancellationToken)
     {
-        List<Task> tasks = [];
-
         // what was returned as a claims in token
-        if (!context.IdentityResources.Any())
+        if (!await context.IdentityResources.AnyAsync(cancellationToken).ConfigureAwait(true))
         {
-            tasks.Add(context.IdentityResources.AddRangeAsync(IdentityConfiguration.IdentityResources.Select(resource => resource.ToEntity()), cancellationToken));
+            context.IdentityResources.AddRange(IdentityConfiguration.IdentityResources.Select(resource => resource.ToEntity()));
         }
 
         // the list of APIs (like resource)
-        if (settings.Api.Resources.Count != 0 && !context.ApiResources.Any())
+        if (settings.Api.Resources.Count != 0 && !await context.ApiResources.AnyAsync(cancellationToken).ConfigureAwait(true))
         {
             IEnumerable<ApiResourceEntity> resources = settings.Api.Resources.Select(resource => new ApiResource
             {
@@ -131,11 +136,11 @@ public static class IdentityExtensions
                 UserClaims = resource.UserClaims
             }.ToEntity());
 
-            tasks.Add(context.ApiResources.AddRangeAsync(resources, cancellationToken));
+            context.ApiResources.AddRange(resources);
         }
 
         // more granually autherization (read or write scope or full scope(read and write) or other permissions)
-        if (settings.Api.Scopes.Count != 0 && !context.ApiScopes.Any())
+        if (settings.Api.Scopes.Count != 0 && !await context.ApiScopes.AnyAsync(cancellationToken).ConfigureAwait(true))
         {
             IEnumerable<ApiScopeEntity> scopes = settings.Api.Scopes.Select(scope => new ApiScope
             {
@@ -143,16 +148,17 @@ public static class IdentityExtensions
                 DisplayName = scope.DisplayName
             }.ToEntity());
 
-            tasks.Add(context.ApiScopes.AddRangeAsync(scopes, cancellationToken));
+            context.ApiScopes.AddRange(scopes);
         }
 
-        if (settings.Clients.Count != 0 && !context.Clients.Any())
+        if (settings.Clients.Count != 0 && !await context.Clients.AnyAsync(cancellationToken).ConfigureAwait(true))
         {
             IEnumerable<ClientEntity> clients = settings.Clients.Select(client => new Client
             {
                 ClientId = client.Id,
                 ClientName = client.Name,
-                ClientSecrets = [.. client.Secrets.Select(secret => new Duende.IdentityServer.Models.Secret(secret.Sha256()))],
+                ClientSecrets = client.Secrets.Select(secret => new Duende.IdentityServer.Models.Secret(secret.Sha256()))
+                                              .ToArray(),
                 // authorization code flow
                 AllowedGrantTypes = client.IsTokenExchange
                     ? [OidcConstants.GrantTypes.TokenExchange]
@@ -170,14 +176,9 @@ public static class IdentityExtensions
                 SlidingRefreshTokenLifetime = client.SlidingRefreshTokenLifetime ?? IdentityConstants.DefaultSlidingRefreshTokenLifetime,
             }.ToEntity());
 
-            tasks.Add(context.Clients.AddRangeAsync(clients, cancellationToken));
+            context.Clients.AddRange(clients);
         }
 
-        if (tasks.Count != 0)
-        {
-            await Task.WhenAll(tasks).ConfigureAwait(true);
-
-            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(true);
-        }
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(true);
     }
 }

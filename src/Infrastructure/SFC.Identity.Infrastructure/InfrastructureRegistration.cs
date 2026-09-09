@@ -22,13 +22,13 @@ public static class InfrastructureRegistration
     {
         builder.Services.AddHttpContextAccessor();
 
-        builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        builder.Services.AddAutoMapper(config => { }, Assembly.GetExecutingAssembly());
 
         // redis
         builder.Services.AddRedis(builder.Configuration);
 
         // identity
-        builder.Services.AddIdentity(builder.Configuration);
+        builder.Services.AddIdentity(builder.Configuration, builder.Environment);
 
         // rabbitmq
         builder.AddMassTransit();

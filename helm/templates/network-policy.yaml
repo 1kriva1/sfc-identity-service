@@ -46,6 +46,7 @@ spec:
                 - sfc-invite
                 - sfc-request
                 - sfc-scheme
+                - sfc-game
                 - sfc-bff
       ports:
         - protocol: TCP
