@@ -10,7 +10,9 @@
         "ASPNETCORE_HTTPS_PORT": "7266",
         "ConnectionStrings__Database": "Server=127.0.0.1,1433;Database=Identity;User Id=sfc;Password=Test1234!;TrustServerCertificate=True;",
         "ConnectionStrings__RabbitMq": "rabbitmq://localhost:5672",
-        "ConnectionStrings__Redis": "localhost:6379"
+        "ConnectionStrings__Redis": "localhost:6379",
+        "Kestrel__Certificates__Default__Path": "C:/SFC/Configurations/certificates/sfc-identity/sfc-identity.pfx",
+        "Kestrel__Certificates__Default__Password": "Test1234!"
       },
       "dotnetRunMessages": true,
       "externalUrlConfiguration": true,
@@ -30,7 +32,7 @@
         "ASPNETCORE_URLS": "https://+:7266;http://+:7265",
         "ASPNETCORE_HTTPS_PORT": "7266"
       },
-      "DockerfileRunArguments": "--network sfc-network",
+      "DockerfileRunArguments": "--network sfc-network --volume C:/SFC/Configurations/certificates/sfc-identity/sfc-identity.pfx:/https/sfc-identity.pfx",
       "httpPort": 7265,
       "useSSL": true,
       "sslPort": 7266,
