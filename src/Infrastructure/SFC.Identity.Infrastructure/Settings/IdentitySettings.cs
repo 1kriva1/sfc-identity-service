@@ -53,7 +53,7 @@ public class ClientSetting
 
     public string Name { get; set; } = default!;
 
-    public bool IsTokenExchange { get; set; }
+    public ICollection<string> AllowedGrantTypes { get; init; } = [];
 
     public ICollection<string> Secrets { get; init; } = [];
 

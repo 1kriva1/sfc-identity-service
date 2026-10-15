@@ -157,12 +157,9 @@ public static class IdentityExtensions
             {
                 ClientId = client.Id,
                 ClientName = client.Name,
-                ClientSecrets = client.Secrets.Select(secret => new Duende.IdentityServer.Models.Secret(secret.Sha256()))
-                                              .ToArray(),
+                ClientSecrets = [.. client.Secrets.Select(secret => new Duende.IdentityServer.Models.Secret(secret.Sha256()))],
                 // authorization code flow
-                AllowedGrantTypes = client.IsTokenExchange
-                    ? [OidcConstants.GrantTypes.TokenExchange]
-                    : GrantTypes.Code,
+                AllowedGrantTypes = client.AllowedGrantTypes,
                 AllowOfflineAccess = client.AllowOfflineAccess,
                 RedirectUris = client.RedirectUris,
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris,
